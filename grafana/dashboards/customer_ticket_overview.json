@@ -6,71 +6,151 @@
   "schemaVersion": 37,
   "version": 1,
   "refresh": "5m",
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
   "panels": [
     {
+      "id": 1,
       "type": "stat",
       "title": "Total Customers",
-      "datasource": "Supabase",
+      "datasource": {
+        "type": "postgres",
+        "uid": "supabase"
+      },
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) FROM customers;",
+          "rawSql": "SELECT COUNT(*) as value FROM customers;",
           "refId": "A"
         }
       ],
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 }
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "displayMode": "auto"
+          }
+        }
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 }
     },
     {
+      "id": 2,
       "type": "stat",
       "title": "Total Tickets",
-      "datasource": "Supabase",
+      "datasource": {
+        "type": "postgres",
+        "uid": "supabase"
+      },
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) FROM tickets;",
+          "rawSql": "SELECT COUNT(*) as value FROM tickets;",
           "refId": "B"
         }
       ],
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "displayMode": "auto"
+          }
+        }
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 }
     },
     {
+      "id": 3,
       "type": "stat",
       "title": "Open Tickets",
-      "datasource": "Supabase",
+      "datasource": {
+        "type": "postgres",
+        "uid": "supabase"
+      },
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) FROM tickets WHERE status = 'open';",
+          "rawSql": "SELECT COUNT(*) as value FROM tickets WHERE status = 'open';",
           "refId": "C"
         }
       ],
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 }
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "displayMode": "auto"
+          }
+        }
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 }
     },
     {
+      "id": 4,
       "type": "barchart",
       "title": "Tickets by Status",
-      "datasource": "Supabase",
+      "datasource": {
+        "type": "postgres",
+        "uid": "supabase"
+      },
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT status, COUNT(*) FROM tickets GROUP BY status;",
+          "rawSql": "SELECT status, COUNT(*) as count FROM tickets GROUP BY status ORDER BY count DESC;",
           "refId": "D"
         }
       ],
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 4 }
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
     },
     {
+      "id": 5,
       "type": "timeseries",
       "title": "Tickets Created Over Time",
-      "datasource": "Supabase",
+      "datasource": {
+        "type": "postgres",
+        "uid": "supabase"
+      },
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT created_at AS time, COUNT(*) FROM tickets GROUP BY time ORDER BY time;",
+          "rawSql": "SELECT created_at AS time, COUNT(*) as value FROM tickets GROUP BY DATE_TRUNC('day', created_at) ORDER BY time;",
           "refId": "E"
         }
       ],
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 4 }
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
     }
   ]
 } 
