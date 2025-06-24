@@ -3,7 +3,7 @@ FROM grafana/grafana:10.4.2
 USER root
 
 # Install additional tools and create directories
-RUN apk add --no-cache curl wget jq \
+RUN apk add --no-cache curl wget jq python3 py3-pip \
     && mkdir -p /var/lib/grafana/dashboards \
         /etc/grafana/provisioning/dashboards \
         /etc/grafana/provisioning/datasources
@@ -12,10 +12,12 @@ RUN apk add --no-cache curl wget jq \
 COPY grafana/grafana.ini /etc/grafana/grafana.ini
 COPY grafana/provisioning/ /etc/grafana/provisioning/
 COPY grafana/dashboards/ /var/lib/grafana/dashboards/
+COPY healthz.py /healthz.py
 COPY scripts/start.sh /usr/local/bin/start.sh
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Set permissions after files are in place
-RUN chmod +x /usr/local/bin/start.sh \
+RUN chmod +x /usr/local/bin/start.sh /usr/local/bin/entrypoint.sh \
     && chown -R grafana:root /var/lib/grafana \
     && chown -R grafana:root /etc/grafana
 
@@ -48,4 +50,4 @@ ENV GF_LOG_LEVEL=${GRAFANA_LOG_LEVEL:-info}
 ENV GF_SERVER_HTTP_ADDR=0.0.0.0
 
 # Use the startup script as the main command
-CMD ["/usr/local/bin/start.sh"] 
+CMD ["/usr/local/bin/entrypoint.sh"] 
