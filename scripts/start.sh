@@ -5,6 +5,12 @@ set -e
 
 echo "🚀 Starting Grafana..."
 
+# If Railway injected $PORT, use it for Grafana
+if [ -n "$PORT" ]; then
+    export GF_SERVER_HTTP_PORT="$PORT"
+    echo "   Using Railway PORT: $PORT"
+fi
+
 # Set Railway-specific environment variables if not already set
 if [ -n "$RAILWAY_PUBLIC_DOMAIN" ]; then
     export GF_SERVER_ROOT_URL="https://$RAILWAY_PUBLIC_DOMAIN"
