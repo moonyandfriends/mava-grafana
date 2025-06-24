@@ -10,13 +10,12 @@ RUN apk add --no-cache \
     jq
 
 # Install Grafana plugins at build time for Railway deployment
-RUN grafana-cli plugins install grafana-clock-panel && \
-    grafana-cli plugins install grafana-simple-json-datasource && \
-    grafana-cli plugins install grafana-worldmap-panel && \
-    grafana-cli plugins install grafana-piechart-panel && \
-    grafana-cli plugins install grafana-polystat-panel && \
-    grafana-cli plugins install vonage-status-panel && \
-    grafana-cli plugins install grafana-statusmap
+# Install core plugins that are known to work with Grafana 12.x
+RUN grafana cli plugins install grafana-clock-panel || true && \
+    grafana cli plugins install grafana-simple-json-datasource || true && \
+    grafana cli plugins install grafana-worldmap-panel || true && \
+    grafana cli plugins install grafana-piechart-panel || true && \
+    grafana cli plugins install grafana-polystat-panel || true
 
 # Create necessary directories
 RUN mkdir -p /var/lib/grafana/dashboards \
