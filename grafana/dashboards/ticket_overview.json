@@ -5,7 +5,7 @@
   "tags": ["tickets", "overview"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 1,
+  "version": 2,
   "refresh": "5m",
   "time": {
     "from": "now-30d",
@@ -17,6 +17,7 @@
       "type": "stat",
       "title": "Total Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -28,8 +29,9 @@
     {
       "id": 2,
       "type": "barchart",
-      "title": "Tickets by Status",
+      "title": "By Status",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
       "targets": [
         {
           "format": "table",
@@ -41,8 +43,9 @@
     {
       "id": 3,
       "type": "timeseries",
-      "title": "Tickets Created Over Time",
+      "title": "Created Over Time",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
       "targets": [
         {
           "format": "time_series",
@@ -54,8 +57,9 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "Average Ticket Resolution Time (hrs)",
+      "title": "Avg. Resolution Time (hrs)",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 14},
       "targets": [
         {
           "format": "table",
@@ -67,8 +71,9 @@
     {
       "id": 5,
       "type": "piechart",
-      "title": "Tickets by Priority",
+      "title": "By Priority",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
       "targets": [
         {
           "format": "table",
@@ -80,8 +85,9 @@
     {
       "id": 6,
       "type": "piechart",
-      "title": "Tickets by Category",
+      "title": "By Category",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
       "targets": [
         {
           "format": "table",
@@ -93,8 +99,9 @@
     {
       "id": 7,
       "type": "barchart",
-      "title": "Open vs. Closed Tickets",
+      "title": "Open vs. Closed",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 28},
       "targets": [
         {
           "format": "table",

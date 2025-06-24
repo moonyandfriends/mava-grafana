@@ -5,7 +5,7 @@
   "tags": ["agent", "performance"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 1,
+  "version": 2,
   "refresh": "5m",
   "time": {
     "from": "now-30d",
@@ -15,8 +15,9 @@
     {
       "id": 1,
       "type": "barchart",
-      "title": "Tickets Assigned per Agent",
+      "title": "Assigned per Agent",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -28,8 +29,9 @@
     {
       "id": 2,
       "type": "barchart",
-      "title": "Tickets Resolved per Agent",
+      "title": "Resolved per Agent",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -41,8 +43,9 @@
     {
       "id": 3,
       "type": "barchart",
-      "title": "Open Tickets per Agent",
+      "title": "Open per Agent",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
       "targets": [
         {
           "format": "table",
@@ -54,8 +57,9 @@
     {
       "id": 4,
       "type": "barchart",
-      "title": "Average Resolution Time per Agent (hrs)",
+      "title": "Avg. Resolution Time (hrs)",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
       "targets": [
         {
           "format": "table",
@@ -67,8 +71,9 @@
     {
       "id": 5,
       "type": "timeseries",
-      "title": "Agent Workload Over Time (Tickets Assigned)",
+      "title": "Workload Over Time",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 16},
       "targets": [
         {
           "format": "time_series",
@@ -80,8 +85,9 @@
     {
       "id": 6,
       "type": "barchart",
-      "title": "Agent Response Time (mins)",
+      "title": "Response Time (mins)",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 26},
       "targets": [
         {
           "format": "table",

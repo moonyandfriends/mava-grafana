@@ -5,7 +5,7 @@
   "tags": ["customer", "engagement"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 1,
+  "version": 2,
   "refresh": "5m",
   "time": {
     "from": "now-30d",
@@ -13,23 +13,11 @@
   },
   "panels": [
     {
-      "id": 1,
-      "type": "timeseries",
-      "title": "New Customers Over Time",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "targets": [
-        {
-          "format": "time_series",
-          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS count FROM customers WHERE created_at >= now() - interval '30 days' GROUP BY time ORDER BY time;",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "id": 2,
       "type": "stat",
-      "title": "Active Customers (Last 30 Days)",
+      "title": "Active Customers",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 12, "x": 0, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -39,10 +27,39 @@
       ]
     },
     {
+      "id": 5,
+      "type": "stat",
+      "title": "With Wallet Address",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 12, "x": 12, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS with_wallet FROM customers WHERE wallet_address IS NOT NULL AND wallet_address <> '' AND created_at >= now() - interval '30 days';",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "New Customers Over Time",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 6},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS count FROM customers WHERE created_at >= now() - interval '30 days' GROUP BY time ORDER BY time;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
       "id": 3,
       "type": "barchart",
-      "title": "Customers by Client",
+      "title": "By Client",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 14},
       "targets": [
         {
           "format": "table",
@@ -56,6 +73,7 @@
       "type": "barchart",
       "title": "Tickets per Customer (Top 10)",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 14},
       "targets": [
         {
           "format": "table",
@@ -65,23 +83,11 @@
       ]
     },
     {
-      "id": 5,
-      "type": "stat",
-      "title": "Customers with Wallet Address",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT COUNT(*) AS with_wallet FROM customers WHERE wallet_address IS NOT NULL AND wallet_address <> '' AND created_at >= now() - interval '30 days';",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "id": 6,
       "type": "barchart",
-      "title": "Customer Satisfaction (Avg. Rating, Top 10)",
+      "title": "Customer Satisfaction (Top 10)",
       "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 22},
       "targets": [
         {
           "format": "table",
