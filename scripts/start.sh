@@ -115,7 +115,7 @@ echo ""
 
 # Start the services
 echo -e "${YELLOW}Starting services...${NC}"
-$COMPOSE_CMD $COMPOSE_ARGS up --build
+$COMPOSE_CMD "$COMPOSE_ARGS" up --build
 
 # If not detached, show completion message
 if [[ "$DETACHED" == false ]]; then
