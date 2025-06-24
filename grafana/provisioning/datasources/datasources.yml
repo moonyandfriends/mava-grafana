@@ -1,0 +1,145 @@
+apiVersion: 1
+
+# Configuration for provisioning data sources
+# https://grafana.com/docs/grafana/latest/administration/provisioning/#data-sources
+
+datasources:
+  # Supabase PostgreSQL data source (Primary)
+  - name: Supabase
+    type: postgres
+    uid: supabase-uid
+    url: ${SUPABASE_URL}
+    database: postgres
+    user: postgres
+    isDefault: true
+    jsonData:
+      sslmode: require
+      maxOpenConns: 100
+      maxIdleConns: 100
+      maxIdleConnsAuto: true
+      connMaxLifetime: 14400
+      postgresVersion: 1300
+      timescaledb: false
+    secureJsonData:
+      password: ${SUPABASE_SERVICE_KEY}
+    version: 1
+    editable: true
+
+  # Prometheus data source (Optional)
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus-uid
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: false
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.40.0
+      cacheLevel: 'High'
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: 10m
+    secureJsonData: {}
+    version: 1
+    editable: true
+
+  # Sample JSON API data source for demo purposes
+  - name: Sample JSON API
+    type: grafana-simple-json-datasource
+    uid: json-api-uid
+    access: proxy
+    url: https://jsonplaceholder.typicode.com
+    isDefault: false
+    jsonData:
+      timeout: 60
+      keepCookies: []
+    secureJsonData: {}
+    version: 1
+    editable: true
+
+  # TestData DB for demo dashboards
+  - name: TestData DB
+    type: testdata
+    uid: testdata-uid
+    access: proxy
+    isDefault: false
+    jsonData: {}
+    secureJsonData: {}
+    version: 1
+    editable: true
+
+  # Sample InfluxDB configuration (commented out by default)
+  # - name: InfluxDB
+  #   type: influxdb
+  #   uid: influxdb-uid
+  #   access: proxy
+  #   url: http://influxdb:8086
+  #   database: telegraf
+  #   user: telegraf
+  #   isDefault: false
+  #   jsonData:
+  #     httpMode: GET
+  #     keepCookies: []
+  #   secureJsonData:
+  #     password: telegraf_password
+  #   version: 1
+  #   editable: true
+
+  # Sample MySQL configuration (commented out by default)
+  # - name: MySQL
+  #   type: mysql
+  #   uid: mysql-uid
+  #   url: mysql-server:3306
+  #   database: grafana_demo
+  #   user: grafana_user
+  #   isDefault: false
+  #   jsonData:
+  #     maxOpenConns: 100
+  #     maxIdleConns: 100
+  #     maxIdleConnsAuto: true
+  #     connMaxLifetime: 14400
+  #     timezone: UTC
+  #   secureJsonData:
+  #     password: grafana_password
+  #   version: 1
+  #   editable: true
+
+  # Sample PostgreSQL configuration (commented out by default)
+  # - name: PostgreSQL
+  #   type: postgres
+  #   uid: postgres-uid
+  #   url: postgres-server:5432
+  #   database: grafana_demo
+  #   user: grafana_user
+  #   isDefault: false
+  #   jsonData:
+  #     sslmode: disable
+  #     maxOpenConns: 100
+  #     maxIdleConns: 100
+  #     maxIdleConnsAuto: true
+  #     connMaxLifetime: 14400
+  #     postgresVersion: 1300
+  #     timescaledb: false
+  #   secureJsonData:
+  #     password: grafana_password
+  #   version: 1
+  #   editable: true
+
+  # Sample Elasticsearch configuration (commented out by default)
+  # - name: Elasticsearch
+  #   type: elasticsearch
+  #   uid: elasticsearch-uid
+  #   access: proxy
+  #   url: http://elasticsearch:9200
+  #   database: logstash-*
+  #   isDefault: false
+  #   jsonData:
+  #     esVersion: "7.10.0"
+  #     includeFrozen: false
+  #     logMessageField: message
+  #     logLevelField: level
+  #     maxConcurrentShardRequests: 5
+  #     timeField: "@timestamp"
+  #   version: 1
+  #   editable: true 
