@@ -31,8 +31,8 @@ COPY grafana/dashboards/ /var/lib/grafana/dashboards/
 RUN id grafana || (echo 'User grafana does not exist!' && cat /etc/passwd && exit 1)
 
 # Ensure proper ownership
-RUN chown -R grafana:grafana /var/lib/grafana && \
-    chown -R grafana:grafana /etc/grafana
+RUN chown -R grafana:root /var/lib/grafana && \
+    chown -R grafana:root /etc/grafana
 
 # Switch back to grafana user
 USER grafana
