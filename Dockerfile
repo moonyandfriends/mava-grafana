@@ -3,12 +3,11 @@ FROM grafana/grafana:latest
 # Switch user to root for installation
 USER root
 
-# Install additional tools and plugins
-RUN apt-get update && apt-get install -y \
+# Install additional tools and plugins (Alpine Linux uses apk)
+RUN apk add --no-cache \
     curl \
     wget \
-    jq \
-    && rm -rf /var/lib/apt/lists/*
+    jq
 
 # Install Grafana plugins at build time for Railway deployment
 RUN grafana-cli plugins install grafana-clock-panel && \
