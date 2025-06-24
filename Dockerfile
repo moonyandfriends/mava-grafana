@@ -3,26 +3,20 @@ FROM grafana/grafana:10.4.2
 # Switch user to root for installation
 USER root
 
-# Install additional tools
-RUN apk add --no-cache curl wget jq
-
-# Create necessary directories
-RUN mkdir -p /var/lib/grafana/dashboards \
-    /etc/grafana/provisioning/dashboards \
-    /etc/grafana/provisioning/datasources
+# Install additional tools, create directories, set permissions, and make script executable in one RUN
+RUN apk add --no-cache curl wget jq \
+    && mkdir -p /var/lib/grafana/dashboards \
+        /etc/grafana/provisioning/dashboards \
+        /etc/grafana/provisioning/datasources \
+    && chmod +x /usr/local/bin/start.sh \
+    && chown -R grafana:root /var/lib/grafana \
+    && chown -R grafana:root /etc/grafana
 
 # Copy custom configuration files
 COPY grafana/grafana.ini /etc/grafana/grafana.ini
 COPY grafana/provisioning/ /etc/grafana/provisioning/
 COPY grafana/dashboards/ /var/lib/grafana/dashboards/
 COPY scripts/start.sh /usr/local/bin/start.sh
-
-# Make startup script executable
-RUN chmod +x /usr/local/bin/start.sh
-
-# Ensure proper ownership
-RUN chown -R grafana:root /var/lib/grafana && \
-    chown -R grafana:root /etc/grafana
 
 # Switch back to grafana user
 USER grafana
