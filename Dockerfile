@@ -29,6 +29,9 @@ COPY grafana/grafana.ini /etc/grafana/grafana.ini
 COPY grafana/provisioning/ /etc/grafana/provisioning/
 COPY grafana/dashboards/ /var/lib/grafana/dashboards/
 
+# Debug: Ensure grafana user exists before chown
+RUN id grafana || (echo 'User grafana does not exist!' && cat /etc/passwd && exit 1)
+
 # Ensure proper ownership
 RUN chown -R grafana:grafana /var/lib/grafana && \
     chown -R grafana:grafana /etc/grafana
