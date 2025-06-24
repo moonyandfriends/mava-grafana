@@ -1,0 +1,76 @@
+{
+  "id": null,
+  "title": "Customer & Ticket Overview",
+  "tags": ["mava", "overview"],
+  "timezone": "browser",
+  "schemaVersion": 37,
+  "version": 1,
+  "refresh": "5m",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Total Customers",
+      "datasource": "Supabase",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) FROM customers;",
+          "refId": "A"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "Total Tickets",
+      "datasource": "Supabase",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) FROM tickets;",
+          "refId": "B"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "Open Tickets",
+      "datasource": "Supabase",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) FROM tickets WHERE status = 'open';",
+          "refId": "C"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 }
+    },
+    {
+      "type": "barchart",
+      "title": "Tickets by Status",
+      "datasource": "Supabase",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT status, COUNT(*) FROM tickets GROUP BY status;",
+          "refId": "D"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 4 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Tickets Created Over Time",
+      "datasource": "Supabase",
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT created_at AS time, COUNT(*) FROM tickets GROUP BY time ORDER BY time;",
+          "refId": "E"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 4 }
+    }
+  ]
+} 
