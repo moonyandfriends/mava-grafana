@@ -112,6 +112,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install Docker Compose plugin
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose-plugin
+
       - name: Create test environment file
         run: |
           cp env.example .env
@@ -122,7 +127,7 @@ jobs:
       - name: Test Docker Compose (Grafana only)
         run: |
           echo "🧪 Testing Docker Compose setup..."
-          docker-compose up -d grafana
+          docker compose up -d grafana
           
           # Wait for services to start
           echo "⏳ Waiting for services to start..."
@@ -133,17 +138,17 @@ jobs:
             echo "✅ Grafana is running"
           else
             echo "❌ Grafana failed to start"
-            docker-compose logs grafana
+            docker compose logs grafana
             exit 1
           fi
           
           # Cleanup
-          docker-compose down -v
+          docker compose down -v
 
       - name: Test Docker Compose (with Prometheus)
         run: |
           echo "🧪 Testing Docker Compose with Prometheus..."
-          docker-compose --profile with-prometheus up -d
+          docker compose --profile with-prometheus up -d
           
           # Wait for services to start
           echo "⏳ Waiting for services to start..."
@@ -154,12 +159,12 @@ jobs:
             echo "✅ Both Grafana and Prometheus are running"
           else
             echo "❌ Services failed to start"
-            docker-compose logs
+            docker compose logs
             exit 1
           fi
           
           # Cleanup
-          docker-compose down -v
+          docker compose down -v
 
   lint-and-format:
     name: Lint and Format Check
@@ -168,23 +173,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install linting tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          sudo wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+          sudo chmod +x /usr/local/bin/hadolint
+
       - name: Check shell scripts
         run: |
           echo "🔍 Checking shell scripts..."
-          if command -v shellcheck >/dev/null 2>&1; then
-            find . -name "*.sh" -type f -exec shellcheck {} +
-          else
-            echo "⚠️ shellcheck not available, skipping shell script linting"
-          fi
+          find . -name "*.sh" -type f -exec shellcheck {} +
 
       - name: Check Dockerfile
         run: |
           echo "🔍 Checking Dockerfile..."
-          if command -v hadolint >/dev/null 2>&1; then
-            hadolint Dockerfile
-          else
-            echo "⚠️ hadolint not available, skipping Dockerfile linting"
-          fi
+          hadolint Dockerfile
 
       - name: Check file permissions
         run: |
@@ -208,7 +212,7 @@ jobs:
           output: 'trivy-results.sarif'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
 
