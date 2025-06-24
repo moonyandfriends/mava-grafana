@@ -4,7 +4,7 @@ datasources:
   - name: Supabase
     type: postgres
     access: proxy
-    url: "${SUPABASE_HOST}"
+    url: ${SUPABASE_HOST}
     database: ${SUPABASE_DB}
     user: ${SUPABASE_USER}
     secureJsonData:
