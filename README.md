@@ -1,5 +1,9 @@
 # 📊 Mava Grafana - Railway Template
 
+[![CI/CD Pipeline](https://github.com/moonyandfriends/mava-grafana/actions/workflows/ci.yml/badge.svg)](https://github.com/moonyandfriends/mava-grafana/actions/workflows/ci.yml)
+[![Docker Build](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com)
+[![Railway Deploy](https://img.shields.io/badge/deploy-railway-green.svg)](https://railway.app)
+
 A production-ready Grafana template optimized for Railway deployment with prebuilt dashboards for support ticket analytics using Supabase (PostgreSQL).
 
 ## 🚀 Features
