@@ -6,4 +6,7 @@ EXPOSE 3000
 # Ensure Grafana listens on all interfaces (important for Railway)
 ENV GF_SERVER_HTTP_ADDR=0.0.0.0
 
-# Start Grafana (default entrypoint) 
+# Start Grafana (default entrypoint)
+
+# Copy provisioning files
+COPY grafana/provisioning/datasources/ /etc/grafana/provisioning/datasources/ 
