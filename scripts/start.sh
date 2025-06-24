@@ -1,37 +1,19 @@
-#!/bin/sh
+#!/bin/bash
 
-# Debug: Print environment variables (without sensitive data)
-echo "🚀 Starting Grafana with configuration:"
-echo "   PORT: ${PORT:-not-set}"
-echo "   GF_SERVER_HTTP_PORT: ${GF_SERVER_HTTP_PORT:-3000}"
-echo "   GRAFANA_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}"
-echo "   RAILWAY_PUBLIC_DOMAIN: ${RAILWAY_PUBLIC_DOMAIN:-not-set}"
+# Exit on any error
+set -e
 
-# If Railway injected $PORT, use it
-if [ -n "$PORT" ]; then
-    export GF_SERVER_HTTP_PORT="$PORT"
-    echo "   Using Railway PORT: $PORT"
-else
-    echo "   Using default PORT: 3000"
+echo "🚀 Starting Grafana..."
+
+# Set Railway-specific environment variables if not already set
+if [ -n "$RAILWAY_PUBLIC_DOMAIN" ]; then
+    export GF_SERVER_ROOT_URL="https://$RAILWAY_PUBLIC_DOMAIN"
+    export GF_SERVER_DOMAIN="$RAILWAY_PUBLIC_DOMAIN"
 fi
 
-# Check if required files exist
-echo "📁 Checking required files..."
-if [ -f "/etc/grafana/grafana.ini" ]; then
-    echo "   ✓ grafana.ini found"
-else
-    echo "   ✗ grafana.ini not found!"
-    exit 1
-fi
+# Ensure proper permissions
+chown -R grafana:root /var/lib/grafana || true
+chown -R grafana:root /etc/grafana || true
 
-if [ -d "/usr/share/grafana" ]; then
-    echo "   ✓ homepath directory exists"
-else
-    echo "   ✗ homepath directory not found!"
-    exit 1
-fi
-
-echo "🚀 Starting Grafana server..."
-exec grafana-server \
-     --homepath=/usr/share/grafana \
-     --config=/etc/grafana/grafana.ini 
+# Start Grafana with the default command
+exec /run.sh 
