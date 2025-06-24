@@ -43,20 +43,23 @@ jobs:
       - name: Check Grafana dashboard structure
         run: |
           echo "🔍 Validating Grafana dashboard structure..."
-          for dashboard in grafana/dashboards/**/*.json; do
-            if [ -f "$dashboard" ]; then
-              echo "Checking dashboard: $dashboard"
-              # Check for required fields
-              if ! jq -e '.dashboard.title' "$dashboard" >/dev/null 2>&1; then
-                echo "❌ Missing title in: $dashboard"
-                exit 1
-              fi
-              if ! jq -e '.dashboard.panels' "$dashboard" >/dev/null 2>&1; then
-                echo "❌ Missing panels in: $dashboard"
-                exit 1
-              fi
-              echo "✅ Valid dashboard structure: $dashboard"
+          find grafana/dashboards -name "*.json" -type f | while read -r dashboard; do
+            echo "Checking dashboard: $dashboard"
+            # Check for required fields (Grafana dashboard structure is flat, not nested under 'dashboard')
+            if ! jq -e '.title' "$dashboard" >/dev/null 2>&1; then
+              echo "❌ Missing title in: $dashboard"
+              exit 1
             fi
+            if ! jq -e '.panels' "$dashboard" >/dev/null 2>&1; then
+              echo "❌ Missing panels in: $dashboard"
+              exit 1
+            fi
+            # Check if it's a valid Grafana dashboard (has required fields)
+            if ! jq -e '.id' "$dashboard" >/dev/null 2>&1; then
+              echo "❌ Missing id field in: $dashboard"
+              exit 1
+            fi
+            echo "✅ Valid dashboard structure: $dashboard"
           done
 
   docker-build:
