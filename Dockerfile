@@ -27,6 +27,9 @@ RUN chown -R grafana:root /var/lib/grafana && \
 # Switch back to grafana user
 USER grafana
 
+# Set working directory
+WORKDIR /usr/share/grafana
+
 # Expose port
 EXPOSE 3000
 
