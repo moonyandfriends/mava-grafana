@@ -4,10 +4,7 @@ FROM grafana/grafana:10.4.2
 USER root
 
 # Install additional tools and plugins (Alpine Linux uses apk)
-RUN apk add --no-cache \
-    curl=8.4.0-r0 \
-    wget=1.21.3-r2 \
-    jq=1.7.1-r0
+RUN apk add --no-cache curl wget jq
 
 # Install Grafana plugins at build time for Railway deployment
 # Install core plugins that are known to work with Grafana 12.x
