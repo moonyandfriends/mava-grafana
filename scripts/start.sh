@@ -5,6 +5,8 @@ set -e
 
 echo "🚀 Starting Grafana..."
 
+export GF_SERVER_HTTP_ADDR=0.0.0.0
+
 # If Railway injected $PORT, use it for Grafana
 if [ -n "$PORT" ]; then
     export GF_SERVER_HTTP_PORT="$PORT"

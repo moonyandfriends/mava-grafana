@@ -45,6 +45,7 @@ ENV GF_SECURITY_ALLOW_EMBEDDING=true
 ENV GF_USERS_ALLOW_SIGN_UP=false
 ENV GF_AUTH_ANONYMOUS_ENABLED=false
 ENV GF_LOG_LEVEL=${GRAFANA_LOG_LEVEL:-info}
+ENV GF_SERVER_HTTP_ADDR=0.0.0.0
 
 # Use the startup script as the main command
 CMD ["/usr/local/bin/start.sh"] 
