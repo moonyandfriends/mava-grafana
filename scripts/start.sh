@@ -12,9 +12,18 @@ echo "📁 Checking directories..."
 ls -la /var/lib/grafana/
 ls -la /etc/grafana/
 
+# Check if grafana.ini exists
+echo "📄 Checking configuration file..."
+if [ -f "/etc/grafana/grafana.ini" ]; then
+    echo "✓ grafana.ini found"
+else
+    echo "✗ grafana.ini not found!"
+    exit 1
+fi
+
 # Start Grafana with Railway-compatible settings
+echo "🚀 Starting Grafana server..."
 exec grafana-server \
     --config=/etc/grafana/grafana.ini \
     --homepath=/usr/share/grafana \
-    --pidfile=/var/run/grafana/grafana.pid \
     --packaging=docker 

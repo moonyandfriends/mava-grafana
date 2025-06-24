@@ -63,5 +63,5 @@ ENV GF_AUTH_ANONYMOUS_ENABLED=false
 ENV GF_USERS_ALLOW_SIGN_UP=false
 ENV GF_LOG_LEVEL=${GRAFANA_LOG_LEVEL:-info}
 
-# Default command with better error handling
-CMD ["/usr/local/bin/start.sh"] 
+# Default command - start Grafana directly
+CMD ["grafana-server", "--config=/etc/grafana/grafana.ini", "--homepath=/usr/share/grafana"] 
