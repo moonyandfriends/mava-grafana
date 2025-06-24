@@ -197,7 +197,7 @@ jobs:
       - name: Check Dockerfile
         run: |
           echo "🔍 Checking Dockerfile..."
-          hadolint Dockerfile -e DL3018
+          hadolint Dockerfile --ignore DL3018
 
       - name: Check file permissions
         run: |
