@@ -28,4 +28,5 @@ echo "   Starting Grafana server..."
 # Start Grafana with the correct command
 exec grafana-server \
      --homepath=/usr/share/grafana \
-     --config=/etc/grafana/grafana.ini 
+     --config=/etc/grafana/grafana.ini \
+     --pidfile=/var/run/grafana/grafana-server.pid 
