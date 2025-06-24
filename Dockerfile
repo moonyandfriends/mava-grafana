@@ -1,20 +1,21 @@
-FROM grafana/grafana:latest
+FROM grafana/grafana:10.4.2
 
 # Switch user to root for installation
 USER root
 
 # Install additional tools and plugins (Alpine Linux uses apk)
 RUN apk add --no-cache \
-    curl \
-    wget \
-    jq
+    curl=8.4.0-r0 \
+    wget=1.21.3-r2 \
+    jq=1.7.1-r0
 
 # Install Grafana plugins at build time for Railway deployment
 # Install core plugins that are known to work with Grafana 12.x
-RUN grafana cli plugins install grafana-clock-panel || true && \
-    grafana cli plugins install grafana-simple-json-datasource || true && \
-    grafana cli plugins install grafana-worldmap-panel || true && \
-    grafana cli plugins install grafana-piechart-panel || true && \
+RUN set -e; \
+    grafana cli plugins install grafana-clock-panel || true; \
+    grafana cli plugins install grafana-simple-json-datasource || true; \
+    grafana cli plugins install grafana-worldmap-panel || true; \
+    grafana cli plugins install grafana-piechart-panel || true; \
     grafana cli plugins install grafana-polystat-panel || true
 
 # Create necessary directories
