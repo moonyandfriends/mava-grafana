@@ -18,7 +18,6 @@ COPY grafana/dashboards/ /var/lib/grafana/dashboards/
 # Copy custom scripts
 COPY scripts/create_grafana_viewer.sh /scripts/create_grafana_viewer.sh
 COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /scripts/create_grafana_viewer.sh /docker-entrypoint.sh
 
 # Debug: print SUPABASE_HOST value at build time
 RUN echo "SUPABASE_HOST=[$SUPABASE_HOST]"
