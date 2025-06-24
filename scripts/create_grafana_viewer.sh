@@ -30,15 +30,35 @@ if [[ -z "$GRAFANA_VIEWER_USER" || -z "$GRAFANA_VIEWER_PASSWORD" || -z "$GRAFANA
   exit 1
 fi
 
+# Wait for Grafana to be ready
+MAX_RETRIES=30
+RETRY_DELAY=2
+RETRIES=0
+until curl -s -u "$GRAFANA_ADMIN_USER:$GRAFANA_ADMIN_PASSWORD" "$GRAFANA_URL/api/health" | grep 'database'; do
+  RETRIES=$((RETRIES+1))
+  if [ $RETRIES -ge $MAX_RETRIES ]; then
+    echo "Grafana did not become ready in time. Exiting."
+    exit 1
+  fi
+  echo "Waiting for Grafana to be ready... ($RETRIES/$MAX_RETRIES)"
+  sleep $RETRY_DELAY
+done
+
+echo "Grafana is ready. Creating viewer user..."
+
 # Create the user (default role is Viewer)
-RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$GRAFANA_URL/api/admin/users" \
+RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$GRAFANA_URL/api/admin/users" \
   -H "Content-Type: application/json" \
   -u "$GRAFANA_ADMIN_USER:$GRAFANA_ADMIN_PASSWORD" \
   -d "{\"name\": \"$GRAFANA_VIEWER_USER\", \"email\": \"$GRAFANA_VIEWER_EMAIL\", \"login\": \"$GRAFANA_VIEWER_USER\", \"password\": \"$GRAFANA_VIEWER_PASSWORD\"}")
 
-if [[ "$RESPONSE" == "200" || "$RESPONSE" == "201" ]]; then
+HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
+HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+
+if [[ "$HTTP_STATUS" == "200" || "$HTTP_STATUS" == "201" ]]; then
   echo "Viewer user '$GRAFANA_VIEWER_USER' created successfully."
 else
-  echo "Failed to create user. HTTP status: $RESPONSE"
+  echo "Failed to create user. HTTP status: $HTTP_STATUS"
+  echo "Response body: $HTTP_BODY"
   exit 1
 fi 
