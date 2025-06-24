@@ -32,6 +32,9 @@ echo "   Setting file permissions..."
 chown -R grafana:root /var/lib/grafana || true
 chown -R grafana:root /etc/grafana || true
 
+echo "   GF_SERVER_HTTP_PORT: $GF_SERVER_HTTP_PORT"
+echo "   GF_SERVER_HTTP_ADDR: $GF_SERVER_HTTP_ADDR"
+
 echo "   Starting Grafana server..."
 # Start Grafana with the correct command
 exec grafana-server \
