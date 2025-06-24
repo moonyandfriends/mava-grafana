@@ -1,0 +1,94 @@
+{
+  "id": null,
+  "uid": "customer-engagement",
+  "title": "Customer Engagement",
+  "tags": ["customer", "engagement"],
+  "timezone": "browser",
+  "schemaVersion": 37,
+  "version": 1,
+  "refresh": "5m",
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "New Customers Over Time",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS count FROM customers WHERE created_at >= now() - interval '30 days' GROUP BY time ORDER BY time;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Active Customers (Last 30 Days)",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS active_customers FROM customers WHERE updated_at >= now() - interval '30 days';",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "barchart",
+      "title": "Customers by Client",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT client, COUNT(*) AS count FROM customers WHERE created_at >= now() - interval '30 days' GROUP BY client ORDER BY count DESC;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "barchart",
+      "title": "Tickets per Customer (Top 10)",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT c.name AS customer, COUNT(t.id) AS ticket_count FROM customers c LEFT JOIN tickets t ON c.id = t.customer_id WHERE c.created_at >= now() - interval '30 days' GROUP BY c.name ORDER BY ticket_count DESC LIMIT 10;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Customers with Wallet Address",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS with_wallet FROM customers WHERE wallet_address IS NOT NULL AND wallet_address <> '' AND created_at >= now() - interval '30 days';",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "barchart",
+      "title": "Customer Satisfaction (Avg. Rating, Top 10)",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT name AS customer, ROUND(AVG((jsonb_array_elements_text(user_ratings))::numeric), 2) AS avg_rating FROM customers WHERE jsonb_array_length(user_ratings) > 0 AND created_at >= now() - interval '30 days' GROUP BY name ORDER BY avg_rating DESC LIMIT 10;",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+} 
