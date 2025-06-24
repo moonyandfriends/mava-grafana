@@ -26,6 +26,10 @@ RUN mkdir -p /var/lib/grafana/dashboards \
 COPY grafana/grafana.ini /etc/grafana/grafana.ini
 COPY grafana/provisioning/ /etc/grafana/provisioning/
 COPY grafana/dashboards/ /var/lib/grafana/dashboards/
+COPY scripts/start.sh /usr/local/bin/start.sh
+
+# Make startup script executable
+RUN chmod +x /usr/local/bin/start.sh
 
 # Debug: Ensure grafana user exists before chown
 RUN id grafana || (echo 'User grafana does not exist!' && cat /etc/passwd && exit 1)
@@ -52,6 +56,12 @@ ENV GF_SERVER_HTTP_PORT=${PORT:-3000}
 ENV GF_PATHS_PROVISIONING=/etc/grafana/provisioning
 ENV GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
 ENV GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+ENV GF_SERVER_ROOT_URL=${RAILWAY_PUBLIC_DOMAIN:-http://localhost:3000}
+ENV GF_SERVER_SERVE_FROM_SUB_PATH=false
+ENV GF_SECURITY_ALLOW_EMBEDDING=true
+ENV GF_AUTH_ANONYMOUS_ENABLED=false
+ENV GF_USERS_ALLOW_SIGN_UP=false
+ENV GF_LOG_LEVEL=${GRAFANA_LOG_LEVEL:-info}
 
-# Default command
-CMD ["grafana-server", "--config=/etc/grafana/grafana.ini"] 
+# Default command with better error handling
+CMD ["/usr/local/bin/start.sh"] 
