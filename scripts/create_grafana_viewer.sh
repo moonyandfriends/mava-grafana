@@ -18,6 +18,11 @@
 
 set -e
 
+if ! command -v curl >/dev/null 2>&1; then
+  echo "Error: curl is not installed. Please install curl to use this script."
+  exit 1
+fi
+
 GRAFANA_URL="${GRAFANA_URL:-http://localhost:3000}"
 GRAFANA_ADMIN_USER="${GRAFANA_ADMIN_USER:-admin}"
 GRAFANA_ADMIN_PASSWORD="${GRAFANA_ADMIN_PASSWORD:-admin}"
@@ -30,23 +35,22 @@ if [[ -z "$GRAFANA_VIEWER_USER" || -z "$GRAFANA_VIEWER_PASSWORD" || -z "$GRAFANA
   exit 1
 fi
 
-# Wait for Grafana to be ready
+echo "[INFO] Waiting for Grafana to be ready at $GRAFANA_URL ..."
 MAX_RETRIES=30
 RETRY_DELAY=2
 RETRIES=0
 until curl -s -u "$GRAFANA_ADMIN_USER:$GRAFANA_ADMIN_PASSWORD" "$GRAFANA_URL/api/health" | grep 'database'; do
   RETRIES=$((RETRIES+1))
   if [ $RETRIES -ge $MAX_RETRIES ]; then
-    echo "Grafana did not become ready in time. Exiting."
+    echo "[ERROR] Grafana did not become ready in time. Exiting."
     exit 1
   fi
-  echo "Waiting for Grafana to be ready... ($RETRIES/$MAX_RETRIES)"
+  echo "[INFO] Waiting for Grafana to be ready... ($RETRIES/$MAX_RETRIES)"
   sleep $RETRY_DELAY
 done
 
-echo "Grafana is ready. Creating viewer user..."
+echo "[INFO] Grafana is ready. Creating viewer user '$GRAFANA_VIEWER_USER'..."
 
-# Create the user (default role is Viewer)
 RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$GRAFANA_URL/api/admin/users" \
   -H "Content-Type: application/json" \
   -u "$GRAFANA_ADMIN_USER:$GRAFANA_ADMIN_PASSWORD" \
@@ -56,9 +60,10 @@ HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
 HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
 
 if [[ "$HTTP_STATUS" == "200" || "$HTTP_STATUS" == "201" ]]; then
-  echo "Viewer user '$GRAFANA_VIEWER_USER' created successfully."
+  echo "[SUCCESS] Viewer user '$GRAFANA_VIEWER_USER' created successfully."
+  exit 0
 else
-  echo "Failed to create user. HTTP status: $HTTP_STATUS"
-  echo "Response body: $HTTP_BODY"
+  echo "[ERROR] Failed to create user. HTTP status: $HTTP_STATUS"
+  echo "[ERROR] Response body: $HTTP_BODY"
   exit 1
 fi 
