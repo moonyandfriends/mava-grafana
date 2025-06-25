@@ -91,7 +91,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT status, COUNT(*) AS count FROM tickets WHERE created_at >= now() - interval '30 days' GROUP BY status ORDER BY count DESC;",
+          "rawSql": "WITH all_statuses AS (SELECT 'Open' AS status UNION ALL SELECT 'Pending' UNION ALL SELECT 'Waiting' UNION ALL SELECT 'Resolved') SELECT s.status, COUNT(t.id) AS count FROM all_statuses s LEFT JOIN tickets t ON t.status = s.status AND t.created_at >= now() - interval '30 days' GROUP BY s.status ORDER BY s.status;",
           "refId": "A"
         }
       ]
