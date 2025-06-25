@@ -5,7 +5,7 @@
   "tags": ["tickets", "overview"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 3,
+  "version": 4,
   "refresh": "5m",
   "time": {
     "from": "now-30d",
@@ -13,25 +13,11 @@
   },
   "panels": [
     {
-      "id": 1,
-      "type": "stat",
-      "title": "Total Tickets",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_tickets FROM tickets WHERE created_at >= now() - interval '30 days';",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "id": 11,
       "type": "stat",
       "title": "Open Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "gridPos": {"h": 5, "w": 5, "x": 0, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -45,7 +31,7 @@
       "type": "stat",
       "title": "Pending Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "gridPos": {"h": 5, "w": 5, "x": 5, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -59,7 +45,7 @@
       "type": "stat",
       "title": "Waiting Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "gridPos": {"h": 5, "w": 5, "x": 10, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -73,11 +59,25 @@
       "type": "stat",
       "title": "Resolved Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 4},
+      "gridPos": {"h": 5, "w": 5, "x": 15, "y": 0},
       "targets": [
         {
           "format": "table",
           "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE status = 'Resolved' AND created_at >= now() - interval '30 days';",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Total Tickets",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 5, "w": 5, "x": 20, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS total_tickets FROM tickets WHERE created_at >= now() - interval '30 days';",
           "refId": "A"
         }
       ]
