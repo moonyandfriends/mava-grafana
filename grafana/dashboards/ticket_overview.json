@@ -84,21 +84,33 @@
     },
     {
       "id": 20,
-      "type": "piechart",
+      "type": "stat",
       "title": "Tickets by Status (%)",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 8, "w": 12, "x": 6, "y": 4},
-      "options": {
-        "pieType": "pie",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          }
         }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "displayMode": "pie"
       },
       "targets": [
         {
