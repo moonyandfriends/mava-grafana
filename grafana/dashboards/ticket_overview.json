@@ -5,7 +5,7 @@
   "tags": ["tickets", "overview"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 7,
+  "version": 8,
   "refresh": "5m",
   "time": {
     "from": "now-30d",
@@ -17,7 +17,7 @@
       "type": "stat",
       "title": "Open Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 4, "x": 0, "y": 0},
+      "gridPos": {"h": 8, "w": 5, "x": 0, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -31,7 +31,7 @@
       "type": "stat",
       "title": "Pending Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 4, "x": 4, "y": 0},
+      "gridPos": {"h": 8, "w": 5, "x": 5, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -45,7 +45,7 @@
       "type": "stat",
       "title": "Waiting Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 4, "x": 8, "y": 0},
+      "gridPos": {"h": 8, "w": 5, "x": 10, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -59,7 +59,7 @@
       "type": "stat",
       "title": "Resolved Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 4, "x": 12, "y": 0},
+      "gridPos": {"h": 8, "w": 5, "x": 15, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -73,7 +73,7 @@
       "type": "stat",
       "title": "Total Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 4, "x": 16, "y": 0},
+      "gridPos": {"h": 8, "w": 4, "x": 20, "y": 0},
       "targets": [
         {
           "format": "table",
