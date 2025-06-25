@@ -88,10 +88,22 @@
       "title": "Tickets by Status (%)",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 8, "w": 12, "x": 6, "y": 4},
+      "options": {
+        "pieType": "pie",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        }
+      },
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH all_statuses AS (SELECT 'Open' AS status UNION ALL SELECT 'Pending' UNION ALL SELECT 'Waiting' UNION ALL SELECT 'Resolved') SELECT s.status, COUNT(t.id) AS count FROM all_statuses s LEFT JOIN tickets t ON t.status = s.status AND t.created_at >= now() - interval '30 days' GROUP BY s.status ORDER BY s.status;",
+          "rawSql": "SELECT status, COUNT(*) AS count FROM tickets WHERE created_at >= now() - interval '30 days' GROUP BY status ORDER BY count DESC;",
           "refId": "A"
         }
       ]
