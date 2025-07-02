@@ -5,7 +5,7 @@
   "tags": ["tickets", "overview"],
   "timezone": "browser",
   "schemaVersion": 37,
-  "version": 2,
+  "version": 8,
   "refresh": "5m",
   "time": {
     "from": "now-30d",
@@ -13,11 +13,67 @@
   },
   "panels": [
     {
+      "id": 11,
+      "type": "stat",
+      "title": "Open Tickets",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 5, "x": 0, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE status = 'Open' AND created_at >= now() - interval '30 days';",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "Pending Tickets",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 5, "x": 5, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE status = 'Pending' AND created_at >= now() - interval '30 days';",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "Waiting Tickets",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 5, "x": 10, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE status = 'Waiting' AND created_at >= now() - interval '30 days';",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "Resolved Tickets",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 5, "x": 15, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE status = 'Resolved' AND created_at >= now() - interval '30 days';",
+          "refId": "A"
+        }
+      ]
+    },
+    {
       "id": 1,
       "type": "stat",
       "title": "Total Tickets",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 0},
+      "gridPos": {"h": 8, "w": 4, "x": 20, "y": 0},
       "targets": [
         {
           "format": "table",
@@ -27,11 +83,49 @@
       ]
     },
     {
+      "id": 20,
+      "type": "stat",
+      "title": "Tickets by Status (%)",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 6, "y": 4},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "displayMode": "pie"
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT status, COUNT(*) AS count FROM tickets WHERE created_at >= now() - interval '30 days' GROUP BY status ORDER BY count DESC;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
       "id": 2,
       "type": "barchart",
       "title": "By Status",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
       "targets": [
         {
           "format": "table",
@@ -45,7 +139,7 @@
       "type": "timeseries",
       "title": "Created Over Time",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
       "targets": [
         {
           "format": "time_series",
@@ -59,7 +153,7 @@
       "type": "stat",
       "title": "Avg. Resolution Time (hrs)",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 14},
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 20},
       "targets": [
         {
           "format": "table",
@@ -73,7 +167,7 @@
       "type": "piechart",
       "title": "By Priority",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 26},
       "targets": [
         {
           "format": "table",
@@ -87,7 +181,7 @@
       "type": "piechart",
       "title": "By Category",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 26},
       "targets": [
         {
           "format": "table",
@@ -101,7 +195,7 @@
       "type": "barchart",
       "title": "Open vs. Closed",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 28},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 34},
       "targets": [
         {
           "format": "table",
