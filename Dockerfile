@@ -20,8 +20,12 @@ COPY scripts/create_grafana_viewer.sh /scripts/create_grafana_viewer.sh
 COPY scripts/deploy_self_hosted.sh /scripts/deploy_self_hosted.sh
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
-# Ensure scripts are executable
+# Switch to root to set permissions
+USER root
 RUN chmod +x /docker-entrypoint.sh /scripts/create_grafana_viewer.sh /scripts/deploy_self_hosted.sh
+
+# Switch back to the default Grafana user
+USER 472
 
 # Debug: print SUPABASE_HOST value at build time
 RUN echo "SUPABASE_HOST=[$SUPABASE_HOST]"
