@@ -21,7 +21,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE status = 'Open' AND created_at >= now() - interval '30 days';",
+          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets WHERE status = 'Open' AND created_at >= now() - interval '30 days';",
           "refId": "A"
         }
       ]
@@ -35,7 +35,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE status = 'Pending' AND created_at >= now() - interval '30 days';",
+          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets WHERE status = 'Pending' AND created_at >= now() - interval '30 days';",
           "refId": "A"
         }
       ]
@@ -49,7 +49,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE status = 'Waiting' AND created_at >= now() - interval '30 days';",
+          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets WHERE status = 'Waiting' AND created_at >= now() - interval '30 days';",
           "refId": "A"
         }
       ]
@@ -63,7 +63,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE status = 'Resolved' AND created_at >= now() - interval '30 days';",
+          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets WHERE status = 'Resolved' AND created_at >= now() - interval '30 days';",
           "refId": "A"
         }
       ]
@@ -115,7 +115,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT status, COUNT(*) AS count FROM tickets WHERE created_at >= now() - interval '30 days' GROUP BY status ORDER BY count DESC;",
+          "rawSql": "SELECT status, COUNT(*) AS count FROM mava_tickets WHERE created_at >= now() - interval '30 days' GROUP BY status ORDER BY count DESC;",
           "refId": "A"
         }
       ]

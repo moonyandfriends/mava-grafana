@@ -21,7 +21,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT assigned_to AS agent, COUNT(*) AS count FROM tickets WHERE created_at >= now() - interval '30 days' GROUP BY assigned_to ORDER BY count DESC;",
+          "rawSql": "SELECT assigned_to AS agent, COUNT(*) AS count FROM mava_tickets WHERE created_at >= now() - interval '30 days' GROUP BY assigned_to ORDER BY count DESC;",
           "refId": "A"
         }
       ]
@@ -35,7 +35,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT assigned_to AS agent, COUNT(*) AS count FROM tickets WHERE status = 'Resolved' AND updated_at >= now() - interval '30 days' GROUP BY assigned_to ORDER BY count DESC;",
+          "rawSql": "SELECT assigned_to AS agent, COUNT(*) AS count FROM mava_tickets WHERE status = 'Resolved' AND updated_at >= now() - interval '30 days' GROUP BY assigned_to ORDER BY count DESC;",
           "refId": "A"
         }
       ]
@@ -49,7 +49,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT assigned_to AS agent, COUNT(*) AS count FROM tickets WHERE status != 'Resolved' AND created_at >= now() - interval '30 days' GROUP BY assigned_to ORDER BY count DESC;",
+          "rawSql": "SELECT assigned_to AS agent, COUNT(*) AS count FROM mava_tickets WHERE status != 'Resolved' AND created_at >= now() - interval '30 days' GROUP BY assigned_to ORDER BY count DESC;",
           "refId": "A"
         }
       ]
@@ -63,7 +63,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT assigned_to AS agent, ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600), 2) AS avg_resolution_hours FROM tickets WHERE status = 'Resolved' AND updated_at >= now() - interval '30 days' GROUP BY assigned_to ORDER BY avg_resolution_hours ASC;",
+          "rawSql": "SELECT assigned_to AS agent, ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600), 2) AS avg_resolution_hours FROM mava_tickets WHERE status = 'Resolved' AND updated_at >= now() - interval '30 days' GROUP BY assigned_to ORDER BY avg_resolution_hours ASC;",
           "refId": "A"
         }
       ]
@@ -77,7 +77,7 @@
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT date_trunc('day', created_at) AS time, assigned_to AS agent, COUNT(*) AS count FROM tickets WHERE created_at >= now() - interval '30 days' GROUP BY time, assigned_to ORDER BY time;",
+          "rawSql": "SELECT date_trunc('day', created_at) AS time, assigned_to AS agent, COUNT(*) AS count FROM mava_tickets WHERE created_at >= now() - interval '30 days' GROUP BY time, assigned_to ORDER BY time;",
           "refId": "A"
         }
       ]
@@ -91,7 +91,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT assigned_to AS agent, ROUND(AVG(EXTRACT(EPOCH FROM (first_agent_message_created_at - created_at))/60), 2) AS avg_response_mins FROM tickets WHERE first_agent_message_created_at IS NOT NULL AND created_at >= now() - interval '30 days' GROUP BY assigned_to ORDER BY avg_response_mins ASC;",
+          "rawSql": "SELECT assigned_to AS agent, ROUND(AVG(EXTRACT(EPOCH FROM (first_agent_message_created_at - created_at))/60), 2) AS avg_response_mins FROM mava_tickets WHERE first_agent_message_created_at IS NOT NULL AND created_at >= now() - interval '30 days' GROUP BY assigned_to ORDER BY avg_response_mins ASC;",
           "refId": "A"
         }
       ]
