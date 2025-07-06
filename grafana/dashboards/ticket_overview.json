@@ -1,7 +1,7 @@
 {
   "id": null,
-  "uid": "ticket-overview",
-  "title": "Ticket Overview",
+  "uid": "mava-ticket-overview",
+  "title": "Mava Ticket Overview",
   "tags": ["mava_tickets_with_customers", "overview"],
   "timezone": "browser",
   "schemaVersion": 37,
