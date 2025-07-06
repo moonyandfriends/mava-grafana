@@ -7,28 +7,28 @@
   "panels": [
     {
       "id": 1,
-      "title": "Total Discord Messages (Last 30 Days)",
+      "title": "Total Discord Messages",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_messages FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false;",
+          "rawSql": "SELECT COUNT(*) AS total_messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false;",
           "refId": "A"
         }
       ]
     },
     {
       "id": 2,
-      "title": "Active Discord Users (Last 30 Days)",
+      "title": "Active Discord Users",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(DISTINCT author_id) AS active_users FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false;",
+          "rawSql": "SELECT COUNT(DISTINCT author_id) AS active_users FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false;",
           "refId": "A"
         }
       ]
@@ -63,14 +63,14 @@
     },
     {
       "id": 5,
-      "title": "Top Discord Community Activity (Last 30 Days)",
+      "title": "Top Discord Community Activity",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 12, "w": 12, "x": 0, "y": 4},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(author_display_name, author_username) AS \"Community Member\", author_username AS Username, author_id AS UserID, COUNT(*) AS Messages, ROUND(COUNT(*)::numeric / 30, 1) AS \"Messages/Day\" FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
+          "rawSql": "SELECT COALESCE(author_display_name, author_username) AS \"Community Member\", author_username AS Username, author_id AS UserID, COUNT(*) AS Messages, ROUND(COUNT(*)::numeric / GREATEST(EXTRACT(EPOCH FROM ($__timeTo() - $__timeFrom()))/86400, 1), 2) AS \"Messages/Day\" FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
           "refId": "A"
         }
       ],
@@ -107,14 +107,14 @@
     },
     {
       "id": 7,
-      "title": "Discord Daily Message Activity (Last 30 Days)",
+      "title": "Discord Daily Message Activity",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16},
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS messages FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false GROUP BY time ORDER BY time;",
+          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY time ORDER BY time;",
           "refId": "A"
         }
       ],
@@ -157,14 +157,14 @@
     },
     {
       "id": 8,
-      "title": "Discord Channel Activity (Top 10 Channels, Last 30 Days)",
+      "title": "Discord Channel Activity (Top 10 Channels)",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT dc.name AS Channel, COUNT(dm.*) AS Messages FROM discord_messages dm JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at > NOW() - INTERVAL '30 days' AND dm.author_is_bot = false GROUP BY dc.name ORDER BY Messages DESC LIMIT 10;",
+          "rawSql": "SELECT dc.name AS Channel, COUNT(dm.*) AS Messages FROM discord_messages dm JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false GROUP BY dc.name ORDER BY Messages DESC LIMIT 10;",
           "refId": "A"
         }
       ]
@@ -178,7 +178,7 @@
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT date_trunc('week', created_at) AS time, COALESCE(author_display_name, author_username) AS metric, COUNT(*) AS value FROM discord_messages WHERE created_at > NOW() - INTERVAL '12 weeks' AND author_is_bot = false AND author_id IN (SELECT author_id FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false GROUP BY author_id HAVING COUNT(*) > 50) GROUP BY time, metric ORDER BY time, metric;",
+          "rawSql": "SELECT date_trunc('week', created_at) AS time, COALESCE(author_display_name, author_username) AS metric, COUNT(*) AS value FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND author_id IN (SELECT author_id FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY author_id HAVING COUNT(*) > GREATEST(EXTRACT(EPOCH FROM ($__timeTo() - $__timeFrom()))/86400/7, 1)) GROUP BY time, metric ORDER BY time, metric;",
           "refId": "A"
         }
       ],
@@ -208,14 +208,14 @@
     },
     {
       "id": 10,
-      "title": "Most Common Words in Discord (Last 30 Days)",
+      "title": "Most Common Words in Discord",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32},
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false AND content IS NOT NULL AND content <> '' AND LENGTH(content) > 3), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 25;",
+          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND content IS NOT NULL AND content <> '' AND LENGTH(content) > 3), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 25;",
           "refId": "A"
         }
       ]
