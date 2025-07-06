@@ -21,7 +21,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets WHERE LOWER(status) = 'open';",
+          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE LOWER(status) = 'open';",
           "refId": "A"
         }
       ]
@@ -35,7 +35,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets WHERE LOWER(status) = 'pending';",
+          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE LOWER(status) = 'pending';",
           "refId": "A"
         }
       ]
@@ -49,7 +49,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets WHERE LOWER(status) = 'waiting';",
+          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE LOWER(status) = 'waiting';",
           "refId": "A"
         }
       ]
@@ -63,7 +63,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets WHERE LOWER(status) = 'resolved';",
+          "rawSql": "SELECT COUNT(*) AS count FROM tickets WHERE LOWER(status) = 'resolved';",
           "refId": "A"
         }
       ]
@@ -77,7 +77,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_tickets FROM mava_tickets;",
+          "rawSql": "SELECT COUNT(*) AS total_tickets FROM tickets;",
           "refId": "A"
         }
       ]
@@ -115,7 +115,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT status, COUNT(*) AS count FROM mava_tickets GROUP BY status ORDER BY count DESC;",
+          "rawSql": "SELECT status, COUNT(*) AS count FROM tickets GROUP BY status ORDER BY count DESC;",
           "refId": "A"
         }
       ]
@@ -129,7 +129,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT status, COUNT(*) AS count FROM mava_tickets GROUP BY status ORDER BY count DESC;",
+          "rawSql": "SELECT status, COUNT(*) AS count FROM tickets GROUP BY status ORDER BY count DESC;",
           "refId": "A"
         }
       ]
@@ -143,7 +143,7 @@
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS count FROM mava_tickets WHERE created_at IS NOT NULL GROUP BY time ORDER BY time;",
+          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS count FROM tickets WHERE created_at IS NOT NULL GROUP BY time ORDER BY time;",
           "refId": "A"
         }
       ]
@@ -157,7 +157,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600), 2) AS avg_resolution_hours FROM mava_tickets WHERE LOWER(status) = 'resolved' AND created_at IS NOT NULL AND updated_at IS NOT NULL;",
+          "rawSql": "SELECT ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600), 2) AS avg_resolution_hours FROM tickets WHERE LOWER(status) = 'resolved' AND created_at IS NOT NULL AND updated_at IS NOT NULL;",
           "refId": "A"
         }
       ]
@@ -171,7 +171,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT priority, COUNT(*) AS count FROM mava_tickets GROUP BY priority ORDER BY count DESC;",
+          "rawSql": "SELECT priority, COUNT(*) AS count FROM tickets GROUP BY priority ORDER BY count DESC;",
           "refId": "A"
         }
       ]
@@ -185,7 +185,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT category, COUNT(*) AS count FROM mava_tickets GROUP BY category ORDER BY count DESC;",
+          "rawSql": "SELECT category, COUNT(*) AS count FROM tickets GROUP BY category ORDER BY count DESC;",
           "refId": "A"
         }
       ]
@@ -199,7 +199,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT CASE WHEN LOWER(status) = 'resolved' THEN 'Closed' ELSE 'Open' END AS state, COUNT(*) AS count FROM mava_tickets GROUP BY state;",
+          "rawSql": "SELECT CASE WHEN LOWER(status) = 'resolved' THEN 'Closed' ELSE 'Open' END AS state, COUNT(*) AS count FROM tickets GROUP BY state;",
           "refId": "A"
         }
       ]
