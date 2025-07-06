@@ -70,7 +70,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(author_display_name, author_username) AS \"Community Member\", author_username AS Username, author_id AS UserID, COUNT(*) AS Messages, ROUND(COUNT(*)::numeric / GREATEST(EXTRACT(EPOCH FROM ($__timeTo() - $__timeFrom()))/86400, 1), 2) AS \"Messages/Day\" FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
+          "rawSql": "SELECT COALESCE(author_display_name, author_username) AS \"Community Member\", author_username AS Username, author_id AS UserID, COUNT(*) AS Messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
           "refId": "A"
         }
       ],
@@ -170,48 +170,11 @@
       ]
     },
     {
-      "id": 9,
-      "title": "Weekly Community Member Performance",
-      "type": "timeseries",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
-      "targets": [
-        {
-          "format": "time_series",
-          "rawSql": "SELECT date_trunc('week', created_at) AS time, COALESCE(author_display_name, author_username) AS metric, COUNT(*) AS value FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND author_id IN (SELECT author_id FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY author_id HAVING COUNT(*) > GREATEST(EXTRACT(EPOCH FROM ($__timeTo() - $__timeFrom()))/86400/7, 1)) GROUP BY time, metric ORDER BY time, metric;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "linear",
-            "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "spanNulls": false,
-            "insertNulls": false,
-            "showPoints": "never",
-            "pointSize": 5,
-            "stacking": {
-              "mode": "none",
-              "group": "A"
-            }
-          }
-        }
-      }
-    },
-    {
       "id": 10,
       "title": "Most Common Words in Discord",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24},
       "targets": [
         {
           "format": "table",
