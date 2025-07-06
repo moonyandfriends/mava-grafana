@@ -1,8 +1,8 @@
 {
   "id": null,
-  "uid": "ambassador-activity",
-  "title": "Ambassador Activity Dashboard",
-  "tags": ["ambassador", "activity", "discord", "telegram"],
+  "uid": "community-stats",
+  "title": "Community Stats",
+  "tags": ["community", "stats", "discord", "telegram"],
   "timezone": "browser",
   "panels": [
     {
@@ -63,14 +63,14 @@
     },
     {
       "id": 5,
-      "title": "Top Discord Ambassador Activity (Last 30 Days)",
+      "title": "Top Discord Community Activity (Last 30 Days)",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 12, "w": 12, "x": 0, "y": 4},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(author_display_name, author_username) AS Ambassador, author_username AS Username, author_id AS UserID, COUNT(*) AS Messages, ROUND(COUNT(*)::numeric / 30, 1) AS \"Messages/Day\" FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
+          "rawSql": "SELECT COALESCE(author_display_name, author_username) AS \"Community Member\", author_username AS Username, author_id AS UserID, COUNT(*) AS Messages, ROUND(COUNT(*)::numeric / 30, 1) AS \"Messages/Day\" FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
           "refId": "A"
         }
       ],
@@ -171,7 +171,7 @@
     },
     {
       "id": 9,
-      "title": "Weekly Ambassador Performance",
+      "title": "Weekly Community Member Performance",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
