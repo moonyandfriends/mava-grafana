@@ -1,0 +1,217 @@
+{
+  "id": null,
+  "uid": "ambassador-activity",
+  "title": "Ambassador Activity Dashboard",
+  "tags": ["ambassador", "activity", "discord", "telegram"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Discord Messages (Last 30 Days)",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS total_messages FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Active Discord Users (Last 30 Days)",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(DISTINCT author_id) AS active_users FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Total Telegram Users",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS total_users FROM telegram_users WHERE is_bot = false;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Telegram Messages (All Time)",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS total_messages FROM telegram_messages;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Top Discord Ambassador Activity (Last 30 Days)",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 12, "x": 0, "y": 4},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COALESCE(author_display_name, author_username) AS Ambassador, author_username AS Username, author_id AS UserID, COUNT(*) AS Messages, ROUND(COUNT(*)::numeric / 30, 1) AS \"Messages/Day\" FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Telegram Users Overview",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 12, "x": 12, "y": 4},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COALESCE(first_name || ' ' || last_name, first_name) AS Name, username AS Username, user_id AS UserID, language_code AS Language, is_premium AS Premium, first_seen AS \"First Seen\" FROM telegram_users WHERE is_bot = false ORDER BY first_seen DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Discord Daily Message Activity (Last 30 Days)",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS messages FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false GROUP BY time ORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Discord Channel Activity (Top 10 Channels, Last 30 Days)",
+      "type": "barchart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT dc.name AS Channel, COUNT(dm.*) AS Messages FROM discord_messages dm JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at > NOW() - INTERVAL '30 days' AND dm.author_is_bot = false GROUP BY dc.name ORDER BY Messages DESC LIMIT 10;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Weekly Ambassador Performance",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT date_trunc('week', created_at) AS time, COALESCE(author_display_name, author_username) AS metric, COUNT(*) AS value FROM discord_messages WHERE created_at > NOW() - INTERVAL '12 weeks' AND author_is_bot = false AND author_id IN (SELECT author_id FROM discord_messages WHERE created_at > NOW() - INTERVAL '30 days' AND author_is_bot = false GROUP BY author_id HAVING COUNT(*) > 50) GROUP BY time, metric ORDER BY time, metric;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "refresh": "5m",
+  "version": 1
+}
