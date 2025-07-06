@@ -12,7 +12,7 @@ datasources:
       password: ${SUPABASE_PASSWORD}
     isDefault: true
     jsonData:
-      sslmode: ${SUPABASE_SSL_MODE:-disable}
+      sslmode: disable
       postgresVersion: 1300
       port: ${SUPABASE_PORT}
     editable: true 
