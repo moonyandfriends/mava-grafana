@@ -157,7 +157,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600), 2) AS avg_resolution_hours FROM mava_tickets WHERE LOWER(status) = 'resolved' AND created_at IS NOT NULL AND updated_at IS NOT NULL;"
+          "rawSql": "SELECT ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600), 2) AS avg_resolution_hours FROM mava_tickets WHERE LOWER(status) = 'resolved' AND created_at IS NOT NULL AND updated_at IS NOT NULL;",
           "refId": "A"
         }
       ]
@@ -199,7 +199,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT CASE WHEN LOWER(status) = 'resolved' THEN 'Closed' ELSE 'Open' END AS state, COUNT(*) AS count FROM mava_tickets GROUP BY state;"
+          "rawSql": "SELECT CASE WHEN LOWER(status) = 'resolved' THEN 'Closed' ELSE 'Open' END AS state, COUNT(*) AS count FROM mava_tickets GROUP BY state;",
           "refId": "A"
         }
       ]
