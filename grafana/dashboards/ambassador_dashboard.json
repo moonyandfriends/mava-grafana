@@ -7,56 +7,70 @@
   "panels": [
     {
       "id": 1,
-      "title": "Total X (Twitter) Posts",
+      "title": "Total Ambassadors",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 8, "x": 0, "y": 0},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_posts FROM x_posts WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "SELECT COUNT(*) AS total_ambassadors FROM community_ambassadors;",
           "refId": "A"
         }
       ]
     },
     {
       "id": 2,
-      "title": "Total Discord Posts",
+      "title": "Ambassador Discord Posts",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 8, "x": 8, "y": 0},
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_posts FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false;",
+          "rawSql": "SELECT COUNT(*) AS discord_posts FROM discord_messages dm JOIN community_ambassadors ca ON dm.author_id::bigint = ca.discord_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false;",
           "refId": "A"
         }
       ]
     },
     {
       "id": 3,
-      "title": "Total Telegram Posts",
+      "title": "Ambassador Telegram Posts",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 8, "x": 16, "y": 0},
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_posts FROM telegram_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "SELECT COUNT(*) AS telegram_posts FROM telegram_messages tm JOIN community_ambassadors ca ON tm.user_id = ca.telegram_id WHERE tm.created_at >= $__timeFrom() AND tm.created_at <= $__timeTo();",
           "refId": "A"
         }
       ]
     },
     {
       "id": 4,
-      "title": "Ambassador Performance Overview",
+      "title": "Ambassador X Posts",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS x_posts FROM x_posts xp JOIN community_ambassadors ca ON xp.username = ca.x_handle WHERE xp.created_at >= $__timeFrom() AND xp.created_at <= $__timeTo();",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Community Ambassadors Overview",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 12, "w": 24, "x": 0, "y": 4},
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH ambassador_activity AS (SELECT 'Discord' AS platform, COALESCE(author_display_name, author_username) AS ambassador_name, author_username AS username, COUNT(*) AS posts FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY author_display_name, author_username UNION ALL SELECT 'Telegram' AS platform, COALESCE(tu.first_name || ' ' || tu.last_name, tu.first_name) AS ambassador_name, tu.username, COUNT(*) AS posts FROM telegram_messages tm JOIN telegram_users tu ON tm.user_id = tu.user_id WHERE tm.created_at >= $__timeFrom() AND tm.created_at <= $__timeTo() GROUP BY tu.first_name, tu.last_name, tu.username UNION ALL SELECT 'X (Twitter)' AS platform, username AS ambassador_name, username, COUNT(*) AS posts FROM x_posts WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY username) SELECT ambassador_name AS \"Ambassador\", username AS \"Username\", SUM(CASE WHEN platform = 'Discord' THEN posts ELSE 0 END) AS \"Discord Posts\", SUM(CASE WHEN platform = 'Telegram' THEN posts ELSE 0 END) AS \"Telegram Posts\", SUM(CASE WHEN platform = 'X (Twitter)' THEN posts ELSE 0 END) AS \"X Posts\", SUM(posts) AS \"Total Posts\" FROM ambassador_activity GROUP BY ambassador_name, username ORDER BY SUM(posts) DESC LIMIT 20;",
+          "rawSql": "SELECT ca.ambassador AS \"Ambassador\", ca.role AS \"Role\", ca.x_handle AS \"X Handle\", COALESCE(discord_posts.posts, 0) AS \"Discord Posts\", COALESCE(telegram_posts.posts, 0) AS \"Telegram Posts\", COALESCE(x_posts.posts, 0) AS \"X Posts\", COALESCE(discord_posts.posts, 0) + COALESCE(telegram_posts.posts, 0) + COALESCE(x_posts.posts, 0) AS \"Total Posts\" FROM community_ambassadors ca LEFT JOIN (SELECT ca.ambassador, COUNT(*) AS posts FROM discord_messages dm JOIN community_ambassadors ca ON dm.author_id::bigint = ca.discord_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false GROUP BY ca.ambassador) discord_posts ON ca.ambassador = discord_posts.ambassador LEFT JOIN (SELECT ca.ambassador, COUNT(*) AS posts FROM telegram_messages tm JOIN community_ambassadors ca ON tm.user_id = ca.telegram_id WHERE tm.created_at >= $__timeFrom() AND tm.created_at <= $__timeTo() GROUP BY ca.ambassador) telegram_posts ON ca.ambassador = telegram_posts.ambassador LEFT JOIN (SELECT ca.ambassador, COUNT(*) AS posts FROM x_posts xp JOIN community_ambassadors ca ON xp.username = ca.x_handle WHERE xp.created_at >= $__timeFrom() AND xp.created_at <= $__timeTo() GROUP BY ca.ambassador) x_posts ON ca.ambassador = x_posts.ambassador ORDER BY \"Total Posts\" DESC;",
           "refId": "A"
         }
       ],
@@ -70,29 +84,109 @@
       }
     },
     {
-      "id": 5,
-      "title": "Ambassador Activity by Platform",
+      "id": 6,
+      "title": "Ambassador Roles Distribution",
       "type": "piechart",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH platform_posts AS (SELECT 'Discord' AS platform, COUNT(*) AS posts FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false UNION ALL SELECT 'Telegram' AS platform, COUNT(*) AS posts FROM telegram_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() UNION ALL SELECT 'X (Twitter)' AS platform, COUNT(*) AS posts FROM x_posts WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo()) SELECT platform AS \"Platform\", posts AS \"Posts\" FROM platform_posts WHERE posts > 0 ORDER BY posts DESC;",
+          "rawSql": "SELECT role AS \"Role\", COUNT(*) AS \"Count\" FROM community_ambassadors GROUP BY role ORDER BY COUNT(*) DESC;",
           "refId": "A"
         }
       ]
     },
     {
-      "id": 6,
-      "title": "Daily Ambassador Activity Across Platforms",
-      "type": "timeseries",
+      "id": 7,
+      "title": "Ambassador Activity by Platform",
+      "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
       "targets": [
         {
+          "format": "table",
+          "rawSql": "WITH platform_stats AS (SELECT 'Discord' AS platform, COUNT(*) AS posts FROM discord_messages dm JOIN community_ambassadors ca ON dm.author_id::bigint = ca.discord_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false UNION ALL SELECT 'Telegram' AS platform, COUNT(*) AS posts FROM telegram_messages tm JOIN community_ambassadors ca ON tm.user_id = ca.telegram_id WHERE tm.created_at >= $__timeFrom() AND tm.created_at <= $__timeTo() UNION ALL SELECT 'X (Twitter)' AS platform, COUNT(*) AS posts FROM x_posts xp JOIN community_ambassadors ca ON xp.username = ca.x_handle WHERE xp.created_at >= $__timeFrom() AND xp.created_at <= $__timeTo()) SELECT platform AS \"Platform\", posts AS \"Posts\" FROM platform_stats WHERE posts > 0 ORDER BY posts DESC;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Top Discord Ambassadors",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 24},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT ca.ambassador AS \"Ambassador\", ca.role AS \"Role\", COUNT(*) AS \"Discord Posts\" FROM discord_messages dm JOIN community_ambassadors ca ON dm.author_id::bigint = ca.discord_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false GROUP BY ca.ambassador, ca.role ORDER BY COUNT(*) DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Top Telegram Ambassadors",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 24},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT ca.ambassador AS \"Ambassador\", ca.role AS \"Role\", COUNT(*) AS \"Telegram Posts\" FROM telegram_messages tm JOIN community_ambassadors ca ON tm.user_id = ca.telegram_id WHERE tm.created_at >= $__timeFrom() AND tm.created_at <= $__timeTo() GROUP BY ca.ambassador, ca.role ORDER BY COUNT(*) DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Top X (Twitter) Ambassadors",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 24},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT ca.ambassador AS \"Ambassador\", ca.role AS \"Role\", ca.x_handle AS \"X Handle\", COUNT(*) AS \"X Posts\" FROM x_posts xp JOIN community_ambassadors ca ON xp.username = ca.x_handle WHERE xp.created_at >= $__timeFrom() AND xp.created_at <= $__timeTo() GROUP BY ca.ambassador, ca.role, ca.x_handle ORDER BY COUNT(*) DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Ambassador Daily Activity Timeline",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32},
+      "targets": [
+        {
           "format": "time_series",
-          "rawSql": "WITH daily_activity AS (SELECT date_trunc('day', created_at) AS time, 'Discord' AS platform, COUNT(*) AS posts FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY date_trunc('day', created_at) UNION ALL SELECT date_trunc('day', created_at) AS time, 'Telegram' AS platform, COUNT(*) AS posts FROM telegram_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY date_trunc('day', created_at) UNION ALL SELECT date_trunc('day', created_at) AS time, 'X (Twitter)' AS platform, COUNT(*) AS posts FROM x_posts WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY date_trunc('day', created_at)) SELECT time, platform AS metric, posts AS value FROM daily_activity ORDER BY time, platform;",
+          "rawSql": "WITH daily_activity AS (SELECT date_trunc('day', dm.created_at) AS time, 'Discord' AS platform, COUNT(*) AS posts FROM discord_messages dm JOIN community_ambassadors ca ON dm.author_id::bigint = ca.discord_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false GROUP BY date_trunc('day', dm.created_at) UNION ALL SELECT date_trunc('day', tm.created_at) AS time, 'Telegram' AS platform, COUNT(*) AS posts FROM telegram_messages tm JOIN community_ambassadors ca ON tm.user_id = ca.telegram_id WHERE tm.created_at >= $__timeFrom() AND tm.created_at <= $__timeTo() GROUP BY date_trunc('day', tm.created_at) UNION ALL SELECT date_trunc('day', xp.created_at) AS time, 'X (Twitter)' AS platform, COUNT(*) AS posts FROM x_posts xp JOIN community_ambassadors ca ON xp.username = ca.x_handle WHERE xp.created_at >= $__timeFrom() AND xp.created_at <= $__timeTo() GROUP BY date_trunc('day', xp.created_at)) SELECT time, platform AS metric, posts AS value FROM daily_activity ORDER BY time, platform;",
           "refId": "A"
         }
       ],
@@ -114,109 +208,6 @@
             "pointSize": 5,
             "stacking": {
               "mode": "none",
-              "group": "A"
-            }
-          }
-        }
-      }
-    },
-    {
-      "id": 7,
-      "title": "Top X (Twitter) Ambassadors",
-      "type": "table",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 24},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT username AS \"Ambassador\", COUNT(*) AS \"X Posts\" FROM x_posts WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY username ORDER BY COUNT(*) DESC LIMIT 10;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "displayMode": "table",
-            "filterable": true
-          }
-        }
-      }
-    },
-    {
-      "id": 8,
-      "title": "Top Discord Ambassadors",
-      "type": "table",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 24},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT COALESCE(author_display_name, author_username) AS \"Ambassador\", COUNT(*) AS \"Discord Posts\" FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY author_display_name, author_username ORDER BY COUNT(*) DESC LIMIT 10;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "displayMode": "table",
-            "filterable": true
-          }
-        }
-      }
-    },
-    {
-      "id": 9,
-      "title": "Top Telegram Ambassadors",
-      "type": "table",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 24},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT COALESCE(tu.first_name || ' ' || tu.last_name, tu.first_name) AS \"Ambassador\", COUNT(*) AS \"Telegram Posts\" FROM telegram_messages tm JOIN telegram_users tu ON tm.user_id = tu.user_id WHERE tm.created_at >= $__timeFrom() AND tm.created_at <= $__timeTo() GROUP BY tu.first_name, tu.last_name ORDER BY COUNT(*) DESC LIMIT 10;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "displayMode": "table",
-            "filterable": true
-          }
-        }
-      }
-    },
-    {
-      "id": 10,
-      "title": "Ambassador Engagement Trends (Weekly)",
-      "type": "timeseries",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32},
-      "targets": [
-        {
-          "format": "time_series",
-          "rawSql": "WITH weekly_activity AS (SELECT date_trunc('week', created_at) AS time, 'Discord' AS platform, COUNT(*) AS posts FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY date_trunc('week', created_at) UNION ALL SELECT date_trunc('week', created_at) AS time, 'Telegram' AS platform, COUNT(*) AS posts FROM telegram_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY date_trunc('week', created_at) UNION ALL SELECT date_trunc('week', created_at) AS time, 'X (Twitter)' AS platform, COUNT(*) AS posts FROM x_posts WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY date_trunc('week', created_at)) SELECT time, platform AS metric, posts AS value FROM weekly_activity ORDER BY time, platform;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "linear",
-            "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 20,
-            "gradientMode": "none",
-            "spanNulls": false,
-            "insertNulls": false,
-            "showPoints": "auto",
-            "pointSize": 5,
-            "stacking": {
-              "mode": "normal",
               "group": "A"
             }
           }
