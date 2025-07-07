@@ -42,7 +42,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_messages FROM telegram_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "SELECT COUNT(*) AS total_messages FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo();",
           "refId": "A"
         }
       ]
@@ -98,7 +98,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(DISTINCT user_id) AS active_users FROM telegram_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "SELECT COUNT(DISTINCT from_user_id) AS active_users FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo();",
           "refId": "A"
         }
       ]
@@ -112,7 +112,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(DISTINCT user_id) AS active_users FROM telegram_messages;",
+          "rawSql": "SELECT COUNT(DISTINCT from_user_id) AS active_users FROM telegram_messages;",
           "refId": "A"
         }
       ]
@@ -148,7 +148,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(first_name || ' ' || last_name, first_name) AS \"Community Member\", username AS Username, user_id AS UserID, COUNT(*) AS Messages FROM telegram_messages tm JOIN telegram_users tu ON tm.user_id = tu.user_id WHERE tm.created_at >= $__timeFrom() AND tm.created_at <= $__timeTo() GROUP BY tu.user_id, tu.first_name, tu.last_name, tu.username ORDER BY Messages DESC LIMIT 20;",
+          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Community Member\", tm.from_user_username AS Username, tm.from_user_id AS UserID, COUNT(*) AS Messages FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false GROUP BY tm.from_user_id, tm.from_user_first_name, tm.from_user_last_name, tm.from_user_username ORDER BY Messages DESC LIMIT 20;",
           "refId": "A"
         }
       ],
@@ -220,7 +220,7 @@
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS messages FROM telegram_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY time ORDER BY time;",
+          "rawSql": "SELECT date_trunc('day', date) AS time, COUNT(*) AS messages FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time ORDER BY time;",
           "refId": "A"
         }
       ],
