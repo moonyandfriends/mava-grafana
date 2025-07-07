@@ -134,6 +134,24 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "Ticket ID"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open in Mava Dashboard",
+                    "url": "https://dashboard.mava.app/dashboard/ticket?space=653191231792c3d3a69b4946&id=${__value.text}",
+                    "targetBlank": true
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
               "options": "Source"
             },
             "properties": [
