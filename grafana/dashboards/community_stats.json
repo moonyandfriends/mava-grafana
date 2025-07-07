@@ -218,7 +218,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", 'Telegram' AS \"Platform\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
+          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -366,7 +366,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT dc.name AS Channel, COUNT(dm.*) AS Messages FROM discord_messages dm JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.channel_id NOT IN ('1065252962470994021', '1336461137767563304', '1068618500656078849', '1092260477658214492', '1063595387513999430') GROUP BY dc.name ORDER BY Messages DESC LIMIT 10;",
+          "rawSql": "SELECT dc.name AS Channel, COUNT(dm.*) AS Messages FROM discord_messages dm JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.channel_id NOT IN ('1065252962470994021', '1336461137767563304', '1068618500656078849', '1092260477658214492', '1063595387513999430', '1063540719857442876', '1063533369574568027') GROUP BY dc.name ORDER BY Messages DESC LIMIT 10;",
           "refId": "A"
         }
       ]
@@ -475,6 +475,80 @@
         "showValue": "always",
         "groupWidth": 0.7,
         "barWidth": 0.97
+      }
+    },
+    {
+      "id": 18,
+      "title": "Discord Server Joins & Leaves",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 64},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT date_trunc('day', occurred_at) AS time, 'Joins' AS metric, COUNT(*) AS value FROM discord_actions WHERE action_type = 'member_join' AND occurred_at >= $__timeFrom() AND occurred_at <= $__timeTo() GROUP BY time UNION ALL SELECT date_trunc('day', occurred_at) AS time, 'Leaves' AS metric, COUNT(*) AS value FROM discord_actions WHERE action_type = 'member_leave' AND occurred_at >= $__timeFrom() AND occurred_at <= $__timeTo() GROUP BY time ORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "auto",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": 19,
+      "title": "Telegram Server Joins & Leaves",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 64},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT date_trunc('day', date) AS time, 'Joins' AS metric, COUNT(*) AS value FROM telegram_messages WHERE new_chat_members IS NOT NULL AND date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time UNION ALL SELECT date_trunc('day', date) AS time, 'Leaves' AS metric, COUNT(*) AS value FROM telegram_messages WHERE left_chat_member IS NOT NULL AND date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time ORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "auto",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          }
+        }
       }
     }
   ],
