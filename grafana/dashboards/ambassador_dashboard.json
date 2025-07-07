@@ -95,7 +95,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS x_posts FROM x_posts xp JOIN community_ambassadors ca ON xp.username = ca.x_handle WHERE xp.created_at >= $__timeFrom() AND xp.created_at <= $__timeTo();",
+          "rawSql": "\n            SELECT\n                COUNT(*) AS x_posts\n            FROM\n                discord_messages dm\n            JOIN\n                community_ambassadors ca ON dm.author_id::bigint = ca.discord_id\n            WHERE\n                dm.channel_id = '1248750328896295084'\n                AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\n                AND dm.author_is_bot = false\n                AND dm.content ILIKE '%' || ca.x_handle || '%';\n        ",
           "refId": "A"
         }
       ]
