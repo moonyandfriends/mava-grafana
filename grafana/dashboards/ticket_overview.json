@@ -177,11 +177,119 @@
       }
     },
     {
+      "id": 18,
+      "title": "Open Tickets",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 28},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH latest_messages AS (SELECT ticket_id, content, created_at, ROW_NUMBER() OVER (PARTITION BY ticket_id ORDER BY created_at DESC) as rn FROM mava_messages WHERE content IS NOT NULL AND content <> ''), ticket_last_message AS (SELECT ticket_id, content as last_message, created_at as last_message_time FROM latest_messages WHERE rn = 1) SELECT t.id AS \"Ticket ID\", t.subject AS \"Subject\", t.status AS \"Status\", t.priority AS \"Priority\", t.category AS \"Category\", COALESCE(t.customer_name, 'Unknown') AS \"Customer\", t.created_at AS \"Created\", tlm.last_message AS \"Last Message\", tlm.last_message_time AS \"Last Activity\" FROM mava_tickets_with_customers t LEFT JOIN ticket_last_message tlm ON t.id = tlm.ticket_id WHERE t.status IN ('Open', 'Pending', 'Waiting') ORDER BY COALESCE(tlm.last_message_time, t.created_at) DESC LIMIT 50;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Subject"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 200
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last Message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Status"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Priority"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Category"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Created"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last Activity"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "id": 10,
       "title": "Most Common Words in Support Tickets",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 40},
       "targets": [
         {
           "format": "table",
