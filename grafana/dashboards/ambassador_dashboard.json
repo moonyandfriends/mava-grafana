@@ -84,25 +84,11 @@
       }
     },
     {
-      "id": 6,
-      "title": "Ambassador Roles Distribution",
-      "type": "piechart",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT role AS \"Role\", COUNT(*) AS \"Count\" FROM community_ambassadors GROUP BY role ORDER BY COUNT(*) DESC;",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "id": 7,
       "title": "Ambassador Activity by Platform",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16},
       "targets": [
         {
           "format": "table",
@@ -164,7 +150,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT ca.ambassador AS \"Ambassador\", ca.role AS \"Role\", ca.x_handle AS \"X Handle\", COUNT(*) AS \"X Posts\" FROM x_posts xp JOIN community_ambassadors ca ON xp.username = ca.x_handle WHERE xp.created_at >= $__timeFrom() AND xp.created_at <= $__timeTo() GROUP BY ca.ambassador, ca.role, ca.x_handle ORDER BY COUNT(*) DESC;",
+          "rawSql": "SELECT ca.ambassador AS \"Ambassador\", ca.role AS \"Role\", ca.x_handle AS \"X Handle\", COUNT(*) AS \"X Posts\" FROM discord_messages dm JOIN community_ambassadors ca ON dm.author_id::bigint = ca.discord_id WHERE dm.channel_id = '1248750328896295084' AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content ILIKE '%' || ca.x_handle || '%' GROUP BY ca.ambassador, ca.role, ca.x_handle ORDER BY COUNT(*) DESC;",
           "refId": "A"
         }
       ],
