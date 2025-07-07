@@ -97,15 +97,29 @@
       ]
     },
     {
+      "id": 19,
+      "type": "timeseries",
+      "title": "Closed Over Time",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 20},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT date_trunc('day', updated_at) AS time, COUNT(*) AS count FROM mava_tickets_with_customers WHERE status IN ('Closed', 'Resolved') AND updated_at IS NOT NULL GROUP BY time ORDER BY time;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
       "id": 18,
       "title": "Open Tickets",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 20},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 28},
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH latest_messages AS (SELECT m.ticket_id, m.content, m.created_at as message_created_at, m.sender, m.from_customer, ROW_NUMBER() OVER (PARTITION BY m.ticket_id ORDER BY m.created_at DESC) as rn FROM mava_messages m WHERE m.is_deleted = false AND m.content IS NOT NULL AND m.content != '') SELECT t.id AS \"Ticket ID\", t.status AS \"Status\", t.priority AS \"Priority\", t.category AS \"Category\", COALESCE(t.customer_name, 'Unknown') AS \"Customer\", t.source_type AS \"Source\", t.assigned_to AS \"Assigned To\", t.created_at AS \"Created\", t.updated_at AS \"Last Updated\", CASE WHEN lm.content IS NOT NULL THEN CASE WHEN LENGTH(lm.content) > 100 THEN SUBSTRING(lm.content, 1, 100) || '...' ELSE lm.content END ELSE 'No messages' END AS \"Latest Message\", lm.message_created_at AS \"Last Message Time\" FROM mava_tickets_with_customers t LEFT JOIN latest_messages lm ON t.id = lm.ticket_id AND lm.rn = 1 WHERE t.status IN ('Open', 'Pending', 'Waiting') ORDER BY t.updated_at DESC LIMIT 50;",
+          "rawSql": "WITH latest_messages AS (SELECT m.ticket_id, m.content, m.created_at as message_created_at, m.sender, m.from_customer, ROW_NUMBER() OVER (PARTITION BY m.ticket_id ORDER BY m.created_at DESC) as rn FROM mava_messages m WHERE m.is_deleted = false AND m.content IS NOT NULL AND m.content != '') SELECT t.id AS \"Ticket ID\", t.category AS \"Category\", COALESCE(t.customer_name, 'Unknown') AS \"Customer\", t.source_type AS \"Source\", t.assigned_to AS \"Assigned To\", t.created_at AS \"Created\", t.updated_at AS \"Last Updated\", CASE WHEN lm.content IS NOT NULL THEN CASE WHEN LENGTH(lm.content) > 100 THEN SUBSTRING(lm.content, 1, 100) || '...' ELSE lm.content END ELSE 'No messages' END AS \"Latest Message\", lm.message_created_at AS \"Last Message Time\" FROM mava_tickets_with_customers t LEFT JOIN latest_messages lm ON t.id = lm.ticket_id AND lm.rn = 1 WHERE t.status IN ('Open', 'Pending', 'Waiting') ORDER BY t.updated_at DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -126,30 +140,6 @@
               {
                 "id": "custom.width",
                 "value": 100
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Status"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 80
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Priority"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 80
               }
             ]
           },
