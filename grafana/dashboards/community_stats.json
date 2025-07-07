@@ -162,11 +162,107 @@
       }
     },
     {
+      "id": 16,
+      "title": "Latest Discord Messages",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 12, "x": 0, "y": 20},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COALESCE(dm.author_display_name, dm.author_username) AS \"Author\", dm.content AS \"Message\", dm.created_at AS \"Time\", dc.name AS \"Channel\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content IS NOT NULL AND dm.content <> '' ORDER BY dm.created_at DESC LIMIT 50;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 400
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "title": "Latest Telegram Messages",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 12, "x": 12, "y": 20},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", 'Telegram' AS \"Platform\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 400
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "id": 11,
       "title": "Discord Daily Message Activity",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32},
       "targets": [
         {
           "format": "time_series",
@@ -216,7 +312,7 @@
       "title": "Telegram Daily Message Activity",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32},
       "targets": [
         {
           "format": "time_series",
@@ -266,7 +362,7 @@
       "title": "Discord Channel Activity (Top 10 Channels)",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 28},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 40},
       "targets": [
         {
           "format": "table",
@@ -280,7 +376,7 @@
       "title": "Most Common Words in Discord",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 36},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 48},
       "targets": [
         {
           "format": "table",
@@ -333,7 +429,7 @@
       "title": "Most Common Words in Telegram",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 44},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 56},
       "targets": [
         {
           "format": "table",
