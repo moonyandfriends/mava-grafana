@@ -308,7 +308,7 @@
             "properties": [
               {
                 "id": "custom.axisPlacement",
-                "value": "left"
+                "value": "bottom"
               },
               {
                 "id": "custom.axisLabel",
@@ -319,9 +319,62 @@
         ]
       },
       "options": {
-        "orientation": "horizontal",
+        "orientation": "vertical",
         "displayMode": "gradient",
-        "xTickLabelRotation": 90,
+        "xTickLabelRotation": 45,
+        "xTickLabelSpacing": 0,
+        "showValue": "always",
+        "groupWidth": 0.7,
+        "barWidth": 0.97
+      }
+    },
+    {
+      "id": 15,
+      "title": "Most Common Words in Telegram",
+      "type": "barchart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 44},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(text, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND from_user_is_bot = false AND text IS NOT NULL AND text <> '' AND LENGTH(text) > 3), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 25;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "displayMode": "list",
+            "filterable": false,
+            "showUnfilled": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Word"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "bottom"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Words"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "displayMode": "gradient",
+        "xTickLabelRotation": 45,
         "xTickLabelSpacing": 0,
         "showValue": "always",
         "groupWidth": 0.7,
