@@ -137,7 +137,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 180
+                "value": 160
               }
             ]
           },
@@ -149,7 +149,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 200
+                "value": 180
               }
             ]
           },
@@ -161,7 +161,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 180
+                "value": 160
               }
             ]
           },
@@ -173,7 +173,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 200
+                "value": 180
               }
             ]
           },
@@ -185,7 +185,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 200
+                "value": 180
               }
             ]
           },
@@ -197,7 +197,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 150
+                "value": 140
               }
             ]
           },
@@ -209,7 +209,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 180
+                "value": 160
               }
             ]
           }
@@ -228,7 +228,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 24
       },
       "targets": [
         {
@@ -295,7 +295,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 24
+        "y": 16
       },
       "targets": [
         {
