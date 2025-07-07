@@ -83,44 +83,6 @@
       ]
     },
     {
-      "id": 20,
-      "type": "stat",
-      "title": "Tickets by Status (%)",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 6, "y": 4},
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          }
-        }
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "displayMode": "pie"
-      },
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT status, COUNT(*) AS count FROM mava_tickets_with_customers GROUP BY status ORDER BY count DESC;",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "id": 3,
       "type": "timeseries",
       "title": "Created Over Time",
@@ -143,7 +105,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT t.id AS \"Ticket ID\", t.status AS \"Status\", t.priority AS \"Priority\", t.category AS \"Category\", COALESCE(t.customer_name, 'Unknown') AS \"Customer\", t.source_type AS \"Source\", t.assigned_to AS \"Assigned To\", t.created_at AS \"Created\", t.updated_at AS \"Last Updated\" FROM mava_tickets_with_customers t WHERE t.status IN ('Open', 'Pending', 'Waiting') ORDER BY t.updated_at DESC LIMIT 50;",
+          "rawSql": "WITH latest_messages AS (SELECT m.ticket_id, m.content, m.created_at as message_created_at, m.sender, m.from_customer, ROW_NUMBER() OVER (PARTITION BY m.ticket_id ORDER BY m.created_at DESC) as rn FROM mava_messages m WHERE m.is_deleted = false AND m.content IS NOT NULL AND m.content != '') SELECT t.id AS \"Ticket ID\", t.status AS \"Status\", t.priority AS \"Priority\", t.category AS \"Category\", COALESCE(t.customer_name, 'Unknown') AS \"Customer\", t.source_type AS \"Source\", t.assigned_to AS \"Assigned To\", t.created_at AS \"Created\", t.updated_at AS \"Last Updated\", CASE WHEN lm.content IS NOT NULL THEN CASE WHEN LENGTH(lm.content) > 100 THEN SUBSTRING(lm.content, 1, 100) || '...' ELSE lm.content END ELSE 'No messages' END AS \"Latest Message\", lm.message_created_at AS \"Last Message Time\" FROM mava_tickets_with_customers t LEFT JOIN latest_messages lm ON t.id = lm.ticket_id AND lm.rn = 1 WHERE t.status IN ('Open', 'Pending', 'Waiting') ORDER BY t.updated_at DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -250,6 +212,30 @@
                 "value": 120
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Latest Message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last Message Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
           }
         ]
       }
@@ -263,7 +249,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM mava_messages WHERE content IS NOT NULL AND content <> '' AND LENGTH(content) > 3), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us', 'hello', 'thanks', 'please')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 20;",
+          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(m.content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM mava_messages m WHERE m.content IS NOT NULL AND m.content <> '' AND LENGTH(m.content) > 3 AND m.is_deleted = false AND m.created_at >= $__timeFrom() AND m.created_at <= $__timeTo()), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us', 'hello', 'thanks', 'please', 'issue', 'problem', 'help', 'need', 'can', 'get', 'see', 'know', 'think', 'make', 'time', 'good', 'now', 'here', 'out', 'when', 'come', 'its', 'take')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 20;",
           "refId": "A"
         }
       ],
