@@ -1,7 +1,7 @@
 {
   "id": null,
   "uid": "mava-ticket-overview",
-  "title": "Mava Ticket Overview",
+  "title": "Mava Tickets",
   "tags": ["mava_tickets_with_customers", "overview"],
   "timezone": "browser",
   "schemaVersion": 37,
@@ -135,57 +135,15 @@
       ]
     },
     {
-      "id": 6,
-      "type": "piechart",
-      "title": "By Category",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT category, COUNT(*) AS count FROM mava_tickets_with_customers WHERE category IS NOT NULL AND category <> '' GROUP BY category ORDER BY count DESC;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          }
-        }
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "pieType": "pie",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "legend": {
-          "displayMode": "visible",
-          "placement": "bottom"
-        },
-        "displayLabels": ["name", "value"]
-      }
-    },
-    {
       "id": 18,
       "title": "Open Tickets",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 28},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 20},
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH latest_messages AS (SELECT ticket_id, content, created_at, ROW_NUMBER() OVER (PARTITION BY ticket_id ORDER BY created_at DESC) as rn FROM mava_messages WHERE content IS NOT NULL AND content <> ''), ticket_last_message AS (SELECT ticket_id, content as last_message, created_at as last_message_time FROM latest_messages WHERE rn = 1) SELECT t.id AS \"Ticket ID\", t.status AS \"Status\", t.priority AS \"Priority\", t.category AS \"Category\", COALESCE(t.customer_name, 'Unknown') AS \"Customer\", t.source_type AS \"Source\", t.created_at AS \"Created\", tlm.last_message AS \"Last Message\", tlm.last_message_time AS \"Last Activity\" FROM mava_tickets_with_customers t LEFT JOIN ticket_last_message tlm ON t.id = tlm.ticket_id WHERE t.status IN ('Open', 'Pending', 'Waiting') ORDER BY COALESCE(tlm.last_message_time, t.created_at) DESC LIMIT 50;",
+          "rawSql": "SELECT t.id AS \"Ticket ID\", t.status AS \"Status\", t.priority AS \"Priority\", t.category AS \"Category\", COALESCE(t.customer_name, 'Unknown') AS \"Customer\", t.source_type AS \"Source\", t.assigned_to AS \"Assigned To\", t.created_at AS \"Created\", t.updated_at AS \"Last Updated\" FROM mava_tickets_with_customers t WHERE t.status IN ('Open', 'Pending', 'Waiting') ORDER BY t.updated_at DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -206,18 +164,6 @@
               {
                 "id": "custom.width",
                 "value": 100
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Last Message"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 300
               }
             ]
           },
@@ -260,6 +206,30 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "Customer"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Assigned To"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
               "options": "Created"
             },
             "properties": [
@@ -272,7 +242,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Last Activity"
+              "options": "Last Updated"
             },
             "properties": [
               {
