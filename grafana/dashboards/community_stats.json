@@ -14,7 +14,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "SELECT COUNT(*) AS total_messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false;",
           "refId": "A"
         }
       ]
@@ -28,7 +28,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_messages FROM discord_messages;",
+          "rawSql": "SELECT COUNT(*) AS total_messages FROM discord_messages WHERE author_is_bot = false;",
           "refId": "A"
         }
       ]
@@ -70,7 +70,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(DISTINCT author_id) AS active_users FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "SELECT COUNT(DISTINCT author_id) AS active_users FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false;",
           "refId": "A"
         }
       ]
@@ -84,7 +84,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(DISTINCT author_id) AS active_users FROM discord_messages;",
+          "rawSql": "SELECT COUNT(DISTINCT author_id) AS active_users FROM discord_messages WHERE author_is_bot = false;",
           "refId": "A"
         }
       ]
@@ -126,7 +126,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(author_display_name, author_username) AS \"Community Member\", author_username AS Username, author_id AS UserID, COUNT(*) AS Messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
+          "rawSql": "SELECT COALESCE(author_display_name, author_username) AS \"Community Member\", author_username AS Username, author_id AS UserID, COUNT(*) AS Messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
           "refId": "A"
         }
       ],
@@ -148,7 +148,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Community Member\", tm.from_user_username AS Username, tm.from_user_id AS UserID, COUNT(*) AS Messages FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() GROUP BY tm.from_user_id, tm.from_user_first_name, tm.from_user_last_name, tm.from_user_username ORDER BY Messages DESC LIMIT 20;",
+          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Community Member\", tm.from_user_username AS Username, tm.from_user_id AS UserID, COUNT(*) AS Messages FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false GROUP BY tm.from_user_id, tm.from_user_first_name, tm.from_user_last_name, tm.from_user_username ORDER BY Messages DESC LIMIT 20;",
           "refId": "A"
         }
       ],
@@ -170,7 +170,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(dm.author_display_name, dm.author_username) AS \"Author\", dm.content AS \"Message\", dm.created_at AS \"Time\", dc.name AS \"Channel\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.content IS NOT NULL AND dm.content <> '' ORDER BY dm.created_at DESC LIMIT 50;",
+          "rawSql": "SELECT COALESCE(dm.author_display_name, dm.author_username) AS \"Author\", dm.content AS \"Message\", dm.created_at AS \"Time\", dc.name AS \"Channel\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content IS NOT NULL AND dm.content <> '' ORDER BY dm.created_at DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -218,7 +218,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", 'Telegram' AS \"Platform\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
+          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", 'Telegram' AS \"Platform\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -266,7 +266,7 @@
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY time ORDER BY time;",
+          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY time ORDER BY time;",
           "refId": "A"
         }
       ],
@@ -366,7 +366,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT dc.name AS Channel, COUNT(dm.*) AS Messages FROM discord_messages dm JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() GROUP BY dc.name ORDER BY Messages DESC LIMIT 10;",
+          "rawSql": "SELECT dc.name AS Channel, COUNT(dm.*) AS Messages FROM discord_messages dm JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.channel_id NOT IN ('1065252962470994021', '1336461137767563304', '1068618500656078849', '1092260477658214492', '1063595387513999430') GROUP BY dc.name ORDER BY Messages DESC LIMIT 10;",
           "refId": "A"
         }
       ]
@@ -380,7 +380,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND content IS NOT NULL AND content <> '' AND LENGTH(content) > 3), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 25;",
+          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND content IS NOT NULL AND content <> '' AND LENGTH(content) > 3), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us', 'automod', 'blocked', 'analysis', 'scam', 'banned', 'indicates', 'aliases', 'message', 'user')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 25;",
           "refId": "A"
         }
       ],
