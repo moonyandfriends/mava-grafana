@@ -1,7 +1,7 @@
 {
   "id": null,
-  "uid": "ambassador-dashboard",
-  "title": "Ambassador Dashboard",
+  "uid": "community-ambassadors",
+  "title": "Community Ambassadors",
   "tags": ["ambassador", "x", "twitter", "discord", "telegram", "social"],
   "timezone": "browser",
   "panels": [
