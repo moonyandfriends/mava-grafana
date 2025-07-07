@@ -185,7 +185,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH latest_messages AS (SELECT ticket_id, content, created_at, ROW_NUMBER() OVER (PARTITION BY ticket_id ORDER BY created_at DESC) as rn FROM mava_messages WHERE content IS NOT NULL AND content <> ''), ticket_last_message AS (SELECT ticket_id, content as last_message, created_at as last_message_time FROM latest_messages WHERE rn = 1) SELECT t.id AS \"Ticket ID\", t.subject AS \"Subject\", t.status AS \"Status\", t.priority AS \"Priority\", t.category AS \"Category\", COALESCE(t.customer_name, 'Unknown') AS \"Customer\", t.created_at AS \"Created\", tlm.last_message AS \"Last Message\", tlm.last_message_time AS \"Last Activity\" FROM mava_tickets_with_customers t LEFT JOIN ticket_last_message tlm ON t.id = tlm.ticket_id WHERE t.status IN ('Open', 'Pending', 'Waiting') ORDER BY COALESCE(tlm.last_message_time, t.created_at) DESC LIMIT 50;",
+          "rawSql": "WITH latest_messages AS (SELECT ticket_id, content, created_at, ROW_NUMBER() OVER (PARTITION BY ticket_id ORDER BY created_at DESC) as rn FROM mava_messages WHERE content IS NOT NULL AND content <> ''), ticket_last_message AS (SELECT ticket_id, content as last_message, created_at as last_message_time FROM latest_messages WHERE rn = 1) SELECT t.id AS \"Ticket ID\", t.status AS \"Status\", t.priority AS \"Priority\", t.category AS \"Category\", COALESCE(t.customer_name, 'Unknown') AS \"Customer\", t.source_type AS \"Source\", t.created_at AS \"Created\", tlm.last_message AS \"Last Message\", tlm.last_message_time AS \"Last Activity\" FROM mava_tickets_with_customers t LEFT JOIN ticket_last_message tlm ON t.id = tlm.ticket_id WHERE t.status IN ('Open', 'Pending', 'Waiting') ORDER BY COALESCE(tlm.last_message_time, t.created_at) DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -200,12 +200,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Subject"
+              "options": "Source"
             },
             "properties": [
               {
                 "id": "custom.width",
-                "value": 200
+                "value": 100
               }
             ]
           },
@@ -289,14 +289,53 @@
       "title": "Most Common Words in Support Tickets",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 40},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 40},
       "targets": [
         {
           "format": "table",
           "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM mava_messages WHERE content IS NOT NULL AND content <> '' AND LENGTH(content) > 3), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us', 'hello', 'thanks', 'please')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 20;",
           "refId": "A"
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "displayMode": "list",
+            "filterable": false,
+            "showUnfilled": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Word"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "bottom"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Words"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "orientation": "vertical",
+        "displayMode": "gradient",
+        "xTickLabelRotation": 45,
+        "xTickLabelSpacing": 0,
+        "showValue": "always",
+        "groupWidth": 0.7,
+        "barWidth": 0.97
+      }
     }
   ]
 } 
