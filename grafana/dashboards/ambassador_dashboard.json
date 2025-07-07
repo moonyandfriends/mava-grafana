@@ -117,7 +117,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "\n            SELECT\n                ca.ambassador AS \"Ambassador\",\n                ca.role AS \"Role\",\n                ca.x_handle AS \"X Handle\",\n                COALESCE(discord_posts.posts, 0) AS \"Discord Posts\",\n                COALESCE(telegram_posts.posts, 0) AS \"Telegram Posts\",\n                COALESCE(x_posts.posts, 0) AS \"X Posts\",\n                COALESCE(discord_posts.posts, 0) + COALESCE(telegram_posts.posts, 0) + COALESCE(x_posts.posts, 0) AS \"Total Posts\"\n            FROM\n                community_ambassadors ca\n            LEFT JOIN (\n                SELECT\n                    ca.ambassador,\n                    COUNT(*) AS posts\n                FROM\n                    discord_messages dm\n                JOIN\n                    community_ambassadors ca ON dm.author_id::bigint = ca.discord_id\n                WHERE\n                    dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false\n                GROUP BY\n                    ca.ambassador\n            ) discord_posts ON ca.ambassador = discord_posts.ambassador\n            LEFT JOIN (\n                SELECT\n                    ca.ambassador,\n                    COUNT(*) AS posts\n                FROM\n                    telegram_messages tm\n                JOIN\n                    community_ambassadors ca ON tm.user_id = ca.telegram_id\n                WHERE\n                    tm.created_at >= $__timeFrom() AND tm.created_at <= $__timeTo()\n                GROUP BY\n                    ca.ambassador\n            ) telegram_posts ON ca.ambassador = telegram_posts.ambassador\n            LEFT JOIN (\n                SELECT\n                    ca.ambassador,\n                    COUNT(*) AS posts\n                FROM\n                    discord_messages dm,\n                    community_ambassadors ca_inner\n                WHERE\n                    dm.channel_id = '1248750328896295084'\n                    AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\n                    AND dm.author_is_bot = false\n                    AND dm.content ILIKE '%' || ca_inner.x_handle || '%'\n                    AND ca_inner.ambassador = ca.ambassador -- Link back to outer query's ambassador\n                GROUP BY\n                    ca.ambassador\n            ) x_posts ON ca.ambassador = x_posts.ambassador\n            ORDER BY\n                \"Total Posts\" DESC;\n        ",
+          "rawSql": "SELECT ca.ambassador AS \"Ambassador\", ca.role AS \"Role\", ca.x_handle AS \"X Handle\", COALESCE(tm_data.telegram_username, 'Not Available') AS \"Telegram Username\", COALESCE(dm_data.discord_username, 'Not Available') AS \"Discord Username\", ca.telegram_id AS \"Telegram ID\", ca.discord_id AS \"Discord ID\" FROM community_ambassadors ca LEFT JOIN (SELECT DISTINCT tm.from_user_id, tm.from_user_username as telegram_username FROM telegram_messages tm WHERE tm.from_user_username IS NOT NULL) tm_data ON ca.telegram_id = tm_data.from_user_id LEFT JOIN (SELECT DISTINCT dm.author_id::bigint, dm.author_username as discord_username FROM discord_messages dm WHERE dm.author_username IS NOT NULL) dm_data ON ca.discord_id = dm_data.author_id ORDER BY ca.ambassador;",
           "refId": "A"
         }
       ],
@@ -127,7 +127,93 @@
             "displayMode": "table",
             "filterable": true
           }
-        }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Ambassador"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Role"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "X Handle"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Telegram Username"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Discord Username"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Telegram ID"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Discord ID"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          }
+        ]
       }
     },
     {
