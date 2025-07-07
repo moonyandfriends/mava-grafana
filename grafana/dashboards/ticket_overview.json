@@ -121,25 +121,11 @@
       ]
     },
     {
-      "id": 2,
-      "type": "barchart",
-      "title": "By Status",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT status, COUNT(*) AS count FROM mava_tickets_with_customers GROUP BY status ORDER BY count DESC;",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "id": 3,
       "type": "timeseries",
       "title": "Created Over Time",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 12},
       "targets": [
         {
           "format": "time_series",
@@ -149,67 +135,53 @@
       ]
     },
     {
-      "id": 4,
-      "type": "stat",
-      "title": "Avg. Resolution Time (hrs)",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 20},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600), 2) AS avg_resolution_hours FROM mava_tickets_with_customers WHERE status = 'Resolved' AND created_at IS NOT NULL AND updated_at IS NOT NULL;",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "type": "piechart",
-      "title": "By Priority",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 26},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT priority, COUNT(*) AS count FROM mava_tickets_with_customers GROUP BY priority ORDER BY count DESC;",
-          "refId": "A"
-        }
-      ]
-    },
-    {
       "id": 6,
       "type": "piechart",
       "title": "By Category",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 26},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT category, COUNT(*) AS count FROM mava_tickets_with_customers GROUP BY category ORDER BY count DESC;",
+          "rawSql": "SELECT category, COUNT(*) AS count FROM mava_tickets_with_customers WHERE category IS NOT NULL AND category <> '' GROUP BY category ORDER BY count DESC;",
           "refId": "A"
         }
-      ]
-    },
-    {
-      "id": 7,
-      "type": "barchart",
-      "title": "Open vs. Closed",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 34},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT CASE WHEN status = 'Resolved' THEN 'Closed' ELSE 'Open' END AS state, COUNT(*) AS count FROM mava_tickets_with_customers GROUP BY state;",
-          "refId": "A"
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          }
         }
-      ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "pieType": "pie",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "visible",
+          "placement": "bottom"
+        },
+        "displayLabels": ["name", "value"]
+      }
     },
     {
       "id": 10,
       "title": "Most Common Words in Support Tickets",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 42},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
       "targets": [
         {
           "format": "table",
