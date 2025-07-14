@@ -136,7 +136,26 @@
             "displayMode": "table",
             "filterable": true
           }
-        }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Username"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View Discord Profile",
+                    "url": "https://discord.com/users/${__data.fields.UserID}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -158,7 +177,26 @@
             "displayMode": "table",
             "filterable": true
           }
-        }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Username"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View Telegram Profile",
+                    "url": "https://t.me/${__data.fields.Username}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -170,7 +208,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(dm.author_display_name, dm.author_username) AS \"Author\", dm.content AS \"Message\", dm.created_at AS \"Time\", dc.name AS \"Channel\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content IS NOT NULL AND dm.content <> '' ORDER BY dm.created_at DESC LIMIT 50;",
+          "rawSql": "SELECT COALESCE(dm.author_display_name, dm.author_username) AS \"Author\", dm.content AS \"Message\", dm.created_at AS \"Time\", dc.name AS \"Channel\", dm.author_id AS \"AuthorID\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content IS NOT NULL AND dm.content <> '' ORDER BY dm.created_at DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -203,6 +241,35 @@
               {
                 "id": "custom.width",
                 "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Author"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View Discord Profile",
+                    "url": "https://discord.com/users/${__data.fields.AuthorID}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AuthorID"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
               }
             ]
           }
@@ -218,7 +285,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
+          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", tm.from_user_username AS \"Username\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -251,6 +318,35 @@
               {
                 "id": "custom.width",
                 "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Author"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View Telegram Profile",
+                    "url": "https://t.me/${__data.fields.Username}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Username"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
               }
             ]
           }
