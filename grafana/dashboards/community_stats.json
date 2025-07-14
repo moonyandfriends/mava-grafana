@@ -152,6 +152,10 @@
                     "url": "https://discord.com/users/${__data.fields.UserID}"
                   }
                 ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
               }
             ]
           }
@@ -193,6 +197,10 @@
                     "url": "https://t.me/${__data.fields.Username}"
                   }
                 ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
               }
             ]
           }
@@ -246,6 +254,10 @@
                     "url": "https://discord.com/users/${__data.fields.AuthorID}"
                   }
                 ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
               }
             ]
           },
@@ -279,6 +291,10 @@
                     "url": "https://discord.com/channels/1063532490829598760/${__data.fields.ChannelID}/${__data.fields.MessageID}"
                   }
                 ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
               }
             ]
           },
@@ -296,6 +312,10 @@
                     "url": "https://discord.com/channels/1063532490829598760/${__data.fields.ChannelID}"
                   }
                 ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
               }
             ]
           },
@@ -373,6 +393,10 @@
                     "url": "https://t.me/${__data.fields.Username}"
                   }
                 ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
               }
             ]
           },
@@ -394,6 +418,10 @@
                     "url": "https://t.me/c/${__data.fields.ChatID}/${__data.fields.MessageID}"
                   }
                 ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
               }
             ]
           },
