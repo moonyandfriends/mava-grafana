@@ -208,7 +208,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(dm.author_display_name, dm.author_username) AS \"Author\", dm.content AS \"Message\", dm.created_at AS \"Time\", dc.name AS \"Channel\", dm.author_id AS \"AuthorID\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content IS NOT NULL AND dm.content <> '' ORDER BY dm.created_at DESC LIMIT 50;",
+          "rawSql": "SELECT COALESCE(dm.author_display_name, dm.author_username) AS \"Author\", dm.content AS \"Message\", dm.created_at AS \"Time\", dc.name AS \"Channel\", dm.author_id AS \"AuthorID\", dm.id AS \"MessageID\", dm.channel_id AS \"ChannelID\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content IS NOT NULL AND dm.content <> '' ORDER BY dm.created_at DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -220,18 +220,6 @@
           }
         },
         "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Message"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 400
-              }
-            ]
-          },
           {
             "matcher": {
               "id": "byName",
@@ -272,6 +260,68 @@
                 "value": true
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 400
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View Discord Message",
+                    "url": "https://discord.com/channels/1063532490829598760/${__data.fields.ChannelID}/${__data.fields.MessageID}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Channel"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View Discord Channel",
+                    "url": "https://discord.com/channels/1063532490829598760/${__data.fields.ChannelID}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "MessageID"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ChannelID"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
           }
         ]
       }
@@ -285,7 +335,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", tm.from_user_username AS \"Username\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
+          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", tm.from_user_username AS \"Username\", tm.message_id AS \"MessageID\", tm.chat_id AS \"ChatID\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -297,18 +347,6 @@
           }
         },
         "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Message"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 400
-              }
-            ]
-          },
           {
             "matcher": {
               "id": "byName",
@@ -341,7 +379,52 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "Message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 400
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View Telegram Message",
+                    "url": "https://t.me/c/${__data.fields.ChatID}/${__data.fields.MessageID}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
               "options": "Username"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "MessageID"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ChatID"
             },
             "properties": [
               {
