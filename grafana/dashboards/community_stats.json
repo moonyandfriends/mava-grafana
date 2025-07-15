@@ -150,7 +150,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 60
+                "value": 120
               }
             ]
           },
@@ -172,6 +172,13 @@
               {
                 "id": "custom.displayMode",
                 "value": "color-text"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "light-pink"
+                }
               }
             ]
           }
@@ -256,7 +263,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 60
+                "value": 120
               }
             ]
           },
@@ -290,6 +297,13 @@
               {
                 "id": "custom.displayMode",
                 "value": "color-text"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "light-pink"
+                }
               }
             ]
           },
