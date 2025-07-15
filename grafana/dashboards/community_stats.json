@@ -803,6 +803,17 @@
           }
         }
       }
+    },
+    {
+      "id": 999,
+      "title": "",
+      "type": "text",
+      "gridPos": {"h": 1, "w": 1, "x": 0, "y": 0},
+      "options": {
+        "mode": "html",
+        "content": "<style>\n/* Custom CSS to style Discord profile links */\n.table-panel a[href*=\"discord.com/users/\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"discord.com/users/\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Additional targeting for table cells with links */\n.table-panel .table-panel-table td a {\n  text-decoration: none !important;\n  font-weight: normal !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"discord.com/users/\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"discord.com/users/\"]:hover {\n  color: #FF69B4 !important;\n}\n</style>"
+      },
+      "transparent": true
     }
   ],
   "time": {
