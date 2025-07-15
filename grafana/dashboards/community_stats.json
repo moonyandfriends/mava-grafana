@@ -199,7 +199,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(MAX(tm.from_user_avatar_url), 'https://ui-avatars.com/api/?name=' || COALESCE(tm.from_user_first_name, tm.from_user_username, 'User') || '&background=5865f2&color=fff') AS \"Avatar\", COALESCE(NULLIF(TRIM(tm.from_user_first_name || ' ' || COALESCE(tm.from_user_last_name, '')), ''), tm.from_user_first_name, tm.from_user_username, 'Unknown') AS \"Community Member\", COALESCE(tm.from_user_username, 'N/A') AS Username, tm.from_user_id AS UserID, COUNT(*) AS Messages FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND COALESCE(tm.from_user_is_bot, false) = false GROUP BY tm.from_user_id, tm.from_user_first_name, tm.from_user_last_name, tm.from_user_username ORDER BY Messages DESC LIMIT 20;",
+          "rawSql": "SELECT 'https://ui-avatars.com/api/?name=' || COALESCE(tm.from_user_first_name, '') || '+' || COALESCE(tm.from_user_last_name, '') || '&size=128&background=FFB6C1&color=000000' AS \"Avatar\", COALESCE(NULLIF(TRIM(tm.from_user_first_name || ' ' || COALESCE(tm.from_user_last_name, '')), ''), tm.from_user_first_name, tm.from_user_username, 'Unknown') AS \"Community Member\", COALESCE(tm.from_user_username, 'N/A') AS Username, tm.from_user_id AS UserID, COUNT(*) AS Messages FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND COALESCE(tm.from_user_is_bot, false) = false GROUP BY tm.from_user_id, tm.from_user_first_name, tm.from_user_last_name, tm.from_user_username ORDER BY Messages DESC LIMIT 20;",
           "refId": "A"
         }
       ],
@@ -439,7 +439,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(tm.from_user_avatar_url, 'https://ui-avatars.com/api/?name=' || COALESCE(tm.from_user_first_name, tm.from_user_username, 'User') || '&background=5865f2&color=fff') AS \"Avatar\", COALESCE(NULLIF(TRIM(tm.from_user_first_name || ' ' || COALESCE(tm.from_user_last_name, '')), ''), tm.from_user_first_name, tm.from_user_username, 'Unknown') AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", COALESCE(tm.from_user_username, 'N/A') AS \"Username\", tm.message_id AS \"MessageID\", tm.chat_id AS \"ChatID\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND COALESCE(tm.from_user_is_bot, false) = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
+          "rawSql": "SELECT 'https://ui-avatars.com/api/?name=' || COALESCE(tm.from_user_first_name, '') || '+' || COALESCE(tm.from_user_last_name, '') || '&size=128&background=FFB6C1&color=000000' AS \"Avatar\", COALESCE(NULLIF(TRIM(tm.from_user_first_name || ' ' || COALESCE(tm.from_user_last_name, '')), ''), tm.from_user_first_name, tm.from_user_username, 'Unknown') AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", COALESCE(tm.from_user_username, 'N/A') AS \"Username\", tm.message_id AS \"MessageID\", tm.chat_id AS \"ChatID\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND COALESCE(tm.from_user_is_bot, false) = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
           "refId": "A"
         }
       ],
