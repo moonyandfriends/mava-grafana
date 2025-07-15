@@ -133,7 +133,7 @@
       "options": {
         "showHeader": true,
         "fontSize": "100%",
-        "rowHeight": 80
+        "rowHeight": 120
       },
       "fieldConfig": {
         "defaults": {
@@ -155,7 +155,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 120
+                "value": 140
               }
             ]
           },
@@ -199,10 +199,15 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Community Member\", tm.from_user_username AS Username, tm.from_user_id AS UserID, COUNT(*) AS Messages FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false GROUP BY tm.from_user_id, tm.from_user_first_name, tm.from_user_last_name, tm.from_user_username ORDER BY Messages DESC LIMIT 20;",
+          "rawSql": "SELECT MAX(tm.from_user_avatar_url) AS \"Avatar\", COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Community Member\", tm.from_user_username AS Username, tm.from_user_id AS UserID, COUNT(*) AS Messages FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false GROUP BY tm.from_user_id, tm.from_user_first_name, tm.from_user_last_name, tm.from_user_username ORDER BY Messages DESC LIMIT 20;",
           "refId": "A"
         }
       ],
+      "options": {
+        "showHeader": true,
+        "fontSize": "100%",
+        "rowHeight": 120
+      },
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -211,6 +216,22 @@
           }
         },
         "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avatar"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "image"
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
           {
             "matcher": {
               "id": "byName",
@@ -251,7 +272,7 @@
       "options": {
         "showHeader": true,
         "fontSize": "100%",
-        "rowHeight": 80
+        "rowHeight": 120
       },
       "fieldConfig": {
         "defaults": {
@@ -273,7 +294,7 @@
               },
               {
                 "id": "custom.width",
-                "value": 120
+                "value": 140
               }
             ]
           },
@@ -411,10 +432,15 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", tm.from_user_username AS \"Username\", tm.message_id AS \"MessageID\", tm.chat_id AS \"ChatID\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
+          "rawSql": "SELECT tm.from_user_avatar_url AS \"Avatar\", COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", tm.from_user_username AS \"Username\", tm.message_id AS \"MessageID\", tm.chat_id AS \"ChatID\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
           "refId": "A"
         }
       ],
+      "options": {
+        "showHeader": true,
+        "fontSize": "100%",
+        "rowHeight": 120
+      },
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -423,6 +449,22 @@
           }
         },
         "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avatar"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "image"
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
           {
             "matcher": {
               "id": "byName",
@@ -622,14 +664,14 @@
     },
     {
       "id": 13,
-      "title": "Discord Channel Activity (Top 10 Channels)",
+      "title": "Discord Channel Activity (Top 5 Channels)",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 50},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT dc.name AS Channel, COUNT(dm.*) AS Messages FROM discord_messages dm JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.channel_id NOT IN ('1065252962470994021', '1336461137767563304', '1068618500656078849', '1092260477658214492', '1063595387513999430', '1063540719857442876', '1063533369574568027') GROUP BY dc.name ORDER BY Messages DESC LIMIT 10;",
+          "rawSql": "SELECT dc.name AS Channel, COUNT(dm.*) AS Messages FROM discord_messages dm JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.channel_id NOT IN ('1065252962470994021', '1336461137767563304', '1068618500656078849', '1092260477658214492', '1063595387513999430', '1063540719857442876', '1063533369574568027') GROUP BY dc.name ORDER BY Messages DESC LIMIT 5;",
           "refId": "A"
         }
       ]
@@ -786,7 +828,7 @@
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT date_trunc('day', date) AS time, 'Joins' AS metric, COUNT(*) AS value FROM telegram_messages WHERE new_chat_members IS NOT NULL AND date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time UNION ALL SELECT date_trunc('day', date) AS time, 'Leaves' AS metric, COUNT(*) AS value FROM telegram_messages WHERE left_chat_member IS NOT NULL AND date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time ORDER BY time;",
+          "rawSql": "SELECT date_trunc('day', date) AS time, 'Joins' AS metric, COUNT(*) AS value FROM telegram_messages WHERE (new_chat_members IS NOT NULL AND new_chat_members != '' AND new_chat_members != '[]' AND new_chat_members != 'null' AND COALESCE(new_chat_members::text, '') != '') AND date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time UNION ALL SELECT date_trunc('day', date) AS time, 'Leaves' AS metric, COUNT(*) AS value FROM telegram_messages WHERE (left_chat_member IS NOT NULL AND left_chat_member != '' AND left_chat_member != '{}' AND left_chat_member != 'null' AND COALESCE(left_chat_member::text, '') != '') AND date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time ORDER BY time;",
           "refId": "A"
         }
       ],
@@ -821,7 +863,7 @@
       "gridPos": {"h": 1, "w": 24, "x": 0, "y": 54},
       "options": {
         "mode": "html",
-        "content": "<style>\n/* Override all links to light pink, no underline, not bold */\n.table-panel a {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n.table-panel a:hover {\n  color: #FF69B4 !important;\n}\n\n/* Custom CSS to style Discord profile links */\n.table-panel a[href*=\"discord.com/users/\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"discord.com/users/\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Additional targeting for table cells with links */\n.table-panel .table-panel-table td a {\n  text-decoration: none !important;\n  font-weight: normal !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"discord.com/users/\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"discord.com/users/\"]:hover {\n  color: #FF69B4 !important;\n}\n\n/* Force row height for tables with avatars - comprehensive targeting */\n.table-panel .table-panel-table {\n  table-layout: fixed !important;\n}\n\n.table-panel .table-panel-table tbody tr {\n  height: 90px !important;\n  min-height: 90px !important;\n  max-height: 90px !important;\n}\n\n.table-panel .table-panel-table tbody tr td {\n  height: 90px !important;\n  min-height: 90px !important;\n  max-height: 90px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* Modern Grafana table targeting */\n.table-panel [data-testid=\"table\"] tbody tr {\n  height: 90px !important;\n  min-height: 90px !important;\n}\n\n.table-panel [data-testid=\"table\"] tbody tr td {\n  height: 90px !important;\n  min-height: 90px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* React table targeting */\n.table-panel .react-table tbody tr {\n  height: 90px !important;\n  min-height: 90px !important;\n}\n\n.table-panel .react-table tbody tr td {\n  height: 90px !important;\n  min-height: 90px !important;\n  vertical-align: middle !important;\n}\n\n/* Generic table targeting for different Grafana versions */\n.table-panel table tbody tr {\n  height: 90px !important;\n  min-height: 90px !important;\n}\n\n.table-panel table tbody tr td {\n  height: 90px !important;\n  min-height: 90px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* Double the size of avatar images */\n.table-panel img {\n  width: 80px !important;\n  height: 80px !important;\n}\n\n/* More specific targeting for avatar images */\n.table-panel .table-panel-table td img {\n  width: 80px !important;\n  height: 80px !important;\n  object-fit: cover !important;\n}\n\n/* Target images in Avatar column specifically */\n.table-panel .table-panel-table tbody tr td:first-child img {\n  width: 80px !important;\n  height: 80px !important;\n  object-fit: cover !important;\n}\n\n/* Alternative targeting for different Grafana versions */\n.table-panel [data-column=\"Avatar\"] img {\n  width: 80px !important;\n  height: 80px !important;\n  object-fit: cover !important;\n}\n\n/* Target by column header */\n.table-panel th:contains(\"Avatar\") + td img {\n  width: 80px !important;\n  height: 80px !important;\n  object-fit: cover !important;\n}\n\n/* Ensure table cells accommodate the larger avatars */\n.table-panel .table-panel-table tbody tr td:first-child {\n  width: 120px !important;\n  min-width: 120px !important;\n  text-align: center !important;\n}\n</style>"
+        "content": "<style>\n/* Override all links to light pink, no underline, not bold */\n.table-panel a {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n.table-panel a:hover {\n  color: #FF69B4 !important;\n}\n\n/* Custom CSS to style Discord profile links */\n.table-panel a[href*=\"discord.com/users/\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"discord.com/users/\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Custom CSS to style Telegram profile links */\n.table-panel a[href*=\"t.me/\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"t.me/\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Custom CSS to style Mava dashboard links */\n.table-panel a[href*=\"mava.app\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"mava.app\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Additional targeting for table cells with links */\n.table-panel .table-panel-table td a {\n  text-decoration: none !important;\n  font-weight: normal !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"discord.com/users/\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"discord.com/users/\"]:hover {\n  color: #FF69B4 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"t.me/\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"t.me/\"]:hover {\n  color: #FF69B4 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"mava.app\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"mava.app\"]:hover {\n  color: #FF69B4 !important;\n}\n\n/* Force row height for tables with avatars - comprehensive targeting */\n.table-panel .table-panel-table {\n  table-layout: fixed !important;\n}\n\n.table-panel .table-panel-table tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n  max-height: 130px !important;\n}\n\n.table-panel .table-panel-table tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  max-height: 130px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* Modern Grafana table targeting */\n.table-panel [data-testid=\"table\"] tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n}\n\n.table-panel [data-testid=\"table\"] tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* React table targeting */\n.table-panel .react-table tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n}\n\n.table-panel .react-table tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  vertical-align: middle !important;\n}\n\n/* Generic table targeting for different Grafana versions */\n.table-panel table tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n}\n\n.table-panel table tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* Larger avatar images - increased from 80px to 110px */\n.table-panel img {\n  width: 110px !important;\n  height: 110px !important;\n}\n\n/* More specific targeting for avatar images */\n.table-panel .table-panel-table td img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Target images in Avatar column specifically */\n.table-panel .table-panel-table tbody tr td:first-child img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Alternative targeting for different Grafana versions */\n.table-panel [data-column=\"Avatar\"] img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Target by column header */\n.table-panel th:contains(\"Avatar\") + td img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Ensure table cells accommodate the larger avatars */\n.table-panel .table-panel-table tbody tr td:first-child {\n  width: 140px !important;\n  min-width: 140px !important;\n  text-align: center !important;\n}\n</style>"
       },
       "transparent": true
     }
