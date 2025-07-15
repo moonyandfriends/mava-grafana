@@ -126,7 +126,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT MAX(author_avatar_url) AS \"Avatar\", COALESCE(author_display_name, author_username) AS \"Community Member\", author_username AS Username, author_id AS UserID, COUNT(*) AS Messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
+          "rawSql": "SELECT COALESCE(MAX(author_avatar_url), 'https://cdn.discordapp.com/embed/avatars/' || ((author_id::bigint >> 22) % 6) || '.png') AS \"Avatar\", COALESCE(author_display_name, author_username) AS \"Community Member\", author_username AS Username, author_id AS UserID, COUNT(*) AS Messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false GROUP BY author_id, author_username, author_display_name ORDER BY Messages DESC LIMIT 20;",
           "refId": "A"
         }
       ],
@@ -199,7 +199,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT MAX(tm.from_user_avatar_url) AS \"Avatar\", COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Community Member\", tm.from_user_username AS Username, tm.from_user_id AS UserID, COUNT(*) AS Messages FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false GROUP BY tm.from_user_id, tm.from_user_first_name, tm.from_user_last_name, tm.from_user_username ORDER BY Messages DESC LIMIT 20;",
+          "rawSql": "SELECT COALESCE(MAX(tm.from_user_avatar_url), 'https://ui-avatars.com/api/?name=' || COALESCE(tm.from_user_first_name, tm.from_user_username, 'User') || '&background=5865f2&color=fff') AS \"Avatar\", COALESCE(NULLIF(TRIM(tm.from_user_first_name || ' ' || COALESCE(tm.from_user_last_name, '')), ''), tm.from_user_first_name, tm.from_user_username, 'Unknown') AS \"Community Member\", COALESCE(tm.from_user_username, 'N/A') AS Username, tm.from_user_id AS UserID, COUNT(*) AS Messages FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND COALESCE(tm.from_user_is_bot, false) = false GROUP BY tm.from_user_id, tm.from_user_first_name, tm.from_user_last_name, tm.from_user_username ORDER BY Messages DESC LIMIT 20;",
           "refId": "A"
         }
       ],
@@ -250,6 +250,13 @@
               {
                 "id": "custom.displayMode",
                 "value": "color-text"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "light-pink"
+                }
               }
             ]
           }
@@ -265,7 +272,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT dm.author_avatar_url AS \"Avatar\", COALESCE(dm.author_display_name, dm.author_username) AS \"Author\", dm.content AS \"Message\", dm.created_at AS \"Time\", dc.name AS \"Channel\", dm.author_id AS \"AuthorID\", dm.id AS \"MessageID\", dm.channel_id AS \"ChannelID\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content IS NOT NULL AND dm.content <> '' ORDER BY dm.created_at DESC LIMIT 50;",
+          "rawSql": "SELECT COALESCE(dm.author_avatar_url, 'https://cdn.discordapp.com/embed/avatars/' || ((dm.author_id::bigint >> 22) % 6) || '.png') AS \"Avatar\", COALESCE(dm.author_display_name, dm.author_username) AS \"Author\", dm.content AS \"Message\", dm.created_at AS \"Time\", dc.name AS \"Channel\", dm.author_id AS \"AuthorID\", dm.id AS \"MessageID\", dm.channel_id AS \"ChannelID\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content IS NOT NULL AND dm.content <> '' ORDER BY dm.created_at DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -432,7 +439,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT tm.from_user_avatar_url AS \"Avatar\", COALESCE(tm.from_user_first_name || ' ' || tm.from_user_last_name, tm.from_user_first_name) AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", tm.from_user_username AS \"Username\", tm.message_id AS \"MessageID\", tm.chat_id AS \"ChatID\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND tm.from_user_is_bot = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
+          "rawSql": "SELECT COALESCE(tm.from_user_avatar_url, 'https://ui-avatars.com/api/?name=' || COALESCE(tm.from_user_first_name, tm.from_user_username, 'User') || '&background=5865f2&color=fff') AS \"Avatar\", COALESCE(NULLIF(TRIM(tm.from_user_first_name || ' ' || COALESCE(tm.from_user_last_name, '')), ''), tm.from_user_first_name, tm.from_user_username, 'Unknown') AS \"Author\", tm.text AS \"Message\", tm.date AS \"Time\", COALESCE(tm.from_user_username, 'N/A') AS \"Username\", tm.message_id AS \"MessageID\", tm.chat_id AS \"ChatID\" FROM telegram_messages tm WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() AND COALESCE(tm.from_user_is_bot, false) = false AND tm.text IS NOT NULL AND tm.text <> '' ORDER BY tm.date DESC LIMIT 50;",
           "refId": "A"
         }
       ],
@@ -495,6 +502,13 @@
               {
                 "id": "custom.displayMode",
                 "value": "color-text"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "light-pink"
+                }
               }
             ]
           },
@@ -828,7 +842,7 @@
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT date_trunc('day', date) AS time, 'Joins' AS metric, COUNT(*) AS value FROM telegram_messages WHERE (new_chat_members IS NOT NULL AND new_chat_members != '' AND new_chat_members != '[]' AND new_chat_members != 'null' AND COALESCE(new_chat_members::text, '') != '') AND date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time UNION ALL SELECT date_trunc('day', date) AS time, 'Leaves' AS metric, COUNT(*) AS value FROM telegram_messages WHERE (left_chat_member IS NOT NULL AND left_chat_member != '' AND left_chat_member != '{}' AND left_chat_member != 'null' AND COALESCE(left_chat_member::text, '') != '') AND date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time ORDER BY time;",
+          "rawSql": "SELECT date_trunc('day', date) AS time, 'Joins' AS metric, COUNT(*) AS value FROM telegram_messages WHERE (new_chat_members IS NOT NULL AND new_chat_members::text != '' AND new_chat_members::text != '[]' AND new_chat_members::text != 'null') AND date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time UNION ALL SELECT date_trunc('day', date) AS time, 'Leaves' AS metric, COUNT(*) AS value FROM telegram_messages WHERE (left_chat_member IS NOT NULL AND left_chat_member::text != '' AND left_chat_member::text != '{}' AND left_chat_member::text != 'null') AND date >= $__timeFrom() AND date <= $__timeTo() GROUP BY time ORDER BY time;",
           "refId": "A"
         }
       ],
