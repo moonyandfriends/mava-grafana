@@ -1,0 +1,398 @@
+{
+  "id": null,
+  "uid": "mava-tickets-comprehensive",
+  "title": "Comprehensive Support Tickets Dashboard",
+  "description": "Unified support tickets dashboard combining operational management and performance analytics",
+  "tags": ["mava", "tickets", "support", "analytics", "performance"],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "hideControls": false,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Ticket Status Overview",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
+      "collapsed": false
+    },
+    {
+      "id": 2,
+      "title": "Open Tickets",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS open_tickets FROM tickets WHERE status = 'open' AND created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 5},
+              {"color": "red", "value": 15}
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Pending Tickets",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 4, "x": 4, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS pending_tickets FROM tickets WHERE status = 'pending' AND created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 3},
+              {"color": "red", "value": 10}
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Waiting Tickets",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS waiting_tickets FROM tickets WHERE status = 'waiting' AND created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "blue", "value": null},
+              {"color": "yellow", "value": 2},
+              {"color": "red", "value": 8}
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 5,
+      "title": "Resolved Tickets",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 4, "x": 12, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS resolved_tickets FROM tickets WHERE status = 'resolved' AND created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "fixed", "fixedColor": "green"}
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 6,
+      "title": "Total Tickets",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 4, "x": 16, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS total_tickets FROM tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "fixed", "fixedColor": "blue"}
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 7,
+      "title": "Resolution Rate",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 4, "x": 20, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT ROUND((COUNT(CASE WHEN status = 'resolved' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0)), 2) AS resolution_rate FROM tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 60},
+              {"color": "green", "value": 80}
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 8,
+      "title": "Ticket Trends & Analytics",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 5},
+      "collapsed": false
+    },
+    {
+      "id": 9,
+      "title": "Ticket Volume & Resolution Trends",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 16, "x": 0, "y": 6},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT DATE_TRUNC('day', created_at) AS time, 'Created' AS metric, COUNT(*) AS value FROM tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY time UNION ALL SELECT DATE_TRUNC('day', updated_at) AS time, 'Resolved' AS metric, COUNT(*) AS value FROM tickets WHERE status = 'resolved' AND updated_at >= $__timeFrom() AND updated_at <= $__timeTo() GROUP BY time ORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "auto",
+            "pointSize": 5,
+            "stacking": {"mode": "none", "group": "A"}
+          }
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Support Content Analysis",
+      "type": "barchart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 6},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND content IS NOT NULL AND content <> '' AND LENGTH(content) > 3), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us', 'help', 'need', 'issue', 'problem', 'support', 'ticket', 'please', 'thanks', 'hello', 'thank', 'you')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 20;",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Active Tickets Management",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 14},
+      "collapsed": false
+    },
+    {
+      "id": 12,
+      "title": "Priority Open Tickets",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 15},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH ticket_with_latest_message AS (SELECT t.id, t.title, t.priority, t.status, t.created_at, t.updated_at, t.customer_id, t.assigned_to, EXTRACT(EPOCH FROM (NOW() - t.created_at))/3600 AS age_hours, m.content AS latest_message, m.sender AS latest_sender FROM tickets t LEFT JOIN LATERAL (SELECT content, sender FROM messages WHERE ticket_id = t.id ORDER BY created_at DESC LIMIT 1) m ON true WHERE t.status IN ('open', 'pending', 'waiting') AND t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo()) SELECT id AS \"Ticket ID\", title AS \"Title\", priority AS \"Priority\", status AS \"Status\", ROUND(age_hours, 1) AS \"Age (Hours)\", customer_id AS \"Customer ID\", assigned_to AS \"Assigned To\", COALESCE(SUBSTRING(latest_message, 1, 100), 'No messages') AS \"Latest Message\", latest_sender AS \"Latest Sender\", created_at AS \"Created\", updated_at AS \"Updated\" FROM ticket_with_latest_message ORDER BY CASE WHEN priority = 'high' THEN 1 WHEN priority = 'medium' THEN 2 WHEN priority = 'low' THEN 3 ELSE 4 END, age_hours DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{"color": "green", "value": null}]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Priority"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "mappings", "value": [
+                {"options": {"high": {"color": "red", "index": 0}}, "type": "value"},
+                {"options": {"medium": {"color": "yellow", "index": 1}}, "type": "value"},
+                {"options": {"low": {"color": "green", "index": 2}}, "type": "value"}
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Age (Hours)"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "max", "value": 168},
+              {"id": "min", "value": 0},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "green", "value": null},
+                  {"color": "yellow", "value": 24},
+                  {"color": "red", "value": 72}
+                ]
+              }}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Status"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "mappings", "value": [
+                {"options": {"open": {"color": "red", "index": 0}}, "type": "value"},
+                {"options": {"pending": {"color": "yellow", "index": 1}}, "type": "value"},
+                {"options": {"waiting": {"color": "blue", "index": 2}}, "type": "value"}
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Title"},
+            "properties": [
+              {"id": "custom.width", "value": 200},
+              {"id": "links", "value": [
+                {"title": "View in Mava", "url": "https://mava.app/tickets/${__data.fields[\"Ticket ID\"]}"}
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Latest Message"},
+            "properties": [
+              {"id": "custom.width", "value": 300}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"desc": false, "displayName": "Priority"}]
+      }
+    }
+  ],
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "refresh": "5m",
+  "version": 1
+}
