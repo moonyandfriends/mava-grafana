@@ -8,6 +8,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
+  "style": "dark",
   "links": [
     {
       "asDropdown": false,
@@ -39,7 +40,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-GrYlRd"
           },
           "custom": {
             "axisLabel": "",
@@ -47,13 +48,13 @@
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 80,
-            "gradientMode": "opacity",
+            "gradientMode": "hue",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "vis": false
             },
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -74,12 +75,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "#4ECDC4",
                 "value": null
               },
               {
-                "color": "red",
-                "value": 80
+                "color": "#45B7D1",
+                "value": 1000
+              },
+              {
+                "color": "#96CEB4",
+                "value": 5000
+              },
+              {
+                "color": "#FFEAA7",
+                "value": 10000
               }
             ]
           },
@@ -124,8 +133,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "blue",
+                "color": "#667eea",
                 "value": null
+              },
+              {
+                "color": "#764ba2",
+                "value": 5000
+              },
+              {
+                "color": "#f093fb",
+                "value": 15000
+              },
+              {
+                "color": "#f5576c",
+                "value": 30000
               }
             ]
           },
@@ -170,8 +191,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#0088CC",
+                "color": "#00d2ff",
                 "value": null
+              },
+              {
+                "color": "#3a7bd5",
+                "value": 1000
+              },
+              {
+                "color": "#4facfe",
+                "value": 5000
+              },
+              {
+                "color": "#00f2fe",
+                "value": 10000
               }
             ]
           },
@@ -216,8 +249,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#0088CC",
+                "color": "#a8edea",
                 "value": null
+              },
+              {
+                "color": "#fed6e3",
+                "value": 5000
+              },
+              {
+                "color": "#d299c2",
+                "value": 15000
+              },
+              {
+                "color": "#fef9d3",
+                "value": 30000
               }
             ]
           },
@@ -262,8 +307,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#5865F2",
+                "color": "#667eea",
                 "value": null
+              },
+              {
+                "color": "#764ba2",
+                "value": 50
+              },
+              {
+                "color": "#f093fb",
+                "value": 200
+              },
+              {
+                "color": "#f5576c",
+                "value": 500
               }
             ]
           },
@@ -308,8 +365,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#5865F2",
+                "color": "#ff9a9e",
                 "value": null
+              },
+              {
+                "color": "#fecfef",
+                "value": 500
+              },
+              {
+                "color": "#fecfef",
+                "value": 1000
+              },
+              {
+                "color": "#ffc3a0",
+                "value": 2000
               }
             ]
           },
@@ -354,8 +423,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#0088CC",
+                "color": "#a8edea",
                 "value": null
+              },
+              {
+                "color": "#fed6e3",
+                "value": 25
+              },
+              {
+                "color": "#d299c2",
+                "value": 100
+              },
+              {
+                "color": "#fef9d3",
+                "value": 300
               }
             ]
           },
@@ -400,8 +481,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#0088CC",
+                "color": "#84fab0",
                 "value": null
+              },
+              {
+                "color": "#8fd3f4",
+                "value": 200
+              },
+              {
+                "color": "#a8edea",
+                "value": 500
+              },
+              {
+                "color": "#fed6e3",
+                "value": 1000
               }
             ]
           },
@@ -446,8 +539,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#FF6B6B",
+                "color": "#ff9a9e",
                 "value": null
+              },
+              {
+                "color": "#fecfef",
+                "value": 10
+              },
+              {
+                "color": "#ffc3a0",
+                "value": 50
+              },
+              {
+                "color": "#ffafbd",
+                "value": 100
               }
             ]
           },
@@ -492,8 +597,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#FF6B6B",
+                "color": "#ffecd2",
                 "value": null
+              },
+              {
+                "color": "#fcb69f",
+                "value": 20
+              },
+              {
+                "color": "#ff9a9e",
+                "value": 100
+              },
+              {
+                "color": "#fecfef",
+                "value": 500
               }
             ]
           },
@@ -538,15 +655,19 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "#4ECDC4",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "#96CEB4",
+                "value": 12
+              },
+              {
+                "color": "#FFEAA7",
                 "value": 24
               },
               {
-                "color": "red",
+                "color": "#FFB6C1",
                 "value": 48
               }
             ]
@@ -592,20 +713,24 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
+                "color": "#ff9a9e",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "#fecfef",
                 "value": 1000
               },
               {
-                "color": "green",
+                "color": "#ffc3a0",
                 "value": 5000
               },
               {
-                "color": "blue",
+                "color": "#667eea",
                 "value": 10000
+              },
+              {
+                "color": "#764ba2",
+                "value": 20000
               }
             ]
           },
@@ -1219,15 +1344,15 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-BlYlRd"
           },
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "barAlignment": 0,
-            "lineWidth": 1,
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "lineWidth": 3,
+            "fillOpacity": 30,
+            "gradientMode": "hue",
             "spanNulls": false,
             "insertNulls": false,
             "showPoints": "never",
@@ -1269,15 +1394,15 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-GrYlRd"
           },
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "barAlignment": 0,
-            "lineWidth": 1,
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "lineWidth": 3,
+            "fillOpacity": 30,
+            "gradientMode": "hue",
             "spanNulls": false,
             "insertNulls": false,
             "showPoints": "never",
@@ -1366,8 +1491,8 @@
         "xTickLabelRotation": 45,
         "xTickLabelSpacing": 0,
         "showValue": "always",
-        "groupWidth": 0.7,
-        "barWidth": 0.97
+        "groupWidth": 0.8,
+        "barWidth": 0.95
       }
     },
     {
@@ -1419,8 +1544,8 @@
         "xTickLabelRotation": 45,
         "xTickLabelSpacing": 0,
         "showValue": "always",
-        "groupWidth": 0.7,
-        "barWidth": 0.97
+        "groupWidth": 0.8,
+        "barWidth": 0.95
       }
     },
     {
@@ -1443,11 +1568,11 @@
           },
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "lineWidth": 3,
+            "fillOpacity": 25,
+            "gradientMode": "hue",
             "spanNulls": false,
             "insertNulls": false,
             "showPoints": "auto",
@@ -1480,11 +1605,11 @@
           },
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "lineWidth": 3,
+            "fillOpacity": 25,
+            "gradientMode": "hue",
             "spanNulls": false,
             "insertNulls": false,
             "showPoints": "auto",
@@ -1518,12 +1643,12 @@
         "cellValues": {},
         "color": {
           "exponent": 0.5,
-          "fill": "#7AB55C",
+          "fill": "#667eea",
           "mode": "spectrum",
           "reverse": false,
           "scale": "exponential",
-          "scheme": "Spectral",
-          "steps": 128
+          "scheme": "Plasma",
+          "steps": 256
         },
         "exemplars": {
           "color": "rgba(255,0,255,0.7)"
@@ -1695,8 +1820,8 @@
         "orientation": "horizontal",
         "displayMode": "gradient",
         "showValue": "always",
-        "groupWidth": 0.7,
-        "barWidth": 0.97,
+        "groupWidth": 0.8,
+        "barWidth": 0.95,
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -1765,21 +1890,21 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "continuous-BlYlRd"
           },
           "custom": {
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "opacity",
+            "fillOpacity": 25,
+            "gradientMode": "hue",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "vis": false
             },
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1947,7 +2072,7 @@
               "tooltip": false,
               "vis": false
             },
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
@@ -1968,15 +2093,19 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "#4ECDC4",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "#96CEB4",
+                "value": 12
+              },
+              {
+                "color": "#FFEAA7",
                 "value": 24
               },
               {
-                "color": "red",
+                "color": "#FFB6C1",
                 "value": 48
               }
             ]
@@ -2158,7 +2287,7 @@
       "gridPos": {"h": 1, "w": 24, "x": 0, "y": 115},
       "options": {
         "mode": "html",
-        "content": "<style>\n/* Override all links to light pink, no underline, not bold */\n.table-panel a {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n.table-panel a:hover {\n  color: #FF69B4 !important;\n}\n\n/* Custom CSS to style Discord profile links */\n.table-panel a[href*=\"discord.com/users/\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"discord.com/users/\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Custom CSS to style Telegram profile links */\n.table-panel a[href*=\"t.me/\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"t.me/\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Custom CSS to style Mava dashboard links */\n.table-panel a[href*=\"mava.app\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"mava.app\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Additional targeting for table cells with links */\n.table-panel .table-panel-table td a {\n  text-decoration: none !important;\n  font-weight: normal !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"discord.com/users/\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"discord.com/users/\"]:hover {\n  color: #FF69B4 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"t.me/\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"t.me/\"]:hover {\n  color: #FF69B4 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"mava.app\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"mava.app\"]:hover {\n  color: #FF69B4 !important;\n}\n\n/* Force row height for tables with avatars - comprehensive targeting */\n.table-panel .table-panel-table {\n  table-layout: fixed !important;\n}\n\n.table-panel .table-panel-table tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n  max-height: 130px !important;\n}\n\n.table-panel .table-panel-table tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  max-height: 130px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* Modern Grafana table targeting */\n.table-panel [data-testid=\"table\"] tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n}\n\n.table-panel [data-testid=\"table\"] tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* React table targeting */\n.table-panel .react-table tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n}\n\n.table-panel .react-table tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  vertical-align: middle !important;\n}\n\n/* Generic table targeting for different Grafana versions */\n.table-panel table tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n}\n\n.table-panel table tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* Larger avatar images - increased from 80px to 110px */\n.table-panel img {\n  width: 110px !important;\n  height: 110px !important;\n}\n\n/* More specific targeting for avatar images */\n.table-panel .table-panel-table td img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Target images in Avatar column specifically */\n.table-panel .table-panel-table tbody tr td:first-child img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Alternative targeting for different Grafana versions */\n.table-panel [data-column=\"Avatar\"] img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Target by column header */\n.table-panel th:contains(\"Avatar\") + td img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Ensure table cells accommodate the larger avatars */\n.table-panel .table-panel-table tbody tr td:first-child {\n  width: 140px !important;\n  min-width: 140px !important;\n  text-align: center !important;\n}\n</style>"
+        "content": "<style>\n/* Modern gradient background for the entire dashboard */\n.main-view {\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;\n  min-height: 100vh !important;\n}\n\n/* Panel background enhancements */\n.panel-container {\n  background: rgba(255, 255, 255, 0.1) !important;\n  backdrop-filter: blur(10px) !important;\n  border-radius: 15px !important;\n  border: 1px solid rgba(255, 255, 255, 0.2) !important;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;\n}\n\n/* Override all links to light pink, no underline, not bold */\n.table-panel a {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n.table-panel a:hover {\n  color: #FF69B4 !important;\n}\n\n/* Custom CSS to style Discord profile links */\n.table-panel a[href*=\"discord.com/users/\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"discord.com/users/\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Custom CSS to style Telegram profile links */\n.table-panel a[href*=\"t.me/\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"t.me/\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Custom CSS to style Mava dashboard links */\n.table-panel a[href*=\"mava.app\"] {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FFB6C1 !important;\n}\n\n.table-panel a[href*=\"mava.app\"]:hover {\n  text-decoration: none !important;\n  font-weight: normal !important;\n  color: #FF69B4 !important;\n}\n\n/* Additional targeting for table cells with links */\n.table-panel .table-panel-table td a {\n  text-decoration: none !important;\n  font-weight: normal !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"discord.com/users/\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"discord.com/users/\"]:hover {\n  color: #FF69B4 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"t.me/\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"t.me/\"]:hover {\n  color: #FF69B4 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"mava.app\"] {\n  color: #FFB6C1 !important;\n}\n\n.table-panel .table-panel-table td a[href*=\"mava.app\"]:hover {\n  color: #FF69B4 !important;\n}\n\n/* Force row height for tables with avatars - comprehensive targeting */\n.table-panel .table-panel-table {\n  table-layout: fixed !important;\n}\n\n.table-panel .table-panel-table tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n  max-height: 130px !important;\n}\n\n.table-panel .table-panel-table tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  max-height: 130px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* Modern Grafana table targeting */\n.table-panel [data-testid=\"table\"] tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n}\n\n.table-panel [data-testid=\"table\"] tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* React table targeting */\n.table-panel .react-table tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n}\n\n.table-panel .react-table tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  vertical-align: middle !important;\n}\n\n/* Generic table targeting for different Grafana versions */\n.table-panel table tbody tr {\n  height: 130px !important;\n  min-height: 130px !important;\n}\n\n.table-panel table tbody tr td {\n  height: 130px !important;\n  min-height: 130px !important;\n  vertical-align: middle !important;\n  padding: 8px !important;\n}\n\n/* Larger avatar images - increased from 80px to 110px */\n.table-panel img {\n  width: 110px !important;\n  height: 110px !important;\n}\n\n/* More specific targeting for avatar images */\n.table-panel .table-panel-table td img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Target images in Avatar column specifically */\n.table-panel .table-panel-table tbody tr td:first-child img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Alternative targeting for different Grafana versions */\n.table-panel [data-column=\"Avatar\"] img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Target by column header */\n.table-panel th:contains(\"Avatar\") + td img {\n  width: 110px !important;\n  height: 110px !important;\n  object-fit: cover !important;\n}\n\n/* Ensure table cells accommodate the larger avatars */\n.table-panel .table-panel-table tbody tr td:first-child {\n  width: 140px !important;\n  min-width: 140px !important;\n  text-align: center !important;\n}\n\n/* Modern stat panel styling */\n.stat-panel {\n  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;\n  backdrop-filter: blur(10px) !important;\n  border-radius: 15px !important;\n  border: 1px solid rgba(255, 255, 255, 0.2) !important;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;\n  transition: all 0.3s ease !important;\n}\n\n.stat-panel:hover {\n  transform: translateY(-2px) !important;\n  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;\n}\n\n/* Modern time series chart styling */\n.time-series-panel {\n  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%) !important;\n  backdrop-filter: blur(15px) !important;\n  border-radius: 20px !important;\n  border: 1px solid rgba(255, 255, 255, 0.15) !important;\n  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12) !important;\n}\n\n/* Enhanced dashboard title styling */\n.dashboard-title {\n  background: linear-gradient(45deg, #667eea, #764ba2) !important;\n  -webkit-background-clip: text !important;\n  -webkit-text-fill-color: transparent !important;\n  background-clip: text !important;\n  font-weight: 700 !important;\n  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;\n}\n\n/* Modern panel headers */\n.panel-header {\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;\n  backdrop-filter: blur(5px) !important;\n  border-radius: 10px 10px 0 0 !important;\n  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;\n}\n\n/* Enhanced grid lines and borders */\n.grid-line {\n  stroke: rgba(255, 255, 255, 0.1) !important;\n  stroke-width: 0.5px !important;\n}\n\n/* Modern scrollbar styling */\n::-webkit-scrollbar {\n  width: 8px !important;\n  height: 8px !important;\n}\n\n::-webkit-scrollbar-track {\n  background: rgba(255, 255, 255, 0.1) !important;\n  border-radius: 10px !important;\n}\n\n::-webkit-scrollbar-thumb {\n  background: linear-gradient(135deg, #667eea, #764ba2) !important;\n  border-radius: 10px !important;\n  border: 2px solid rgba(255, 255, 255, 0.1) !important;\n}\n\n::-webkit-scrollbar-thumb:hover {\n  background: linear-gradient(135deg, #764ba2, #667eea) !important;\n}\n</style>"
       },
       "transparent": true
     }

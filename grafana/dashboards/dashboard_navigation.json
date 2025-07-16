@@ -1,12 +1,12 @@
 {
   "id": null,
   "uid": "dashboard-navigation",
-  "title": "Dashboard Navigation Hub",
-  "tags": ["navigation", "overview", "hub"],
+  "title": "🚀 Dashboard Navigation Hub",
+  "tags": ["navigation", "overview", "hub", "modern", "analytics"],
   "timezone": "browser",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 1,
+  "graphTooltip": 2,
   "links": [
     {
       "asDropdown": false,
@@ -49,7 +49,7 @@
   "panels": [
     {
       "id": 1,
-      "title": "System Health Overview",
+      "title": "📊 System Health Overview",
       "type": "row",
       "collapsed": false,
       "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
@@ -60,63 +60,11 @@
       "title": "💬 Total Messages Today",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 1},
+      "gridPos": {"h": 9, "w": 6, "x": 0, "y": 1},
       "targets": [
         {
           "format": "table",
           "rawSql": "SELECT COUNT(*) as total FROM (SELECT created_at FROM discord_messages WHERE created_at >= date_trunc('day', NOW()) AND author_is_bot = false UNION ALL SELECT date FROM telegram_messages WHERE date >= date_trunc('day', NOW())) today_messages;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "continuous-GrYlRd"},
-          "custom": {
-            "neutral": 0,
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {"color": "rgba(50, 172, 45, 0.97)", "value": null},
-              {"color": "rgba(237, 129, 40, 0.89)", "value": 500},
-              {"color": "rgba(245, 54, 54, 0.9)", "value": 1000}
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "background_solid",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "10.2.0"
-    },
-    {
-      "id": 3,
-      "title": "🎫 Active Support Tickets",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 1},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT COUNT(*) as active_tickets FROM tickets WHERE status IN ('open', 'pending', 'waiting');",
           "refId": "A"
         }
       ],
@@ -135,9 +83,10 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "rgba(50, 172, 45, 0.97)", "value": null},
-              {"color": "rgba(237, 129, 40, 0.89)", "value": 10},
-              {"color": "rgba(245, 54, 54, 0.9)", "value": 25}
+              {"color": "rgba(102, 126, 234, 0.1)", "value": null},
+              {"color": "rgba(102, 126, 234, 0.6)", "value": 100},
+              {"color": "rgba(102, 126, 234, 0.8)", "value": 500},
+              {"color": "rgba(102, 126, 234, 1)", "value": 1000}
             ]
           },
           "unit": "short"
@@ -145,7 +94,7 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background_gradient",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
@@ -154,7 +103,60 @@
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "textMode": "auto",
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.2.0"
+    },
+    {
+      "id": 3,
+      "title": "🎫 Active Support Tickets",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 9, "w": 6, "x": 6, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) as active_tickets FROM tickets WHERE status IN ('open', 'pending', 'waiting');",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "continuous-YlOrRd"},
+          "custom": {
+            "neutral": 0,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "rgba(79, 172, 254, 0.1)", "value": null},
+              {"color": "rgba(79, 172, 254, 0.6)", "value": 5},
+              {"color": "rgba(79, 172, 254, 0.8)", "value": 10},
+              {"color": "rgba(79, 172, 254, 1)", "value": 25}
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background_gradient",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "value_and_name",
         "wideLayout": true
       },
       "pluginVersion": "10.2.0"
@@ -164,7 +166,7 @@
       "title": "🏆 Active Ambassadors",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 1},
+      "gridPos": {"h": 9, "w": 6, "x": 12, "y": 1},
       "targets": [
         {
           "format": "table",
@@ -187,9 +189,10 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "rgba(50, 172, 45, 0.97)", "value": null},
-              {"color": "rgba(237, 129, 40, 0.89)", "value": 5},
-              {"color": "rgba(245, 54, 54, 0.9)", "value": 15}
+              {"color": "rgba(240, 147, 251, 0.1)", "value": null},
+              {"color": "rgba(240, 147, 251, 0.6)", "value": 3},
+              {"color": "rgba(240, 147, 251, 0.8)", "value": 5},
+              {"color": "rgba(240, 147, 251, 1)", "value": 15}
             ]
           },
           "unit": "short"
@@ -197,7 +200,7 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background_gradient",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
@@ -206,7 +209,7 @@
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "textMode": "auto",
+        "textMode": "value_and_name",
         "wideLayout": true
       },
       "pluginVersion": "10.2.0"
@@ -216,7 +219,7 @@
       "title": "⚡ System Uptime",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 1},
+      "gridPos": {"h": 9, "w": 6, "x": 18, "y": 1},
       "targets": [
         {
           "format": "table",
@@ -239,9 +242,10 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "rgba(245, 54, 54, 0.9)", "value": null},
-              {"color": "rgba(237, 129, 40, 0.89)", "value": 95},
-              {"color": "rgba(50, 172, 45, 0.97)", "value": 99}
+              {"color": "rgba(76, 175, 80, 0.1)", "value": null},
+              {"color": "rgba(76, 175, 80, 0.6)", "value": 95},
+              {"color": "rgba(76, 175, 80, 0.8)", "value": 98},
+              {"color": "rgba(76, 175, 80, 1)", "value": 99}
             ]
           },
           "unit": "percent"
@@ -249,7 +253,7 @@
         "overrides": []
       },
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background_gradient",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
@@ -258,17 +262,17 @@
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "textMode": "auto",
+        "textMode": "value_and_name",
         "wideLayout": true
       },
       "pluginVersion": "10.2.0"
     },
     {
       "id": 6,
-      "title": "📈 Activity Trends",
+      "title": "📈 Activity Trends & Analytics",
       "type": "row",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 9},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 10},
       "panels": []
     },
     {
@@ -276,7 +280,7 @@
       "title": "📊 Message Volume Trends (24h)",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 10},
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 11},
       "targets": [
         {
           "format": "time_series",
@@ -291,22 +295,22 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "palette-spectrum"},
           "custom": {
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "opacity",
+            "fillOpacity": 35,
+            "gradientMode": "scheme",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "vis": false
             },
             "lineInterpolation": "smooth",
-            "lineWidth": 3,
-            "pointSize": 5,
+            "lineWidth": 4,
+            "pointSize": 8,
             "scaleDistribution": {
               "type": "linear"
             },
@@ -325,12 +329,12 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "rgba(102, 126, 234, 0.6)",
                 "value": null
               },
               {
-                "color": "red",
-                "value": 80
+                "color": "rgba(102, 126, 234, 1)",
+                "value": 50
               }
             ]
           },
@@ -346,13 +350,17 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "blue",
+                  "fixedColor": "rgba(102, 126, 234, 1)",
                   "mode": "fixed"
                 }
               },
               {
                 "id": "displayName",
-                "value": "Discord Messages"
+                "value": "📱 Discord Messages"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 40
               }
             ]
           },
@@ -365,13 +373,17 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "green",
+                  "fixedColor": "rgba(79, 172, 254, 1)",
                   "mode": "fixed"
                 }
               },
               {
                 "id": "displayName",
-                "value": "Telegram Messages"
+                "value": "💬 Telegram Messages"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 40
               }
             ]
           }
@@ -396,7 +408,7 @@
       "title": "🔄 Platform Distribution",
       "type": "piechart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 10},
+      "gridPos": {"h": 9, "w": 6, "x": 12, "y": 11},
       "targets": [
         {
           "format": "table",
@@ -406,7 +418,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "palette-spectrum"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -417,7 +429,38 @@
           "mappings": [],
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Discord"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "rgba(102, 126, 234, 0.8)",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Telegram"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "rgba(79, 172, 254, 0.8)",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "reduceOptions": {
@@ -431,20 +474,20 @@
           "sort": "none"
         },
         "legend": {
-          "displayMode": "list",
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true,
-          "values": ["percent"]
+          "values": ["percent", "value"]
         }
       },
       "pluginVersion": "10.2.0"
     },
     {
       "id": 10,
-      "title": "⚡ Quick Metrics",
+      "title": "⚡ Quick Metrics Overview",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 10},
+      "gridPos": {"h": 9, "w": 6, "x": 18, "y": 11},
       "targets": [
         {
           "format": "table",
@@ -464,7 +507,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "palette-spectrum"},
           "custom": {
             "neutral": 0,
             "hideFrom": {
@@ -477,8 +520,8 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "red", "value": 80}
+              {"color": "rgba(102, 126, 234, 0.6)", "value": null},
+              {"color": "rgba(102, 126, 234, 1)", "value": 1000}
             ]
           },
           "unit": "short"
@@ -492,12 +535,12 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Total Messages"
+                "value": "💬 Total Messages"
               },
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "blue",
+                  "fixedColor": "rgba(102, 126, 234, 0.9)",
                   "mode": "fixed"
                 }
               }
@@ -511,12 +554,12 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Total Tickets"
+                "value": "🎫 Total Tickets"
               },
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "orange",
+                  "fixedColor": "rgba(79, 172, 254, 0.9)",
                   "mode": "fixed"
                 }
               }
@@ -530,12 +573,12 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Total Ambassadors"
+                "value": "🏆 Total Ambassadors"
               },
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "purple",
+                  "fixedColor": "rgba(240, 147, 251, 0.9)",
                   "mode": "fixed"
                 }
               }
@@ -544,7 +587,7 @@
         ]
       },
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background_gradient",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "vertical",
@@ -553,17 +596,17 @@
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "textMode": "auto",
+        "textMode": "value_and_name",
         "wideLayout": true
       },
       "pluginVersion": "10.2.0"
     },
     {
       "id": 11,
-      "title": "📱 Recent Activity Timeline",
+      "title": "📱 Recent Activity Timeline (Last 2 Hours)",
       "type": "logs",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 18},
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 20},
       "targets": [
         {
           "format": "logs",
@@ -584,17 +627,17 @@
     },
     {
       "id": 12,
-      "title": "🎯 Navigation Hub",
+      "title": "🎯 Navigation Hub & Dashboard Directory",
       "type": "row",
       "collapsed": false,
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 26},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 29},
       "panels": []
     },
     {
       "id": 7,
-      "title": "Dashboard Navigation",
+      "title": "🚀 Community Monitoring Dashboard Navigation",
       "type": "text",
-      "gridPos": {"h": 16, "w": 24, "x": 0, "y": 27},
+      "gridPos": {"h": 18, "w": 24, "x": 0, "y": 30},
       "options": {
         "mode": "html",
         "content": "<div style=\"padding: 25px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; margin-bottom: 20px;\"><h1 style=\"text-align: center; margin: 0 0 15px 0; font-size: 2.5em; font-weight: 300; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);\">🚀 Community Monitoring Hub</h1><p style=\"text-align: center; font-size: 1.1em; margin: 0; opacity: 0.9;\">Comprehensive analytics and monitoring for Discord, Telegram, and Mava support systems</p></div><div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 30px;\"><div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 25px; color: white; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: all 0.3s ease; position: relative; overflow: hidden;\" onmouseover=\"this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 35px rgba(0,0,0,0.2)';\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)';\"><div style=\"position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;\"></div><div style=\"position: relative; z-index: 1;\"><div style=\"font-size: 3em; margin-bottom: 15px;\">📊</div><h3 style=\"margin: 0 0 15px 0; font-size: 1.4em; font-weight: 600;\">Community Stats</h3><p style=\"margin: 0 0 20px 0; font-size: 1em; line-height: 1.6; opacity: 0.9;\">Real-time community activity, user engagement metrics, and comprehensive messaging trends across Discord and Telegram platforms.</p><div style=\"display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 0.9em;\"><span>📈 Growth Analytics</span><span>🔍 User Insights</span><span>📱 Platform Metrics</span></div><a href=\"/d/community-stats\" style=\"display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; backdrop-filter: blur(10px);\" onmouseover=\"this.style.background='rgba(255,255,255,0.3)'; this.style.transform='scale(1.05)';\" onmouseout=\"this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1)';\">Explore Dashboard →</a></div></div><div style=\"background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 15px; padding: 25px; color: white; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: all 0.3s ease; position: relative; overflow: hidden;\" onmouseover=\"this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 35px rgba(0,0,0,0.2)';\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)';\"><div style=\"position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;\"></div><div style=\"position: relative; z-index: 1;\"><div style=\"font-size: 3em; margin-bottom: 15px;\">🏆</div><h3 style=\"margin: 0 0 15px 0; font-size: 1.4em; font-weight: 600;\">Community Ambassadors</h3><p style=\"margin: 0 0 20px 0; font-size: 1em; line-height: 1.6; opacity: 0.9;\">Monitor ambassador activity, engagement levels, and contribution metrics across all community platforms and channels.</p><div style=\"display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 0.9em;\"><span>👥 Ambassador Network</span><span>⭐ Performance</span><span>🎯 Engagement</span></div><a href=\"/d/community-ambassadors\" style=\"display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; backdrop-filter: blur(10px);\" onmouseover=\"this.style.background='rgba(255,255,255,0.3)'; this.style.transform='scale(1.05)';\" onmouseout=\"this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1)';\">View Dashboard →</a></div></div><div style=\"background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; padding: 25px; color: white; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.15); transition: all 0.3s ease; position: relative; overflow: hidden;\" onmouseover=\"this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 35px rgba(0,0,0,0.2)';\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)';\"><div style=\"position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); pointer-events: none;\"></div><div style=\"position: relative; z-index: 1;\"><div style=\"font-size: 3em; margin-bottom: 15px;\">🎫</div><h3 style=\"margin: 0 0 15px 0; font-size: 1.4em; font-weight: 600;\">Mava Support Tickets</h3><p style=\"margin: 0 0 20px 0; font-size: 1em; line-height: 1.6; opacity: 0.9;\">Comprehensive ticket tracking, resolution analytics, agent performance metrics, and customer satisfaction insights.</p><div style=\"display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 0.9em;\"><span>📋 Ticket Management</span><span>⚡ Resolution Speed</span><span>😊 Satisfaction</span></div><a href=\"/d/mava-tickets\" style=\"display: inline-block; background: rgba(255,255,255,0.2); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; backdrop-filter: blur(10px);\" onmouseover=\"this.style.background='rgba(255,255,255,0.3)'; this.style.transform='scale(1.05)';\" onmouseout=\"this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1)';\">Access Dashboard →</a></div></div></div><div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; padding: 25px; margin-top: 30px; color: white;\"><h3 style=\"margin: 0 0 20px 0; font-size: 1.6em; font-weight: 600; text-align: center;\">⚙️ System Architecture & Performance</h3><div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;\"><div style=\"background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); transition: all 0.3s ease;\" onmouseover=\"this.style.background='rgba(255,255,255,0.15)'; this.style.transform='scale(1.02)';\" onmouseout=\"this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)';\"><div style=\"font-size: 2em; margin-bottom: 10px;\">🗄️</div><strong style=\"font-size: 1.1em;\">Database</strong><br><span style=\"opacity: 0.9; font-size: 0.9em;\">PostgreSQL via Supabase</span><br><span style=\"opacity: 0.7; font-size: 0.8em;\">High-performance ACID compliance</span></div><div style=\"background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); transition: all 0.3s ease;\" onmouseover=\"this.style.background='rgba(255,255,255,0.15)'; this.style.transform='scale(1.02)';\" onmouseout=\"this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)';\"><div style=\"font-size: 2em; margin-bottom: 10px;\">🔄</div><strong style=\"font-size: 1.1em;\">Refresh Rate</strong><br><span style=\"opacity: 0.9; font-size: 0.9em;\">5 minutes</span><br><span style=\"opacity: 0.7; font-size: 0.8em;\">Real-time data updates</span></div><div style=\"background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); transition: all 0.3s ease;\" onmouseover=\"this.style.background='rgba(255,255,255,0.15)'; this.style.transform='scale(1.02)';\" onmouseout=\"this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)';\"><div style=\"font-size: 2em; margin-bottom: 10px;\">📅</div><strong style=\"font-size: 1.1em;\">Data Retention</strong><br><span style=\"opacity: 0.9; font-size: 0.9em;\">Last 30 days</span><br><span style=\"opacity: 0.7; font-size: 0.8em;\">Optimized for performance</span></div><div style=\"background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; text-align: center; backdrop-filter: blur(10px); transition: all 0.3s ease;\" onmouseover=\"this.style.background='rgba(255,255,255,0.15)'; this.style.transform='scale(1.02)';\" onmouseout=\"this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)';\"><div style=\"font-size: 2em; margin-bottom: 10px;\">✅</div><strong style=\"font-size: 1.1em;\">System Status</strong><br><span style=\"color: #4CAF50; font-size: 0.9em;\">🟢 All Systems Operational</span><br><span style=\"opacity: 0.7; font-size: 0.8em;\">99.9% uptime</span></div></div></div><div style=\"background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); border-radius: 15px; padding: 25px; margin-top: 30px; color: #333;\"><h3 style=\"margin: 0 0 20px 0; font-size: 1.6em; font-weight: 600; text-align: center;\">📊 Live Data Overview</h3><div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;\"><div style=\"background: rgba(255,255,255,0.8); padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;\" onmouseover=\"this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)';\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)';\"><div style=\"font-size: 2.5em; margin-bottom: 10px; color: #667eea;\">722K</div><strong style=\"color: #333;\">Discord Messages</strong><br><span style=\"color: #666; font-size: 0.9em;\">Total processed</span></div><div style=\"background: rgba(255,255,255,0.8); padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;\" onmouseover=\"this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)';\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)';\"><div style=\"font-size: 2.5em; margin-bottom: 10px; color: #4facfe;\">439</div><strong style=\"color: #333;\">Telegram Messages</strong><br><span style=\"color: #666; font-size: 0.9em;\">Total processed</span></div><div style=\"background: rgba(255,255,255,0.8); padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;\" onmouseover=\"this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)';\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)';\"><div style=\"font-size: 2.5em; margin-bottom: 10px; color: #f093fb;\">2.1K</div><strong style=\"color: #333;\">Mava Tickets</strong><br><span style=\"color: #666; font-size: 0.9em;\">Total processed</span></div><div style=\"background: rgba(255,255,255,0.8); padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;\" onmouseover=\"this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)';\" onmouseout=\"this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)';\"><div style=\"font-size: 2.5em; margin-bottom: 10px; color: #f5576c;\">36K</div><strong style=\"color: #333;\">Mava Messages</strong><br><span style=\"color: #666; font-size: 0.9em;\">Total processed</span></div></div></div><div style=\"margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; text-align: center; color: white;\"><p style=\"margin: 0; font-size: 1.1em; opacity: 0.9;\">🔧 Built with Grafana • 🚀 Powered by Supabase • 📊 Real-time Analytics</p></div>"
@@ -622,6 +665,8 @@
   },
   "refresh": "5m",
   "schemaVersion": 37,
-  "version": 1,
-  "weekStart": ""
+  "version": 2,
+  "weekStart": "",
+  "style": "dark",
+  "preload": false
 }

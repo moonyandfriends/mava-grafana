@@ -10,6 +10,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 2,
   "hideControls": false,
+  "theme": "dark",
   "links": [
     {
       "asDropdown": false,
@@ -45,17 +46,17 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 10},
-              {"color": "red", "value": 20}
+              {"color": "rgba(50, 172, 45, 0.97)", "value": null},
+              {"color": "rgba(237, 129, 40, 0.97)", "value": 10},
+              {"color": "rgba(245, 54, 54, 0.97)", "value": 20}
             ]
           },
           "unit": "short"
         }
       },
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
+        "colorMode": "background_solid",
+        "graphMode": "area",
         "justifyMode": "center",
         "orientation": "horizontal",
         "reduceOptions": {
@@ -63,7 +64,8 @@
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
       "pluginVersion": "9.0.0"
     },
@@ -82,7 +84,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "thresholds"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -94,9 +96,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 100},
-              {"color": "red", "value": 500}
+              {"color": "rgba(114, 137, 218, 0.97)", "value": null},
+              {"color": "rgba(237, 129, 40, 0.97)", "value": 100},
+              {"color": "rgba(245, 54, 54, 0.97)", "value": 500}
             ]
           },
           "unit": "short"
@@ -106,13 +108,13 @@
             "matcher": {"id": "byName", "options": "discord_posts"},
             "properties": [
               {"id": "displayName", "value": "Discord Posts"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "blue"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(114, 137, 218, 0.97)"}}
             ]
           }
         ]
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "background_solid",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "horizontal",
@@ -121,7 +123,8 @@
           "calcs": ["lastNotNull"],
           "fields": "/^discord_posts$/"
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
       "pluginVersion": "9.0.0"
     },
@@ -140,7 +143,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "thresholds"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -152,9 +155,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 50},
-              {"color": "red", "value": 200}
+              {"color": "rgba(34, 139, 206, 0.97)", "value": null},
+              {"color": "rgba(237, 129, 40, 0.97)", "value": 50},
+              {"color": "rgba(245, 54, 54, 0.97)", "value": 200}
             ]
           },
           "unit": "short"
@@ -164,13 +167,13 @@
             "matcher": {"id": "byName", "options": "telegram_posts"},
             "properties": [
               {"id": "displayName", "value": "Telegram Posts"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(34, 139, 206, 0.97)"}}
             ]
           }
         ]
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "background_solid",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "horizontal",
@@ -179,7 +182,8 @@
           "calcs": ["lastNotNull"],
           "fields": "/^telegram_posts$/"
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
       "pluginVersion": "9.0.0"
     },
@@ -198,7 +202,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "thresholds"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -210,9 +214,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 20},
-              {"color": "red", "value": 100}
+              {"color": "rgba(29, 161, 242, 0.97)", "value": null},
+              {"color": "rgba(237, 129, 40, 0.97)", "value": 20},
+              {"color": "rgba(245, 54, 54, 0.97)", "value": 100}
             ]
           },
           "unit": "short"
@@ -222,13 +226,13 @@
             "matcher": {"id": "byName", "options": "x_posts"},
             "properties": [
               {"id": "displayName", "value": "X Posts"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "dark-blue"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(29, 161, 242, 0.97)"}}
             ]
           }
         ]
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "background_solid",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "horizontal",
@@ -237,7 +241,8 @@
           "calcs": ["lastNotNull"],
           "fields": "/^x_posts$/"
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
       "pluginVersion": "9.0.0"
     },
@@ -258,7 +263,7 @@
         "defaults": {
           "color": {
             "mode": "spectrum",
-            "scheme": "Viridis"
+            "scheme": "Plasma"
           },
           "custom": {
             "hideFrom": {
@@ -272,18 +277,18 @@
       "options": {
         "calculate": false,
         "calculation": {},
-        "cellGap": 2,
+        "cellGap": 1,
         "color": {
           "exponent": 0.5,
-          "fill": "dark-orange",
+          "fill": "rgba(128, 0, 128, 0.1)",
           "mode": "spectrum",
           "reverse": false,
           "scale": "exponential",
-          "scheme": "Viridis",
-          "steps": 128
+          "scheme": "Plasma",
+          "steps": 256
         },
         "exemplars": {
-          "color": "rgba(255,0,255,0.7)"
+          "color": "rgba(255, 255, 255, 0.8)"
         },
         "filterValues": {
           "le": 1e-9
@@ -326,12 +331,15 @@
             "align": "auto",
             "displayMode": "auto",
             "inspect": false,
-            "filterable": true
+            "filterable": true,
+            "cellOptions": {
+              "type": "auto"
+            }
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [{"color": "green", "value": null}]
+            "steps": [{"color": "rgba(50, 172, 45, 0.97)", "value": null}]
           }
         },
         "overrides": [
@@ -341,11 +349,11 @@
               {"id": "custom.displayMode", "value": "color-background"},
               {"id": "custom.width", "value": 120},
               {"id": "mappings", "value": [
-                {"options": {"Elite": {"color": "purple", "index": 0}}, "type": "value"},
-                {"options": {"Excellent": {"color": "dark-green", "index": 1}}, "type": "value"},
-                {"options": {"Good": {"color": "green", "index": 2}}, "type": "value"},
-                {"options": {"Average": {"color": "yellow", "index": 3}}, "type": "value"},
-                {"options": {"Needs Support": {"color": "red", "index": 4}}, "type": "value"}
+                {"options": {"Elite": {"color": "rgba(156, 39, 176, 0.97)", "index": 0}}, "type": "value"},
+                {"options": {"Excellent": {"color": "rgba(76, 175, 80, 0.97)", "index": 1}}, "type": "value"},
+                {"options": {"Good": {"color": "rgba(139, 195, 74, 0.97)", "index": 2}}, "type": "value"},
+                {"options": {"Average": {"color": "rgba(255, 193, 7, 0.97)", "index": 3}}, "type": "value"},
+                {"options": {"Needs Support": {"color": "rgba(244, 67, 54, 0.97)", "index": 4}}, "type": "value"}
               ]}
             ]
           },
@@ -355,10 +363,10 @@
               {"id": "custom.displayMode", "value": "color-background"},
               {"id": "custom.width", "value": 130},
               {"id": "mappings", "value": [
-                {"options": {"Multi-Platform": {"color": "dark-green", "index": 0}}, "type": "value"},
-                {"options": {"Discord Only": {"color": "blue", "index": 1}}, "type": "value"},
-                {"options": {"Telegram Only": {"color": "light-blue", "index": 2}}, "type": "value"},
-                {"options": {"Inactive": {"color": "red", "index": 3}}, "type": "value"}
+                {"options": {"Multi-Platform": {"color": "rgba(76, 175, 80, 0.97)", "index": 0}}, "type": "value"},
+                {"options": {"Discord Only": {"color": "rgba(114, 137, 218, 0.97)", "index": 1}}, "type": "value"},
+                {"options": {"Telegram Only": {"color": "rgba(34, 139, 206, 0.97)", "index": 2}}, "type": "value"},
+                {"options": {"Inactive": {"color": "rgba(244, 67, 54, 0.97)", "index": 3}}, "type": "value"}
               ]}
             ]
           },
@@ -367,7 +375,7 @@
             "properties": [
               {"id": "custom.width", "value": 150},
               {"id": "custom.displayMode", "value": "color-text"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(33, 150, 243, 0.97)"}}
             ]
           },
           {
@@ -377,7 +385,7 @@
               {"id": "custom.width", "value": 120},
               {"id": "max", "value": 1000},
               {"id": "min", "value": 0},
-              {"id": "color", "value": {"mode": "continuous-GrYlRd"}}
+              {"id": "color", "value": {"mode": "continuous-BlPu"}}
             ]
           },
           {
@@ -387,7 +395,7 @@
               {"id": "custom.width", "value": 100},
               {"id": "max", "value": 50},
               {"id": "min", "value": 0},
-              {"id": "color", "value": {"mode": "continuous-BlYlRd"}}
+              {"id": "color", "value": {"mode": "continuous-GrYlRd"}}
             ]
           },
           {
@@ -399,13 +407,13 @@
               {"id": "thresholds", "value": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "gold", "value": 1},
-                  {"color": "silver", "value": 2},
-                  {"color": "dark-orange", "value": 3},
-                  {"color": "green", "value": 4},
-                  {"color": "blue", "value": 8},
-                  {"color": "light-blue", "value": 15},
-                  {"color": "gray", "value": 25}
+                  {"color": "rgba(255, 215, 0, 0.97)", "value": 1},
+                  {"color": "rgba(192, 192, 192, 0.97)", "value": 2},
+                  {"color": "rgba(205, 127, 50, 0.97)", "value": 3},
+                  {"color": "rgba(76, 175, 80, 0.97)", "value": 4},
+                  {"color": "rgba(33, 150, 243, 0.97)", "value": 8},
+                  {"color": "rgba(103, 58, 183, 0.97)", "value": 15},
+                  {"color": "rgba(158, 158, 158, 0.97)", "value": 25}
                 ]
               }}
             ]
@@ -415,7 +423,7 @@
             "properties": [
               {"id": "custom.width", "value": 100},
               {"id": "custom.displayMode", "value": "color-text"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "orange"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(255, 152, 0, 0.97)"}}
             ]
           },
           {
@@ -426,10 +434,10 @@
               {"id": "thresholds", "value": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "red", "value": 0},
-                  {"color": "yellow", "value": 1},
-                  {"color": "green", "value": 10},
-                  {"color": "dark-green", "value": 50}
+                  {"color": "rgba(244, 67, 54, 0.97)", "value": 0},
+                  {"color": "rgba(255, 193, 7, 0.97)", "value": 1},
+                  {"color": "rgba(139, 195, 74, 0.97)", "value": 10},
+                  {"color": "rgba(76, 175, 80, 0.97)", "value": 50}
                 ]
               }}
             ]
@@ -443,10 +451,10 @@
               {"id": "thresholds", "value": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "red", "value": 0},
-                  {"color": "yellow", "value": 50},
-                  {"color": "green", "value": 100},
-                  {"color": "dark-green", "value": 200}
+                  {"color": "rgba(244, 67, 54, 0.97)", "value": 0},
+                  {"color": "rgba(255, 193, 7, 0.97)", "value": 50},
+                  {"color": "rgba(139, 195, 74, 0.97)", "value": 100},
+                  {"color": "rgba(76, 175, 80, 0.97)", "value": 200}
                 ]
               }}
             ]
@@ -455,7 +463,13 @@
       },
       "options": {
         "showHeader": true,
-        "sortBy": [{"desc": true, "displayName": "Activity Score"}]
+        "sortBy": [{"desc": true, "displayName": "Activity Score"}],
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": ["sum"],
+          "fields": ""
+        }
       }
     },
     {
@@ -473,7 +487,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "palette-spectrum"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -489,6 +503,24 @@
             "properties": [
               {"id": "displayName", "value": "Posts"}
             ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Discord"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(114, 137, 218, 0.97)"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Telegram"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(34, 139, 206, 0.97)"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "X/Twitter"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(29, 161, 242, 0.97)"}}
+            ]
           }
         ]
       },
@@ -498,7 +530,7 @@
           "calcs": ["lastNotNull"],
           "fields": "/^posts$/"
         },
-        "pieType": "pie",
+        "pieType": "donut",
         "tooltip": {
           "mode": "single",
           "sort": "none"
@@ -506,8 +538,9 @@
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
-          "calcs": ["lastNotNull"]
-        }
+          "calcs": ["lastNotNull", "percent"]
+        },
+        "displayLabels": ["name", "percent"]
       },
       "pluginVersion": "9.0.0"
     },
@@ -526,7 +559,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "thresholds"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -538,9 +571,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 50},
-              {"color": "red", "value": 100}
+              {"color": "rgba(76, 175, 80, 0.97)", "value": null},
+              {"color": "rgba(255, 193, 7, 0.97)", "value": 50},
+              {"color": "rgba(244, 67, 54, 0.97)", "value": 100}
             ]
           }
         },
@@ -549,35 +582,35 @@
             "matcher": {"id": "byName", "options": "max_posts"},
             "properties": [
               {"id": "displayName", "value": "Max Posts"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "blue"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(114, 137, 218, 0.97)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "max_active_days"},
             "properties": [
               {"id": "displayName", "value": "Max Active Days"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "green"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(76, 175, 80, 0.97)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "max_activity_score"},
             "properties": [
               {"id": "displayName", "value": "Max Activity Score"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "purple"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(156, 39, 176, 0.97)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "avg_top_score"},
             "properties": [
               {"id": "displayName", "value": "Avg Top 5 Score"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "orange"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(255, 152, 0, 0.97)"}}
             ]
           }
         ]
       },
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
+        "colorMode": "background_solid",
+        "graphMode": "area",
         "justifyMode": "center",
         "orientation": "horizontal",
         "reduceOptions": {
@@ -585,7 +618,8 @@
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
       "pluginVersion": "9.0.0"
     },
@@ -604,18 +638,18 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "palette-modern"},
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
             "barAlignment": 0,
             "lineWidth": 3,
-            "fillOpacity": 20,
-            "gradientMode": "hue",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
             "spanNulls": false,
             "insertNulls": false,
             "showPoints": "auto",
-            "pointSize": 6,
+            "pointSize": 8,
             "stacking": {"mode": "none", "group": "A"}
           }
         },
@@ -623,13 +657,13 @@
           {
             "matcher": {"id": "byName", "options": "Discord"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "blue"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(114, 137, 218, 0.97)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "Telegram"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(34, 139, 206, 0.97)"}}
             ]
           }
         ]
@@ -662,7 +696,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "palette-spectrum"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -676,31 +710,31 @@
           {
             "matcher": {"id": "byName", "options": "Very Fast (<5min)"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "dark-green"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(76, 175, 80, 0.97)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "Fast (5-30min)"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "green"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(139, 195, 74, 0.97)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "Medium (30min-2h)"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "yellow"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(255, 193, 7, 0.97)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "Slow (2h-24h)"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "orange"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(255, 152, 0, 0.97)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "Very Slow (>24h)"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(244, 67, 54, 0.97)"}}
             ]
           }
         ]
@@ -738,10 +772,10 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "red", "value": 0},
-              {"color": "yellow", "value": 30},
-              {"color": "green", "value": 60},
-              {"color": "dark-green", "value": 80}
+              {"color": "rgba(244, 67, 54, 0.97)", "value": 0},
+              {"color": "rgba(255, 193, 7, 0.97)", "value": 30},
+              {"color": "rgba(139, 195, 74, 0.97)", "value": 60},
+              {"color": "rgba(76, 175, 80, 0.97)", "value": 80}
             ]
           },
           "unit": "percent",
@@ -776,7 +810,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "palette-spectrum"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -814,18 +848,18 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "palette-spectrum"},
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
             "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "lineWidth": 3,
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
             "spanNulls": false,
             "insertNulls": false,
             "showPoints": "auto",
-            "pointSize": 5,
+            "pointSize": 6,
             "stacking": {"mode": "none", "group": "A"}
           }
         }
@@ -850,8 +884,8 @@
   },
   "timepicker": {
     "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
-    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d", "90d"]
   },
-  "refresh": "1m",
+  "refresh": "30s",
   "version": 2
 }

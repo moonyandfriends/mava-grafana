@@ -38,7 +38,7 @@
       "title": "🔥 Active Tickets",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 5, "w": 4, "x": 0, "y": 1},
+      "gridPos": {"h": 6, "w": 4, "x": 0, "y": 1},
       "targets": [
         {
           "format": "table",
@@ -52,9 +52,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "rgba(115, 191, 105, 0.2)", "value": null},
-              {"color": "rgba(237, 129, 40, 0.2)", "value": 10},
-              {"color": "rgba(242, 73, 92, 0.2)", "value": 25}
+              {"color": "rgb(22, 163, 74)", "value": null},
+              {"color": "rgb(251, 146, 60)", "value": 10},
+              {"color": "rgb(239, 68, 68)", "value": 25}
             ]
           },
           "unit": "short",
@@ -64,7 +64,7 @@
         }
       },
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background_gradient",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
@@ -75,14 +75,15 @@
         },
         "textMode": "value_and_name",
         "wideLayout": true
-      }
+      },
+      "transparent": false
     },
     {
       "id": 3,
       "title": "⚡ Avg Response Time",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 5, "w": 4, "x": 4, "y": 1},
+      "gridPos": {"h": 6, "w": 4, "x": 4, "y": 1},
       "targets": [
         {
           "format": "table",
@@ -96,9 +97,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "rgba(115, 191, 105, 0.2)", "value": null},
-              {"color": "rgba(237, 129, 40, 0.2)", "value": 2},
-              {"color": "rgba(242, 73, 92, 0.2)", "value": 6}
+              {"color": "rgb(34, 197, 94)", "value": null},
+              {"color": "rgb(251, 146, 60)", "value": 2},
+              {"color": "rgb(239, 68, 68)", "value": 6}
             ]
           },
           "unit": "h",
@@ -106,7 +107,7 @@
         }
       },
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background_gradient",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
@@ -117,14 +118,15 @@
         },
         "textMode": "value_and_name",
         "wideLayout": true
-      }
+      },
+      "transparent": false
     },
     {
       "id": 4,
       "title": "🎯 Resolution Rate",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 5, "w": 4, "x": 8, "y": 1},
+      "gridPos": {"h": 6, "w": 4, "x": 8, "y": 1},
       "targets": [
         {
           "format": "table",
@@ -138,9 +140,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "rgba(242, 73, 92, 0.2)", "value": null},
-              {"color": "rgba(237, 129, 40, 0.2)", "value": 70},
-              {"color": "rgba(115, 191, 105, 0.2)", "value": 90}
+              {"color": "rgb(239, 68, 68)", "value": null},
+              {"color": "rgb(251, 146, 60)", "value": 70},
+              {"color": "rgb(34, 197, 94)", "value": 90}
             ]
           },
           "unit": "percent",
@@ -149,7 +151,7 @@
         }
       },
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background_gradient",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
@@ -160,14 +162,15 @@
         },
         "textMode": "value_and_name",
         "wideLayout": true
-      }
+      },
+      "transparent": false
     },
     {
       "id": 5,
       "title": "📈 SLA Compliance",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 5, "w": 4, "x": 12, "y": 1},
+      "gridPos": {"h": 6, "w": 4, "x": 12, "y": 1},
       "targets": [
         {
           "format": "table",
@@ -181,9 +184,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "rgba(242, 73, 92, 0.2)", "value": null},
-              {"color": "rgba(237, 129, 40, 0.2)", "value": 85},
-              {"color": "rgba(115, 191, 105, 0.2)", "value": 95}
+              {"color": "rgb(239, 68, 68)", "value": null},
+              {"color": "rgb(251, 146, 60)", "value": 85},
+              {"color": "rgb(34, 197, 94)", "value": 95}
             ]
           },
           "unit": "percent",
@@ -192,7 +195,7 @@
         }
       },
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background_gradient",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
@@ -203,14 +206,15 @@
         },
         "textMode": "value_and_name",
         "wideLayout": true
-      }
+      },
+      "transparent": false
     },
     {
       "id": 6,
       "title": "💬 Avg Messages/Ticket",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 5, "w": 4, "x": 16, "y": 1},
+      "gridPos": {"h": 6, "w": 4, "x": 16, "y": 1},
       "targets": [
         {
           "format": "table",
@@ -224,9 +228,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "rgba(115, 191, 105, 0.2)", "value": null},
-              {"color": "rgba(237, 129, 40, 0.2)", "value": 8},
-              {"color": "rgba(242, 73, 92, 0.2)", "value": 15}
+              {"color": "rgb(34, 197, 94)", "value": null},
+              {"color": "rgb(251, 146, 60)", "value": 8},
+              {"color": "rgb(239, 68, 68)", "value": 15}
             ]
           },
           "unit": "short",
@@ -234,7 +238,7 @@
         }
       },
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background_gradient",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
@@ -245,14 +249,15 @@
         },
         "textMode": "value_and_name",
         "wideLayout": true
-      }
+      },
+      "transparent": false
     },
     {
       "id": 7,
       "title": "🔢 Total Tickets",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 5, "w": 4, "x": 20, "y": 1},
+      "gridPos": {"h": 6, "w": 4, "x": 20, "y": 1},
       "targets": [
         {
           "format": "table",
@@ -262,12 +267,12 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "fixed", "fixedColor": "rgba(31, 120, 193, 0.2)"},
+          "color": {"mode": "fixed", "fixedColor": "rgb(59, 130, 246)"},
           "unit": "short"
         }
       },
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background_gradient",
         "graphMode": "area",
         "justifyMode": "center",
         "orientation": "auto",
@@ -278,13 +283,14 @@
         },
         "textMode": "value_and_name",
         "wideLayout": true
-      }
+      },
+      "transparent": false
     },
     {
       "id": 8,
       "title": "📈 Ticket Trends & Volume Analysis",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 6},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 7},
       "collapsed": false,
       "panels": []
     },
@@ -293,7 +299,7 @@
       "title": "🎯 Ticket Volume & Resolution Trends",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 9, "w": 16, "x": 0, "y": 7},
+      "gridPos": {"h": 10, "w": 16, "x": 0, "y": 8},
       "targets": [
         {
           "format": "time_series",
@@ -309,12 +315,12 @@
             "lineInterpolation": "smooth",
             "barAlignment": 0,
             "lineWidth": 3,
-            "fillOpacity": 20,
-            "gradientMode": "hue",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
             "spanNulls": false,
             "insertNulls": false,
             "showPoints": "always",
-            "pointSize": 6,
+            "pointSize": 7,
             "stacking": {"mode": "none", "group": "A"}
           },
           "unit": "short"
@@ -323,15 +329,15 @@
           {
             "matcher": {"id": "byName", "options": "Created"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(31, 120, 193, 1)"}},
-              {"id": "custom.fillOpacity", "value": 30}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(59, 130, 246)"}},
+              {"id": "custom.fillOpacity", "value": 35}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "Resolved"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(115, 191, 105, 1)"}},
-              {"id": "custom.fillOpacity", "value": 30}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(34, 197, 94)"}},
+              {"id": "custom.fillOpacity", "value": 35}
             ]
           }
         ]
@@ -339,14 +345,15 @@
       "options": {
         "tooltip": {"mode": "multi", "sort": "none"},
         "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull", "mean", "max"]}
-      }
+      },
+      "transparent": false
     },
     {
       "id": 10,
       "title": "🏷️ Priority Distribution",
       "type": "piechart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 9, "w": 8, "x": 16, "y": 7},
+      "gridPos": {"h": 10, "w": 8, "x": 16, "y": 8},
       "targets": [
         {
           "format": "table",
@@ -369,15 +376,15 @@
         "overrides": [
           {
             "matcher": {"id": "byName", "options": "high"},
-            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(242, 73, 92, 1)"}}]
+            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(239, 68, 68)"}}]
           },
           {
             "matcher": {"id": "byName", "options": "medium"},
-            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(237, 129, 40, 1)"}}]
+            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(251, 146, 60)"}}]
           },
           {
             "matcher": {"id": "byName", "options": "low"},
-            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(115, 191, 105, 1)"}}]
+            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(34, 197, 94)"}}]
           }
         ]
       },
@@ -387,17 +394,18 @@
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "pieType": "pie",
+        "pieType": "donut",
         "tooltip": {"mode": "single", "sort": "none"},
         "legend": {"displayMode": "list", "placement": "right", "showLegend": true, "values": ["value", "percent"]},
         "displayLabels": ["name", "percent"]
-      }
+      },
+      "transparent": false
     },
     {
       "id": 11,
       "title": "🎯 Agent Performance & Workload",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 16},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 18},
       "collapsed": false,
       "panels": []
     },
@@ -406,7 +414,7 @@
       "title": "👥 Agent Performance Dashboard",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 17},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 19},
       "targets": [
         {
           "format": "table",
@@ -439,9 +447,9 @@
               {"id": "thresholds", "value": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "rgba(242, 73, 92, 0.8)", "value": null},
-                  {"color": "rgba(237, 129, 40, 0.8)", "value": 70},
-                  {"color": "rgba(115, 191, 105, 0.8)", "value": 90}
+                  {"color": "rgb(239, 68, 68)", "value": null},
+                  {"color": "rgb(251, 146, 60)", "value": 70},
+                  {"color": "rgb(34, 197, 94)", "value": 90}
                 ]
               }}
             ]
@@ -453,9 +461,9 @@
               {"id": "thresholds", "value": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "rgba(115, 191, 105, 0.3)", "value": null},
-                  {"color": "rgba(237, 129, 40, 0.3)", "value": 2},
-                  {"color": "rgba(242, 73, 92, 0.3)", "value": 6}
+                  {"color": "rgba(34, 197, 94, 0.3)", "value": null},
+                  {"color": "rgba(251, 146, 60, 0.3)", "value": 2},
+                  {"color": "rgba(239, 68, 68, 0.3)", "value": 6}
                 ]
               }}
             ]
@@ -467,9 +475,9 @@
               {"id": "thresholds", "value": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "rgba(115, 191, 105, 0.3)", "value": null},
-                  {"color": "rgba(237, 129, 40, 0.3)", "value": 24},
-                  {"color": "rgba(242, 73, 92, 0.3)", "value": 48}
+                  {"color": "rgba(34, 197, 94, 0.3)", "value": null},
+                  {"color": "rgba(251, 146, 60, 0.3)", "value": 24},
+                  {"color": "rgba(239, 68, 68, 0.3)", "value": 48}
                 ]
               }}
             ]
@@ -486,21 +494,21 @@
             "matcher": {"id": "byName", "options": "🔴 High Priority"},
             "properties": [
               {"id": "custom.displayMode", "value": "color-text"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(242, 73, 92, 1)"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(239, 68, 68)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "🟡 Medium Priority"},
             "properties": [
               {"id": "custom.displayMode", "value": "color-text"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(237, 129, 40, 1)"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(251, 146, 60)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "🟢 Low Priority"},
             "properties": [
               {"id": "custom.displayMode", "value": "color-text"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(115, 191, 105, 1)"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(34, 197, 94)"}}
             ]
           }
         ]
@@ -514,7 +522,7 @@
       "id": 13,
       "title": "📊 Response Time Analysis",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 27},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 29},
       "collapsed": false,
       "panels": []
     },
@@ -523,7 +531,7 @@
       "title": "🕒 Response Time Distribution",
       "type": "histogram",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28},
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 30},
       "targets": [
         {
           "format": "table",
@@ -533,7 +541,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-classic"},
+          "color": {"mode": "continuous-BlPu"},
           "custom": {
             "hideFrom": {"tooltip": false, "vis": false, "legend": false}
           },
@@ -543,14 +551,15 @@
       "options": {
         "bucketSize": 2,
         "bucketCount": 24
-      }
+      },
+      "transparent": false
     },
     {
       "id": 15,
       "title": "📅 Response Time Heatmap",
       "type": "heatmap",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28},
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 30},
       "targets": [
         {
           "format": "table",
@@ -561,7 +570,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "continuous-GrYlRd",
+            "mode": "continuous-RdYlBu",
             "exponent": 0.5
           },
           "custom": {
@@ -573,7 +582,7 @@
       "options": {
         "calculate": false,
         "calculation": {},
-        "cellGap": 2,
+        "cellGap": 1,
         "cellValues": {},
         "color": {
           "exponent": 0.5,
@@ -581,7 +590,7 @@
           "mode": "scheme",
           "reverse": false,
           "scale": "exponential",
-          "scheme": "Spectral",
+          "scheme": "RdYlBu",
           "steps": 128
         },
         "exemplars": {"color": "rgba(255,0,255,0.7)"},
@@ -590,13 +599,14 @@
         "rowsFrame": {"layout": "auto"},
         "tooltip": {"show": true, "yHistogram": false},
         "yAxis": {"axisPlacement": "left", "reverse": false, "unit": "short"}
-      }
+      },
+      "transparent": false
     },
     {
       "id": 16,
       "title": "🎫 Active Ticket Management",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 36},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 39},
       "collapsed": false,
       "panels": []
     },
@@ -605,7 +615,7 @@
       "title": "🚨 Priority Tickets Dashboard",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 37},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 40},
       "targets": [
         {
           "format": "table",
@@ -634,9 +644,9 @@
             "properties": [
               {"id": "custom.displayMode", "value": "color-background"},
               {"id": "mappings", "value": [
-                {"options": {"high": {"color": "rgba(242, 73, 92, 0.8)", "index": 0}}, "type": "value"},
-                {"options": {"medium": {"color": "rgba(237, 129, 40, 0.8)", "index": 1}}, "type": "value"},
-                {"options": {"low": {"color": "rgba(115, 191, 105, 0.8)", "index": 2}}, "type": "value"}
+                {"options": {"high": {"color": "rgb(239, 68, 68)", "index": 0}}, "type": "value"},
+                {"options": {"medium": {"color": "rgb(251, 146, 60)", "index": 1}}, "type": "value"},
+                {"options": {"low": {"color": "rgb(34, 197, 94)", "index": 2}}, "type": "value"}
               ]},
               {"id": "custom.width", "value": 100}
             ]
@@ -650,9 +660,9 @@
               {"id": "thresholds", "value": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "rgba(115, 191, 105, 0.8)", "value": null},
-                  {"color": "rgba(237, 129, 40, 0.8)", "value": 24},
-                  {"color": "rgba(242, 73, 92, 0.8)", "value": 72}
+                  {"color": "rgb(34, 197, 94)", "value": null},
+                  {"color": "rgb(251, 146, 60)", "value": 24},
+                  {"color": "rgb(239, 68, 68)", "value": 72}
                 ]
               }},
               {"id": "custom.width", "value": 120}
@@ -663,9 +673,9 @@
             "properties": [
               {"id": "custom.displayMode", "value": "color-text"},
               {"id": "mappings", "value": [
-                {"options": {"open": {"color": "rgba(242, 73, 92, 1)", "index": 0}}, "type": "value"},
-                {"options": {"pending": {"color": "rgba(237, 129, 40, 1)", "index": 1}}, "type": "value"},
-                {"options": {"waiting": {"color": "rgba(31, 120, 193, 1)", "index": 2}}, "type": "value"}
+                {"options": {"open": {"color": "rgb(239, 68, 68)", "index": 0}}, "type": "value"},
+                {"options": {"pending": {"color": "rgb(251, 146, 60)", "index": 1}}, "type": "value"},
+                {"options": {"waiting": {"color": "rgb(59, 130, 246)", "index": 2}}, "type": "value"}
               ]},
               {"id": "custom.width", "value": 100}
             ]
@@ -677,9 +687,9 @@
               {"id": "thresholds", "value": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "rgba(115, 191, 105, 0.3)", "value": null},
-                  {"color": "rgba(237, 129, 40, 0.3)", "value": 6},
-                  {"color": "rgba(242, 73, 92, 0.3)", "value": 24}
+                  {"color": "rgba(34, 197, 94, 0.3)", "value": null},
+                  {"color": "rgba(251, 146, 60, 0.3)", "value": 6},
+                  {"color": "rgba(239, 68, 68, 0.3)", "value": 24}
                 ]
               }},
               {"id": "custom.width", "value": 130}
@@ -720,7 +730,7 @@
       "id": 18,
       "title": "📈 Customer Satisfaction & Insights",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 49},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 52},
       "collapsed": false,
       "panels": []
     },
@@ -729,7 +739,7 @@
       "title": "🔍 Content Analysis - Top Keywords",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 50},
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 53},
       "targets": [
         {
           "format": "table",
@@ -748,7 +758,7 @@
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 100,
-            "gradientMode": "none",
+            "gradientMode": "hue",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -774,8 +784,8 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "red", "value": 80}
+              {"color": "rgb(34, 197, 94)", "value": null},
+              {"color": "rgb(59, 130, 246)", "value": 80}
             ]
           }
         }
@@ -793,14 +803,15 @@
           "mode": "single",
           "sort": "none"
         }
-      }
+      },
+      "transparent": false
     },
     {
       "id": 20,
       "title": "📊 Ticket Resolution Time Distribution",
       "type": "bargauge",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 50},
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 53},
       "targets": [
         {
           "format": "table",
@@ -810,7 +821,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "continuous-GrYlRd"},
+          "color": {"mode": "continuous-RdYlGn"},
           "custom": {
             "axisPlacement": "auto",
             "axisLabel": "",
@@ -818,8 +829,8 @@
             "axisWidth": 80,
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 80,
-            "gradientMode": "none",
+            "fillOpacity": 90,
+            "gradientMode": "hue",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -845,8 +856,8 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "red", "value": 80}
+              {"color": "rgb(34, 197, 94)", "value": null},
+              {"color": "rgb(239, 68, 68)", "value": 80}
             ]
           }
         }
@@ -864,13 +875,14 @@
         "valueMode": "color",
         "text": {},
         "displayMode": "gradient"
-      }
+      },
+      "transparent": false
     },
     {
       "id": 21,
       "title": "⏱️ SLA Performance Tracking",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 58},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 62},
       "collapsed": false,
       "panels": []
     },
@@ -879,7 +891,7 @@
       "title": "📊 SLA Compliance by Priority",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 59},
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 63},
       "targets": [
         {
           "format": "time_series",
@@ -894,13 +906,13 @@
             "drawStyle": "line",
             "lineInterpolation": "smooth",
             "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 20,
-            "gradientMode": "hue",
+            "lineWidth": 3,
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
             "spanNulls": false,
             "insertNulls": false,
             "showPoints": "always",
-            "pointSize": 5,
+            "pointSize": 6,
             "stacking": {"mode": "none", "group": "A"}
           },
           "unit": "percent",
@@ -911,19 +923,19 @@
           {
             "matcher": {"id": "byName", "options": "high Priority"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(242, 73, 92, 1)"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(239, 68, 68)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "medium Priority"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(237, 129, 40, 1)"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(251, 146, 60)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "low Priority"},
             "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(115, 191, 105, 1)"}}
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgb(34, 197, 94)"}}
             ]
           }
         ]
@@ -931,14 +943,15 @@
       "options": {
         "tooltip": {"mode": "multi", "sort": "none"},
         "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true}
-      }
+      },
+      "transparent": false
     },
     {
       "id": 23,
       "title": "🎯 First Response SLA Tracking",
       "type": "gauge",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 59},
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 63},
       "targets": [
         {
           "format": "table",
@@ -953,9 +966,9 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "rgba(242, 73, 92, 1)", "value": null},
-              {"color": "rgba(237, 129, 40, 1)", "value": 80},
-              {"color": "rgba(115, 191, 105, 1)", "value": 95}
+              {"color": "rgb(239, 68, 68)", "value": null},
+              {"color": "rgb(251, 146, 60)", "value": 80},
+              {"color": "rgb(34, 197, 94)", "value": 95}
             ]
           },
           "unit": "percent",
@@ -973,7 +986,8 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true,
         "text": {}
-      }
+      },
+      "transparent": false
     }
   ],
   "time": {
