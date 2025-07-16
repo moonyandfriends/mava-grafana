@@ -1,35 +1,48 @@
 {
   "id": null,
-  "uid": "mava-tickets",
-  "title": "Mava Tickets",
-  "description": "Unified support tickets dashboard combining operational management and performance analytics",
-  "tags": ["mava", "tickets", "support", "analytics", "performance"],
+  "uid": "mava-tickets-enhanced",
+  "title": "🎫 Mava Support Analytics",
+  "description": "Advanced support ticket analytics with modern UI, agent performance metrics, and comprehensive insights into ticket management and customer satisfaction",
+  "tags": ["mava", "tickets", "support", "analytics", "performance", "sla", "agents"],
   "style": "dark",
   "timezone": "browser",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "hideControls": false,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "title": "Mava Dashboard",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://mava.app/dashboard"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
       "id": 1,
-      "title": "Ticket Status Overview",
+      "title": "📊 Key Performance Indicators",
       "type": "row",
       "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
-      "collapsed": false
+      "collapsed": false,
+      "panels": []
     },
     {
       "id": 2,
-      "title": "Open Tickets",
+      "title": "🔥 Active Tickets",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 1},
+      "gridPos": {"h": 5, "w": 4, "x": 0, "y": 1},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS open_tickets FROM tickets WHERE status = 'open' AND created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "SELECT COUNT(*) AS value FROM mava_tickets WHERE status IN ('open', 'pending', 'waiting') AND created_at >= $__timeFrom() AND created_at <= $__timeTo();",
           "refId": "A"
         }
       ],
@@ -39,36 +52,41 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 5},
-              {"color": "red", "value": 15}
+              {"color": "rgba(115, 191, 105, 0.2)", "value": null},
+              {"color": "rgba(237, 129, 40, 0.2)", "value": 10},
+              {"color": "rgba(242, 73, 92, 0.2)", "value": 25}
             ]
+          },
+          "unit": "short",
+          "custom": {
+            "neutral": 0
           }
         }
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "background_solid",
         "graphMode": "area",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
           "values": false,
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       }
     },
     {
       "id": 3,
-      "title": "Pending Tickets",
+      "title": "⚡ Avg Response Time",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 4, "x": 4, "y": 1},
+      "gridPos": {"h": 5, "w": 4, "x": 4, "y": 1},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS pending_tickets FROM tickets WHERE status = 'pending' AND created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "WITH first_responses AS (SELECT t.id, t.created_at, MIN(m.created_at) as first_response FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE m.from_customer = false AND m.created_at > t.created_at AND t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() GROUP BY t.id, t.created_at) SELECT COALESCE(ROUND(AVG(EXTRACT(epoch FROM (first_response - created_at))/3600), 2), 0) as value FROM first_responses;",
           "refId": "A"
         }
       ],
@@ -78,36 +96,39 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 3},
-              {"color": "red", "value": 10}
+              {"color": "rgba(115, 191, 105, 0.2)", "value": null},
+              {"color": "rgba(237, 129, 40, 0.2)", "value": 2},
+              {"color": "rgba(242, 73, 92, 0.2)", "value": 6}
             ]
-          }
+          },
+          "unit": "h",
+          "decimals": 1
         }
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "background_solid",
         "graphMode": "area",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
           "values": false,
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       }
     },
     {
       "id": 4,
-      "title": "Waiting Tickets",
+      "title": "🎯 Resolution Rate",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 1},
+      "gridPos": {"h": 5, "w": 4, "x": 8, "y": 1},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS waiting_tickets FROM tickets WHERE status = 'waiting' AND created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "SELECT ROUND((COUNT(CASE WHEN status = 'resolved' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0)), 1) AS value FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
           "refId": "A"
         }
       ],
@@ -117,98 +138,40 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "blue", "value": null},
-              {"color": "yellow", "value": 2},
-              {"color": "red", "value": 8}
+              {"color": "rgba(242, 73, 92, 0.2)", "value": null},
+              {"color": "rgba(237, 129, 40, 0.2)", "value": 70},
+              {"color": "rgba(115, 191, 105, 0.2)", "value": 90}
             ]
-          }
+          },
+          "unit": "percent",
+          "max": 100,
+          "min": 0
         }
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "background_solid",
         "graphMode": "area",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
           "values": false,
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       }
     },
     {
       "id": 5,
-      "title": "Resolved Tickets",
+      "title": "📈 SLA Compliance",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 4, "x": 12, "y": 1},
+      "gridPos": {"h": 5, "w": 4, "x": 12, "y": 1},
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) AS resolved_tickets FROM tickets WHERE status = 'resolved' AND created_at >= $__timeFrom() AND created_at <= $__timeTo();",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "fixed", "fixedColor": "green"}
-        }
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "textMode": "auto"
-      }
-    },
-    {
-      "id": 6,
-      "title": "Total Tickets",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 4, "x": 16, "y": 1},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_tickets FROM tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "fixed", "fixedColor": "blue"}
-        }
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "textMode": "auto"
-      }
-    },
-    {
-      "id": 7,
-      "title": "Resolution Rate",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 4, "x": 20, "y": 1},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT ROUND((COUNT(CASE WHEN status = 'resolved' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0)), 2) AS resolution_rate FROM tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "WITH sla_metrics AS (SELECT t.id, CASE WHEN t.status = 'resolved' AND EXTRACT(epoch FROM (t.updated_at - t.created_at))/3600 <= 48 THEN 1 ELSE 0 END as met_sla FROM mava_tickets t WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo()) SELECT ROUND(AVG(met_sla) * 100, 1) as value FROM sla_metrics;",
           "refId": "A"
         }
       ],
@@ -218,44 +181,123 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              {"color": "red", "value": null},
-              {"color": "yellow", "value": 60},
-              {"color": "green", "value": 80}
+              {"color": "rgba(242, 73, 92, 0.2)", "value": null},
+              {"color": "rgba(237, 129, 40, 0.2)", "value": 85},
+              {"color": "rgba(115, 191, 105, 0.2)", "value": 95}
             ]
           },
-          "unit": "percent"
+          "unit": "percent",
+          "max": 100,
+          "min": 0
         }
       },
       "options": {
-        "colorMode": "background",
+        "colorMode": "background_solid",
         "graphMode": "area",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
           "values": false,
           "calcs": ["lastNotNull"],
           "fields": ""
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
+      }
+    },
+    {
+      "id": 6,
+      "title": "💬 Avg Messages/Ticket",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 5, "w": 4, "x": 16, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT ROUND(AVG(message_count), 1) as value FROM (SELECT COUNT(*) as message_count FROM mava_messages m JOIN mava_tickets t ON m.ticket_id = t.id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() GROUP BY m.ticket_id) subq;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "rgba(115, 191, 105, 0.2)", "value": null},
+              {"color": "rgba(237, 129, 40, 0.2)", "value": 8},
+              {"color": "rgba(242, 73, 92, 0.2)", "value": 15}
+            ]
+          },
+          "unit": "short",
+          "decimals": 1
+        }
+      },
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      }
+    },
+    {
+      "id": 7,
+      "title": "🔢 Total Tickets",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 5, "w": 4, "x": 20, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS value FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "fixed", "fixedColor": "rgba(31, 120, 193, 0.2)"},
+          "unit": "short"
+        }
+      },
+      "options": {
+        "colorMode": "background_solid",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
       }
     },
     {
       "id": 8,
-      "title": "Ticket Trends & Analytics",
+      "title": "📈 Ticket Trends & Volume Analysis",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 5},
-      "collapsed": false
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 6},
+      "collapsed": false,
+      "panels": []
     },
     {
       "id": 9,
-      "title": "Ticket Volume & Resolution Trends",
+      "title": "🎯 Ticket Volume & Resolution Trends",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 16, "x": 0, "y": 6},
+      "gridPos": {"h": 9, "w": 16, "x": 0, "y": 7},
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT DATE_TRUNC('day', created_at) AS time, 'Created' AS metric, COUNT(*) AS value FROM tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY time UNION ALL SELECT DATE_TRUNC('day', updated_at) AS time, 'Resolved' AS metric, COUNT(*) AS value FROM tickets WHERE status = 'resolved' AND updated_at >= $__timeFrom() AND updated_at <= $__timeTo() GROUP BY time ORDER BY time;",
+          "rawSql": "SELECT DATE_TRUNC('day', created_at) AS time, 'Created' AS metric, COUNT(*) AS value FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY time UNION ALL SELECT DATE_TRUNC('day', updated_at) AS time, 'Resolved' AS metric, COUNT(*) AS value FROM mava_tickets WHERE status = 'resolved' AND updated_at >= $__timeFrom() AND updated_at <= $__timeTo() GROUP BY time ORDER BY time;",
           "refId": "A"
         }
       ],
@@ -264,51 +306,111 @@
           "color": {"mode": "palette-classic"},
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "lineWidth": 3,
+            "fillOpacity": 20,
+            "gradientMode": "hue",
             "spanNulls": false,
             "insertNulls": false,
-            "showPoints": "auto",
-            "pointSize": 5,
+            "showPoints": "always",
+            "pointSize": 6,
             "stacking": {"mode": "none", "group": "A"}
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Created"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(31, 120, 193, 1)"}},
+              {"id": "custom.fillOpacity", "value": 30}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Resolved"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(115, 191, 105, 1)"}},
+              {"id": "custom.fillOpacity", "value": 30}
+            ]
           }
-        }
+        ]
+      },
+      "options": {
+        "tooltip": {"mode": "multi", "sort": "none"},
+        "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true, "calcs": ["lastNotNull", "mean", "max"]}
       }
     },
     {
       "id": 10,
-      "title": "Support Content Analysis",
-      "type": "barchart",
+      "title": "🏷️ Priority Distribution",
+      "type": "piechart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 6},
+      "gridPos": {"h": 9, "w": 8, "x": 16, "y": 7},
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND content IS NOT NULL AND content <> '' AND LENGTH(content) > 3), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us', 'help', 'need', 'issue', 'problem', 'support', 'ticket', 'please', 'thanks', 'hello', 'thank', 'you')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 20;",
+          "rawSql": "SELECT priority as \"Priority\", COUNT(*) as \"Count\" FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND priority IS NOT NULL GROUP BY priority ORDER BY COUNT(*) DESC;",
           "refId": "A"
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "hideFrom": {
+              "tooltip": false,
+              "vis": false,
+              "legend": false
+            }
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "high"},
+            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(242, 73, 92, 1)"}}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "medium"},
+            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(237, 129, 40, 1)"}}]
+          },
+          {
+            "matcher": {"id": "byName", "options": "low"},
+            "properties": [{"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(115, 191, 105, 1)"}}]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "pieType": "pie",
+        "tooltip": {"mode": "single", "sort": "none"},
+        "legend": {"displayMode": "list", "placement": "right", "showLegend": true, "values": ["value", "percent"]},
+        "displayLabels": ["name", "percent"]
+      }
     },
     {
       "id": 11,
-      "title": "Active Tickets Management",
+      "title": "🎯 Agent Performance & Workload",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 14},
-      "collapsed": false
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 16},
+      "collapsed": false,
+      "panels": []
     },
     {
       "id": 12,
-      "title": "Priority Open Tickets",
+      "title": "👥 Agent Performance Dashboard",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 15},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 17},
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH ticket_with_latest_message AS (SELECT t.id, t.title, t.priority, t.status, t.created_at, t.updated_at, t.customer_id, t.assigned_to, EXTRACT(EPOCH FROM (NOW() - t.created_at))/3600 AS age_hours, m.content AS latest_message, m.sender AS latest_sender FROM tickets t LEFT JOIN LATERAL (SELECT content, sender FROM messages WHERE ticket_id = t.id ORDER BY created_at DESC LIMIT 1) m ON true WHERE t.status IN ('open', 'pending', 'waiting') AND t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo()) SELECT id AS \"Ticket ID\", title AS \"Title\", priority AS \"Priority\", status AS \"Status\", ROUND(age_hours, 1) AS \"Age (Hours)\", customer_id AS \"Customer ID\", assigned_to AS \"Assigned To\", COALESCE(SUBSTRING(latest_message, 1, 100), 'No messages') AS \"Latest Message\", latest_sender AS \"Latest Sender\", created_at AS \"Created\", updated_at AS \"Updated\" FROM ticket_with_latest_message ORDER BY CASE WHEN priority = 'high' THEN 1 WHEN priority = 'medium' THEN 2 WHEN priority = 'low' THEN 3 ELSE 4 END, age_hours DESC;",
+          "rawSql": "WITH agent_metrics AS (SELECT t.assigned_to as agent, COUNT(*) as total_tickets, COUNT(CASE WHEN t.status = 'resolved' THEN 1 END) as resolved_tickets, COUNT(CASE WHEN t.status IN ('open', 'pending', 'waiting') THEN 1 END) as active_tickets, COUNT(CASE WHEN t.priority = 'high' THEN 1 END) as high_priority, COUNT(CASE WHEN t.priority = 'medium' THEN 1 END) as medium_priority, COUNT(CASE WHEN t.priority = 'low' THEN 1 END) as low_priority, ROUND(AVG(EXTRACT(epoch FROM (COALESCE(t.updated_at, NOW()) - t.created_at))/3600), 2) as avg_resolution_hours FROM mava_tickets t WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND t.assigned_to IS NOT NULL GROUP BY t.assigned_to), response_metrics AS (SELECT t.assigned_to as agent, AVG(EXTRACT(epoch FROM (m.created_at - t.created_at))/3600) as avg_first_response_hours FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND t.assigned_to IS NOT NULL AND m.from_customer = false AND m.created_at = (SELECT MIN(m2.created_at) FROM mava_messages m2 WHERE m2.ticket_id = t.id AND m2.from_customer = false AND m2.created_at > t.created_at) GROUP BY t.assigned_to) SELECT am.agent AS \"👤 Agent\", am.total_tickets AS \"📊 Total Tickets\", am.resolved_tickets AS \"✅ Resolved\", am.active_tickets AS \"🔥 Active\", ROUND((am.resolved_tickets * 100.0 / NULLIF(am.total_tickets, 0)), 1) AS \"📈 Resolution Rate (%)\", COALESCE(ROUND(rm.avg_first_response_hours, 2), 0) AS \"⚡ Avg First Response (h)\", COALESCE(am.avg_resolution_hours, 0) AS \"🏁 Avg Resolution Time (h)\", am.high_priority AS \"🔴 High Priority\", am.medium_priority AS \"🟡 Medium Priority\", am.low_priority AS \"🟢 Low Priority\" FROM agent_metrics am LEFT JOIN response_metrics rm ON am.agent = rm.agent ORDER BY am.total_tickets DESC;",
           "refId": "A"
         }
       ],
@@ -316,30 +418,231 @@
         "defaults": {
           "color": {"mode": "thresholds"},
           "custom": {
-            "align": "auto",
+            "align": "center",
             "displayMode": "auto",
-            "inspect": false
+            "inspect": false,
+            "filterable": true
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [{"color": "green", "value": null}]
+            "steps": [{"color": "rgba(128, 128, 128, 0.1)", "value": null}]
           }
         },
         "overrides": [
           {
-            "matcher": {"id": "byName", "options": "Priority"},
+            "matcher": {"id": "byName", "options": "📈 Resolution Rate (%)"},
             "properties": [
-              {"id": "custom.displayMode", "value": "color-background"},
-              {"id": "mappings", "value": [
-                {"options": {"high": {"color": "red", "index": 0}}, "type": "value"},
-                {"options": {"medium": {"color": "yellow", "index": 1}}, "type": "value"},
-                {"options": {"low": {"color": "green", "index": 2}}, "type": "value"}
-              ]}
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "max", "value": 100},
+              {"id": "min", "value": 0},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "rgba(242, 73, 92, 0.8)", "value": null},
+                  {"color": "rgba(237, 129, 40, 0.8)", "value": 70},
+                  {"color": "rgba(115, 191, 105, 0.8)", "value": 90}
+                ]
+              }}
             ]
           },
           {
-            "matcher": {"id": "byName", "options": "Age (Hours)"},
+            "matcher": {"id": "byName", "options": "⚡ Avg First Response (h)"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "rgba(115, 191, 105, 0.3)", "value": null},
+                  {"color": "rgba(237, 129, 40, 0.3)", "value": 2},
+                  {"color": "rgba(242, 73, 92, 0.3)", "value": 6}
+                ]
+              }}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "🏁 Avg Resolution Time (h)"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "rgba(115, 191, 105, 0.3)", "value": null},
+                  {"color": "rgba(237, 129, 40, 0.3)", "value": 24},
+                  {"color": "rgba(242, 73, 92, 0.3)", "value": 48}
+                ]
+              }}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "🔥 Active"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "max", "value": 30},
+              {"id": "min", "value": 0}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "🔴 High Priority"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(242, 73, 92, 1)"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "🟡 Medium Priority"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(237, 129, 40, 1)"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "🟢 Low Priority"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(115, 191, 105, 1)"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"desc": true, "displayName": "📊 Total Tickets"}]
+      }
+    },
+    {
+      "id": 13,
+      "title": "📊 Response Time Analysis",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 27},
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 14,
+      "title": "🕒 Response Time Distribution",
+      "type": "histogram",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH response_times AS (SELECT t.id, EXTRACT(epoch FROM (MIN(m.created_at) - t.created_at))/3600 as response_hours FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND m.from_customer = false AND m.created_at > t.created_at GROUP BY t.id, t.created_at) SELECT response_hours as \"Response Time (Hours)\" FROM response_times WHERE response_hours IS NOT NULL AND response_hours <= 48 ORDER BY response_hours;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "hideFrom": {"tooltip": false, "vis": false, "legend": false}
+          },
+          "unit": "h"
+        }
+      },
+      "options": {
+        "bucketSize": 2,
+        "bucketCount": 24
+      }
+    },
+    {
+      "id": 15,
+      "title": "📅 Response Time Heatmap",
+      "type": "heatmap",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH response_times AS (SELECT DATE_TRUNC('day', t.created_at) as day, EXTRACT(hour FROM t.created_at) as hour, AVG(EXTRACT(epoch FROM (MIN(m.created_at) - t.created_at))/3600) as avg_response_hours FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND m.from_customer = false AND m.created_at > t.created_at GROUP BY DATE_TRUNC('day', t.created_at), EXTRACT(hour FROM t.created_at), t.id) SELECT day as time, hour as \"Hour\", AVG(avg_response_hours) as \"Avg Response Time\" FROM response_times GROUP BY day, hour ORDER BY day, hour;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd",
+            "exponent": 0.5
+          },
+          "custom": {
+            "hideFrom": {"tooltip": false, "vis": false, "legend": false}
+          },
+          "unit": "h"
+        }
+      },
+      "options": {
+        "calculate": false,
+        "calculation": {},
+        "cellGap": 2,
+        "cellValues": {},
+        "color": {
+          "exponent": 0.5,
+          "fill": "dark-orange",
+          "mode": "scheme",
+          "reverse": false,
+          "scale": "exponential",
+          "scheme": "Spectral",
+          "steps": 128
+        },
+        "exemplars": {"color": "rgba(255,0,255,0.7)"},
+        "filterValues": {"le": 1e-9},
+        "legend": {"show": true},
+        "rowsFrame": {"layout": "auto"},
+        "tooltip": {"show": true, "yHistogram": false},
+        "yAxis": {"axisPlacement": "left", "reverse": false, "unit": "short"}
+      }
+    },
+    {
+      "id": 16,
+      "title": "🎫 Active Ticket Management",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 36},
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 17,
+      "title": "🚨 Priority Tickets Dashboard",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 37},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH ticket_details AS (SELECT t.id, t.customer_id, c.name as customer_name, t.status, t.priority, t.assigned_to, t.created_at, t.updated_at, EXTRACT(EPOCH FROM (NOW() - t.created_at))/3600 AS age_hours, COUNT(m.id) as message_count, MAX(m.created_at) as last_message_time, STRING_AGG(CASE WHEN m.content IS NOT NULL THEN SUBSTRING(m.content, 1, 50) END, ' | ' ORDER BY m.created_at DESC) as recent_messages FROM mava_tickets t LEFT JOIN mava_customers c ON t.customer_id = c.id LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.status IN ('open', 'pending', 'waiting') AND t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() GROUP BY t.id, t.customer_id, c.name, t.status, t.priority, t.assigned_to, t.created_at, t.updated_at) SELECT id AS \"🎫 Ticket ID\", customer_name AS \"👤 Customer\", status AS \"📊 Status\", priority AS \"⚡ Priority\", assigned_to AS \"👥 Agent\", ROUND(age_hours, 1) AS \"⏰ Age (Hours)\", message_count AS \"💬 Messages\", CASE WHEN last_message_time IS NOT NULL THEN ROUND(EXTRACT(EPOCH FROM (NOW() - last_message_time))/3600, 1) ELSE NULL END AS \"🕒 Last Activity (h)\", COALESCE(SUBSTRING(recent_messages, 1, 100), 'No messages') AS \"📝 Recent Messages\", created_at AS \"📅 Created\", updated_at AS \"🔄 Updated\" FROM ticket_details ORDER BY CASE WHEN priority = 'high' THEN 1 WHEN priority = 'medium' THEN 2 WHEN priority = 'low' THEN 3 ELSE 4 END, age_hours DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "custom": {
+            "align": "left",
+            "displayMode": "auto",
+            "inspect": false,
+            "filterable": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{"color": "rgba(128, 128, 128, 0.1)", "value": null}]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "⚡ Priority"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "mappings", "value": [
+                {"options": {"high": {"color": "rgba(242, 73, 92, 0.8)", "index": 0}}, "type": "value"},
+                {"options": {"medium": {"color": "rgba(237, 129, 40, 0.8)", "index": 1}}, "type": "value"},
+                {"options": {"low": {"color": "rgba(115, 191, 105, 0.8)", "index": 2}}, "type": "value"}
+              ]},
+              {"id": "custom.width", "value": 100}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "⏰ Age (Hours)"},
             "properties": [
               {"id": "custom.displayMode", "value": "gradient-gauge"},
               {"id": "max", "value": 168},
@@ -347,274 +650,329 @@
               {"id": "thresholds", "value": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "green", "value": null},
-                  {"color": "yellow", "value": 24},
-                  {"color": "red", "value": 72}
+                  {"color": "rgba(115, 191, 105, 0.8)", "value": null},
+                  {"color": "rgba(237, 129, 40, 0.8)", "value": 24},
+                  {"color": "rgba(242, 73, 92, 0.8)", "value": 72}
                 ]
-              }}
+              }},
+              {"id": "custom.width", "value": 120}
             ]
           },
           {
-            "matcher": {"id": "byName", "options": "Status"},
+            "matcher": {"id": "byName", "options": "📊 Status"},
             "properties": [
               {"id": "custom.displayMode", "value": "color-text"},
               {"id": "mappings", "value": [
-                {"options": {"open": {"color": "red", "index": 0}}, "type": "value"},
-                {"options": {"pending": {"color": "yellow", "index": 1}}, "type": "value"},
-                {"options": {"waiting": {"color": "blue", "index": 2}}, "type": "value"}
-              ]}
+                {"options": {"open": {"color": "rgba(242, 73, 92, 1)", "index": 0}}, "type": "value"},
+                {"options": {"pending": {"color": "rgba(237, 129, 40, 1)", "index": 1}}, "type": "value"},
+                {"options": {"waiting": {"color": "rgba(31, 120, 193, 1)", "index": 2}}, "type": "value"}
+              ]},
+              {"id": "custom.width", "value": 100}
             ]
           },
           {
-            "matcher": {"id": "byName", "options": "Title"},
-            "properties": [
-              {"id": "custom.width", "value": 200},
-              {"id": "links", "value": [
-                {"title": "View in Mava", "url": "https://mava.app/tickets/${__data.fields[\"Ticket ID\"]}"}
-              ]}
-            ]
-          },
-          {
-            "matcher": {"id": "byName", "options": "Latest Message"},
-            "properties": [
-              {"id": "custom.width", "value": 300}
-            ]
-          }
-        ]
-      },
-      "options": {
-        "showHeader": true,
-        "sortBy": [{"desc": false, "displayName": "Priority"}]
-      }
-    },
-    {
-      "id": 13,
-      "title": "Agent Performance Analytics",
-      "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 27},
-      "collapsed": false
-    },
-    {
-      "id": 14,
-      "title": "Average Response Time",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 28},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "WITH response_times AS (SELECT m1.ticket_id, m1.created_at as customer_message_time, MIN(m2.created_at) as agent_response_time FROM messages m1 JOIN messages m2 ON m1.ticket_id = m2.ticket_id WHERE m1.sender != 'system' AND m2.sender = 'system' AND m2.created_at > m1.created_at AND m1.created_at >= $__timeFrom() AND m1.created_at <= $__timeTo() GROUP BY m1.ticket_id, m1.created_at) SELECT AVG(EXTRACT(epoch FROM (agent_response_time - customer_message_time))/3600) as avg_response_hours FROM response_times;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "thresholds"},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {"color": "green", "value": null},
-              {"color": "yellow", "value": 2},
-              {"color": "red", "value": 6}
-            ]
-          },
-          "unit": "h"
-        }
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "textMode": "auto"
-      }
-    },
-    {
-      "id": 15,
-      "title": "First Response Rate",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 28},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "WITH first_responses AS (SELECT t.id, CASE WHEN EXISTS (SELECT 1 FROM messages m WHERE m.ticket_id = t.id AND m.sender = 'system' AND m.created_at <= t.created_at + INTERVAL '24 hours') THEN 1 ELSE 0 END as responded_within_24h FROM tickets t WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo()) SELECT ROUND(AVG(responded_within_24h) * 100, 2) as first_response_rate FROM first_responses;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "thresholds"},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {"color": "red", "value": null},
-              {"color": "yellow", "value": 80},
-              {"color": "green", "value": 95}
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "textMode": "auto"
-      }
-    },
-    {
-      "id": 16,
-      "title": "Agent Satisfaction Score",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 28},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT 4.2 as satisfaction_score;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "thresholds"},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {"color": "red", "value": null},
-              {"color": "yellow", "value": 3},
-              {"color": "green", "value": 4}
-            ]
-          },
-          "max": 5,
-          "min": 1,
-          "unit": "short"
-        }
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "textMode": "auto"
-      }
-    },
-    {
-      "id": 17,
-      "title": "SLA Compliance",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 28},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "WITH sla_compliance AS (SELECT t.id, CASE WHEN t.status = 'resolved' AND EXTRACT(epoch FROM (t.updated_at - t.created_at))/3600 <= 48 THEN 1 ELSE 0 END as met_sla FROM tickets t WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo()) SELECT ROUND(AVG(met_sla) * 100, 2) as sla_compliance FROM sla_compliance;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "thresholds"},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {"color": "red", "value": null},
-              {"color": "yellow", "value": 85},
-              {"color": "green", "value": 95}
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "textMode": "auto"
-      }
-    },
-    {
-      "id": 18,
-      "title": "Agent Workload Distribution",
-      "type": "table",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT assigned_to AS \"Agent\", COUNT(*) as \"Active Tickets\", COUNT(CASE WHEN status = 'resolved' THEN 1 END) as \"Resolved Tickets\", ROUND(AVG(EXTRACT(epoch FROM (COALESCE(updated_at, NOW()) - created_at))/3600), 2) as \"Avg Resolution Time (Hours)\", COUNT(CASE WHEN priority = 'high' THEN 1 END) as \"High Priority\", COUNT(CASE WHEN priority = 'medium' THEN 1 END) as \"Medium Priority\", COUNT(CASE WHEN priority = 'low' THEN 1 END) as \"Low Priority\" FROM tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND assigned_to IS NOT NULL GROUP BY assigned_to ORDER BY \"Active Tickets\" DESC;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "thresholds"},
-          "custom": {
-            "align": "auto",
-            "displayMode": "auto",
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [{"color": "green", "value": null}]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {"id": "byName", "options": "Active Tickets"},
-            "properties": [
-              {"id": "custom.displayMode", "value": "gradient-gauge"},
-              {"id": "max", "value": 20},
-              {"id": "min", "value": 0}
-            ]
-          },
-          {
-            "matcher": {"id": "byName", "options": "Avg Resolution Time (Hours)"},
+            "matcher": {"id": "byName", "options": "🕒 Last Activity (h)"},
             "properties": [
               {"id": "custom.displayMode", "value": "color-background"},
               {"id": "thresholds", "value": {
                 "mode": "absolute",
                 "steps": [
-                  {"color": "green", "value": null},
-                  {"color": "yellow", "value": 24},
-                  {"color": "red", "value": 48}
+                  {"color": "rgba(115, 191, 105, 0.3)", "value": null},
+                  {"color": "rgba(237, 129, 40, 0.3)", "value": 6},
+                  {"color": "rgba(242, 73, 92, 0.3)", "value": 24}
                 ]
-              }}
+              }},
+              {"id": "custom.width", "value": 130}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "💬 Messages"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "max", "value": 20},
+              {"id": "min", "value": 0},
+              {"id": "custom.width", "value": 100}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "📝 Recent Messages"},
+            "properties": [
+              {"id": "custom.width", "value": 300}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "🎫 Ticket ID"},
+            "properties": [
+              {"id": "custom.width", "value": 120},
+              {"id": "links", "value": [
+                {"title": "View in Mava", "url": "https://mava.app/tickets/${__data.fields[\"🎫 Ticket ID\"]}"}
+              ]}
             ]
           }
         ]
       },
       "options": {
         "showHeader": true,
-        "sortBy": [{"desc": true, "displayName": "Active Tickets"}]
+        "sortBy": [{"desc": false, "displayName": "⚡ Priority"}]
+      }
+    },
+    {
+      "id": 18,
+      "title": "📈 Customer Satisfaction & Insights",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 49},
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 19,
+      "title": "🔍 Content Analysis - Top Keywords",
+      "type": "barchart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 50},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM mava_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND content IS NOT NULL AND content <> '' AND LENGTH(content) > 3), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'first', 'well', 'even', 'want', 'because', 'these', 'give', 'most', 'help', 'need', 'issue', 'problem', 'support', 'ticket', 'please', 'thanks', 'hello', 'thank', 'you', 'can', 'get', 'know', 'see', 'time', 'way', 'new', 'make', 'may', 'take', 'come', 'use', 'work', 'good', 'now', 'think', 'people', 'look', 'find', 'tell', 'ask', 'try', 'call', 'right', 'move', 'old', 'different', 'follow', 'small', 'turn', 'put', 'end', 'why', 'let', 'great', 'own', 'say', 'here', 'show', 'every', 'good', 'those', 'come', 'never', 'still', 'feel', 'hand', 'high', 'part', 'seem', 'long', 'become', 'both', 'same', 'leave', 'mean', 'keep', 'student', 'group', 'set', 'lot', 'right', 'fact', 'run', 'eye', 'ask', 'room', 'hear', 'build', 'place', 'live', 'where', 'through', 'government', 'without', 'again', 'think', 'around', 'between', 'under', 'house', 'point', 'world', 'year', 'during', 'number', 'course', 'water', 'should', 'system', 'order', 'though', 'business', 'home', 'night', 'head', 'room', 'fact', 'within', 'quite', 'actually', 'state', 'person', 'line', 'company', 'while', 'last', 'might', 'school', 'information', 'still', 'large', 'although', 'both', 'public', 'read', 'left', 'side', 'enough', 'case', 'most', 'week', 'company', 'where', 'system', 'each', 'right', 'program', 'hear', 'question', 'during', 'work', 'play', 'government', 'run', 'small', 'number', 'off', 'always', 'move', 'night', 'live', 'point', 'believe', 'hold', 'today', 'bring', 'happen', 'next', 'without', 'before', 'large', 'million', 'must', 'home', 'under', 'water', 'room', 'write', 'mother', 'area', 'national', 'money', 'story', 'young', 'fact', 'month', 'different', 'lot', 'study', 'book', 'eye', 'job', 'word', 'though', 'business', 'issue', 'side', 'kind', 'head', 'far', 'black', 'long', 'both', 'little', 'house', 'yes', 'after', 'since', 'long', 'provide', 'service', 'around', 'friend', 'important', 'father', 'sit', 'away', 'until', 'power', 'hour', 'game', 'often', 'yet', 'line', 'political', 'end', 'among', 'ever', 'stand', 'bad', 'lose', 'however', 'member', 'pay', 'law', 'meet', 'car', 'city', 'almost', 'include', 'continue', 'set', 'later', 'community', 'much', 'name', 'five', 'once', 'white', 'least', 'president', 'learn', 'real', 'change', 'team', 'minute', 'best', 'several', 'idea', 'kid', 'body', 'back', 'parent', 'face', 'others', 'level', 'office', 'door', 'health', 'person', 'art', 'war', 'history', 'party', 'within', 'grow', 'result', 'open', 'morning', 'walk', 'reason', 'low', 'win', 'research', 'girl', 'guy', 'early', 'food', 'before', 'moment', 'himself', 'air', 'teacher', 'force', 'offer')) SELECT word AS \"Keyword\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word HAVING COUNT(*) > 2 ORDER BY COUNT(*) DESC LIMIT 15;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "continuous-BlPu"},
+          "custom": {
+            "axisPlacement": "auto",
+            "axisLabel": "Frequency",
+            "axisColorMode": "text",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 100,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "red", "value": 80}
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "vertical",
+        "barWidth": 0.6,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 20,
+      "title": "📊 Ticket Resolution Time Distribution",
+      "type": "bargauge",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 50},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH resolution_buckets AS (SELECT CASE WHEN EXTRACT(epoch FROM (updated_at - created_at))/3600 <= 1 THEN '< 1 hour' WHEN EXTRACT(epoch FROM (updated_at - created_at))/3600 <= 4 THEN '1-4 hours' WHEN EXTRACT(epoch FROM (updated_at - created_at))/3600 <= 8 THEN '4-8 hours' WHEN EXTRACT(epoch FROM (updated_at - created_at))/3600 <= 24 THEN '8-24 hours' WHEN EXTRACT(epoch FROM (updated_at - created_at))/3600 <= 48 THEN '1-2 days' WHEN EXTRACT(epoch FROM (updated_at - created_at))/3600 <= 168 THEN '2-7 days' ELSE '> 7 days' END as time_bucket FROM mava_tickets WHERE status = 'resolved' AND created_at >= $__timeFrom() AND created_at <= $__timeTo() AND updated_at IS NOT NULL) SELECT time_bucket as \"Resolution Time\", COUNT(*) as \"Count\" FROM resolution_buckets GROUP BY time_bucket ORDER BY CASE time_bucket WHEN '< 1 hour' THEN 1 WHEN '1-4 hours' THEN 2 WHEN '4-8 hours' THEN 3 WHEN '8-24 hours' THEN 4 WHEN '1-2 days' THEN 5 WHEN '2-7 days' THEN 6 WHEN '> 7 days' THEN 7 END;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "continuous-GrYlRd"},
+          "custom": {
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "axisColorMode": "text",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "red", "value": 80}
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "showUnfilled": true,
+        "minVizWidth": 0,
+        "minVizHeight": 10,
+        "valueMode": "color",
+        "text": {},
+        "displayMode": "gradient"
+      }
+    },
+    {
+      "id": 21,
+      "title": "⏱️ SLA Performance Tracking",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 58},
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 22,
+      "title": "📊 SLA Compliance by Priority",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 59},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "WITH sla_tracking AS (SELECT DATE_TRUNC('day', created_at) as time, priority, COUNT(*) as total_tickets, COUNT(CASE WHEN status = 'resolved' AND EXTRACT(epoch FROM (updated_at - created_at))/3600 <= CASE WHEN priority = 'high' THEN 4 WHEN priority = 'medium' THEN 24 WHEN priority = 'low' THEN 48 ELSE 48 END THEN 1 END) as sla_met FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND priority IS NOT NULL GROUP BY DATE_TRUNC('day', created_at), priority) SELECT time, priority || ' Priority' as metric, ROUND((sla_met * 100.0 / NULLIF(total_tickets, 0)), 2) as value FROM sla_tracking WHERE total_tickets > 0 ORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "hue",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "always",
+            "pointSize": 5,
+            "stacking": {"mode": "none", "group": "A"}
+          },
+          "unit": "percent",
+          "max": 100,
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "high Priority"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(242, 73, 92, 1)"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "medium Priority"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(237, 129, 40, 1)"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "low Priority"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(115, 191, 105, 1)"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "tooltip": {"mode": "multi", "sort": "none"},
+        "legend": {"displayMode": "list", "placement": "bottom", "showLegend": true}
+      }
+    },
+    {
+      "id": 23,
+      "title": "🎯 First Response SLA Tracking",
+      "type": "gauge",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 59},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH first_response_sla AS (SELECT t.priority, COUNT(*) as total_tickets, COUNT(CASE WHEN m.created_at <= t.created_at + INTERVAL '1 hour' AND t.priority = 'high' THEN 1 WHEN m.created_at <= t.created_at + INTERVAL '4 hours' AND t.priority = 'medium' THEN 1 WHEN m.created_at <= t.created_at + INTERVAL '8 hours' AND t.priority = 'low' THEN 1 END) as sla_met FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND t.priority IS NOT NULL AND m.from_customer = false AND m.created_at = (SELECT MIN(m2.created_at) FROM mava_messages m2 WHERE m2.ticket_id = t.id AND m2.from_customer = false AND m2.created_at > t.created_at) GROUP BY t.priority) SELECT priority || ' Priority' as metric, ROUND((sla_met * 100.0 / NULLIF(total_tickets, 0)), 1) as value FROM first_response_sla WHERE total_tickets > 0 ORDER BY priority;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "rgba(242, 73, 92, 1)", "value": null},
+              {"color": "rgba(237, 129, 40, 1)", "value": 80},
+              {"color": "rgba(115, 191, 105, 1)", "value": 95}
+            ]
+          },
+          "unit": "percent",
+          "max": 100,
+          "min": 0
+        }
+      },
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
       }
     }
   ],
@@ -622,7 +980,21 @@
     "from": "now-30d",
     "to": "now"
   },
-  "timepicker": {},
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
   "refresh": "5m",
-  "version": 1
+  "version": 2,
+  "weekStart": ""
 }
