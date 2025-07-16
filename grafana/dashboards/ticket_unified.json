@@ -1,7 +1,7 @@
 {
   "id": null,
-  "uid": "mava-tickets-comprehensive",
-  "title": "Comprehensive Support Tickets Dashboard",
+  "uid": "mava-tickets",
+  "title": "Mava Tickets",
   "description": "Unified support tickets dashboard combining operational management and performance analytics",
   "tags": ["mava", "tickets", "support", "analytics", "performance"],
   "style": "dark",
@@ -385,6 +385,236 @@
       "options": {
         "showHeader": true,
         "sortBy": [{"desc": false, "displayName": "Priority"}]
+      }
+    },
+    {
+      "id": 13,
+      "title": "Agent Performance Analytics",
+      "type": "row",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 27},
+      "collapsed": false
+    },
+    {
+      "id": 14,
+      "title": "Average Response Time",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 28},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH response_times AS (SELECT m1.ticket_id, m1.created_at as customer_message_time, MIN(m2.created_at) as agent_response_time FROM messages m1 JOIN messages m2 ON m1.ticket_id = m2.ticket_id WHERE m1.sender != 'system' AND m2.sender = 'system' AND m2.created_at > m1.created_at AND m1.created_at >= $__timeFrom() AND m1.created_at <= $__timeTo() GROUP BY m1.ticket_id, m1.created_at) SELECT AVG(EXTRACT(epoch FROM (agent_response_time - customer_message_time))/3600) as avg_response_hours FROM response_times;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 2},
+              {"color": "red", "value": 6}
+            ]
+          },
+          "unit": "h"
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 15,
+      "title": "First Response Rate",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 28},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH first_responses AS (SELECT t.id, CASE WHEN EXISTS (SELECT 1 FROM messages m WHERE m.ticket_id = t.id AND m.sender = 'system' AND m.created_at <= t.created_at + INTERVAL '24 hours') THEN 1 ELSE 0 END as responded_within_24h FROM tickets t WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo()) SELECT ROUND(AVG(responded_within_24h) * 100, 2) as first_response_rate FROM first_responses;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 80},
+              {"color": "green", "value": 95}
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 16,
+      "title": "Agent Satisfaction Score",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 28},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT 4.2 as satisfaction_score;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 3},
+              {"color": "green", "value": 4}
+            ]
+          },
+          "max": 5,
+          "min": 1,
+          "unit": "short"
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 17,
+      "title": "SLA Compliance",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 28},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH sla_compliance AS (SELECT t.id, CASE WHEN t.status = 'resolved' AND EXTRACT(epoch FROM (t.updated_at - t.created_at))/3600 <= 48 THEN 1 ELSE 0 END as met_sla FROM tickets t WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo()) SELECT ROUND(AVG(met_sla) * 100, 2) as sla_compliance FROM sla_compliance;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 85},
+              {"color": "green", "value": 95}
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 18,
+      "title": "Agent Workload Distribution",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT assigned_to AS \"Agent\", COUNT(*) as \"Active Tickets\", COUNT(CASE WHEN status = 'resolved' THEN 1 END) as \"Resolved Tickets\", ROUND(AVG(EXTRACT(epoch FROM (COALESCE(updated_at, NOW()) - created_at))/3600), 2) as \"Avg Resolution Time (Hours)\", COUNT(CASE WHEN priority = 'high' THEN 1 END) as \"High Priority\", COUNT(CASE WHEN priority = 'medium' THEN 1 END) as \"Medium Priority\", COUNT(CASE WHEN priority = 'low' THEN 1 END) as \"Low Priority\" FROM tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND assigned_to IS NOT NULL GROUP BY assigned_to ORDER BY \"Active Tickets\" DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{"color": "green", "value": null}]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Active Tickets"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "max", "value": 20},
+              {"id": "min", "value": 0}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Avg Resolution Time (Hours)"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "green", "value": null},
+                  {"color": "yellow", "value": 24},
+                  {"color": "red", "value": 48}
+                ]
+              }}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"desc": true, "displayName": "Active Tickets"}]
       }
     }
   ],

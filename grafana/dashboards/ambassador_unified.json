@@ -1,7 +1,7 @@
 {
   "id": null,
-  "uid": "ambassador-unified",
-  "title": "Ambassador Performance & Analytics",
+  "uid": "community-ambassadors",
+  "title": "Community Ambassadors",
   "description": "Unified ambassador dashboard combining community engagement and performance analytics",
   "tags": ["ambassador", "performance", "analytics", "cross-platform", "discord", "telegram", "x", "twitter"],
   "style": "dark",
