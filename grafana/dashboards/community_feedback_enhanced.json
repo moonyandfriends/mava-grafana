@@ -1,0 +1,578 @@
+{
+  "id": null,
+  "uid": "community-feedback-enhanced",
+  "title": "Community Feedback & Sentiment Analysis",
+  "tags": ["community", "feedback", "sentiment", "analysis"],
+  "timezone": "browser",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Feedback Overview",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
+      "panels": []
+    },
+    {
+      "id": 2,
+      "title": "Total Feedback Messages",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) as total_feedback FROM (SELECT content FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND (content ILIKE '%feedback%' OR content ILIKE '%suggestion%' OR content ILIKE '%improve%' OR content ILIKE '%better%' OR content ILIKE '%issue%' OR content ILIKE '%problem%' OR content ILIKE '%bug%') UNION ALL SELECT text as content FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND (text ILIKE '%feedback%' OR text ILIKE '%suggestion%' OR text ILIKE '%improve%' OR text ILIKE '%better%' OR text ILIKE '%issue%' OR text ILIKE '%problem%' OR text ILIKE '%bug%')) feedback_messages;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.2.0"
+    },
+    {
+      "id": 3,
+      "title": "Positive Sentiment",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) as positive_sentiment FROM (SELECT content FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND (content ILIKE '%great%' OR content ILIKE '%awesome%' OR content ILIKE '%excellent%' OR content ILIKE '%amazing%' OR content ILIKE '%love%' OR content ILIKE '%perfect%' OR content ILIKE '%thank%' OR content ILIKE '%good%') UNION ALL SELECT text as content FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND (text ILIKE '%great%' OR text ILIKE '%awesome%' OR text ILIKE '%excellent%' OR text ILIKE '%amazing%' OR text ILIKE '%love%' OR text ILIKE '%perfect%' OR text ILIKE '%thank%' OR text ILIKE '%good%')) positive_messages;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.2.0"
+    },
+    {
+      "id": 4,
+      "title": "Negative Sentiment",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) as negative_sentiment FROM (SELECT content FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND (content ILIKE '%bad%' OR content ILIKE '%terrible%' OR content ILIKE '%hate%' OR content ILIKE '%worst%' OR content ILIKE '%awful%' OR content ILIKE '%frustrat%' OR content ILIKE '%disappoint%' OR content ILIKE '%broken%') UNION ALL SELECT text as content FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND (text ILIKE '%bad%' OR text ILIKE '%terrible%' OR text ILIKE '%hate%' OR text ILIKE '%worst%' OR text ILIKE '%awful%' OR text ILIKE '%frustrat%' OR text ILIKE '%disappoint%' OR text ILIKE '%broken%')) negative_messages;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 25
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.2.0"
+    },
+    {
+      "id": 5,
+      "title": "Sentiment Score",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 1},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH sentiment_data AS (SELECT COUNT(*) FILTER (WHERE content ILIKE '%great%' OR content ILIKE '%awesome%' OR content ILIKE '%excellent%' OR content ILIKE '%amazing%' OR content ILIKE '%love%' OR content ILIKE '%perfect%' OR content ILIKE '%thank%' OR content ILIKE '%good%') as positive, COUNT(*) FILTER (WHERE content ILIKE '%bad%' OR content ILIKE '%terrible%' OR content ILIKE '%hate%' OR content ILIKE '%worst%' OR content ILIKE '%awful%' OR content ILIKE '%frustrat%' OR content ILIKE '%disappoint%' OR content ILIKE '%broken%') as negative FROM (SELECT content FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false UNION ALL SELECT text as content FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo()) all_messages) SELECT CASE WHEN (positive + negative) > 0 THEN ROUND((positive * 100.0) / (positive + negative), 1) ELSE 50 END as sentiment_score FROM sentiment_data;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 40
+              },
+              {
+                "color": "green",
+                "value": 60
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.2.0"
+    },
+    {
+      "id": 6,
+      "title": "Feedback Trends",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 9},
+      "panels": []
+    },
+    {
+      "id": 7,
+      "title": "Sentiment Over Time",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 10},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "WITH daily_sentiment AS (SELECT date_trunc('day', created_at) as time, 'Positive' as sentiment_type, COUNT(*) as count FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND (content ILIKE '%great%' OR content ILIKE '%awesome%' OR content ILIKE '%excellent%' OR content ILIKE '%amazing%' OR content ILIKE '%love%' OR content ILIKE '%perfect%' OR content ILIKE '%thank%' OR content ILIKE '%good%') GROUP BY date_trunc('day', created_at) UNION ALL SELECT date_trunc('day', created_at) as time, 'Negative' as sentiment_type, COUNT(*) as count FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND (content ILIKE '%bad%' OR content ILIKE '%terrible%' OR content ILIKE '%hate%' OR content ILIKE '%worst%' OR content ILIKE '%awful%' OR content ILIKE '%frustrat%' OR content ILIKE '%disappoint%' OR content ILIKE '%broken%') GROUP BY date_trunc('day', created_at) UNION ALL SELECT date_trunc('day', date) as time, 'Positive' as sentiment_type, COUNT(*) as count FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND (text ILIKE '%great%' OR text ILIKE '%awesome%' OR text ILIKE '%excellent%' OR text ILIKE '%amazing%' OR text ILIKE '%love%' OR text ILIKE '%perfect%' OR text ILIKE '%thank%' OR text ILIKE '%good%') GROUP BY date_trunc('day', date) UNION ALL SELECT date_trunc('day', date) as time, 'Negative' as sentiment_type, COUNT(*) as count FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND (text ILIKE '%bad%' OR text ILIKE '%terrible%' OR text ILIKE '%hate%' OR text ILIKE '%worst%' OR text ILIKE '%awful%' OR text ILIKE '%frustrat%' OR text ILIKE '%disappoint%' OR text ILIKE '%broken%') GROUP BY date_trunc('day', date)) SELECT time, sentiment_type as metric, SUM(count) as value FROM daily_sentiment GROUP BY time, sentiment_type ORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Messages",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 3,
+            "pointSize": 6,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Positive"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Negative"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "calcs": ["lastNotNull", "sum"],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.2.0"
+    },
+    {
+      "id": 8,
+      "title": "Feedback Categories",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 20},
+      "panels": []
+    },
+    {
+      "id": 9,
+      "title": "Top Feedback Categories",
+      "type": "piechart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 21},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH feedback_categories AS (SELECT 'Feature Request' as category, COUNT(*) as count FROM (SELECT content FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND (content ILIKE '%feature%' OR content ILIKE '%add%' OR content ILIKE '%request%' OR content ILIKE '%suggestion%') UNION ALL SELECT text as content FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND (text ILIKE '%feature%' OR text ILIKE '%add%' OR text ILIKE '%request%' OR text ILIKE '%suggestion%')) feature_requests UNION ALL SELECT 'Bug Report' as category, COUNT(*) as count FROM (SELECT content FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND (content ILIKE '%bug%' OR content ILIKE '%broken%' OR content ILIKE '%error%' OR content ILIKE '%issue%') UNION ALL SELECT text as content FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND (text ILIKE '%bug%' OR text ILIKE '%broken%' OR text ILIKE '%error%' OR text ILIKE '%issue%')) bug_reports UNION ALL SELECT 'General Feedback' as category, COUNT(*) as count FROM (SELECT content FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND (content ILIKE '%feedback%' OR content ILIKE '%opinion%' OR content ILIKE '%think%') UNION ALL SELECT text as content FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND (text ILIKE '%feedback%' OR text ILIKE '%opinion%' OR text ILIKE '%think%')) general_feedback UNION ALL SELECT 'Improvement' as category, COUNT(*) as count FROM (SELECT content FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND (content ILIKE '%improve%' OR content ILIKE '%better%' OR content ILIKE '%enhance%') UNION ALL SELECT text as content FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND (text ILIKE '%improve%' OR text ILIKE '%better%' OR text ILIKE '%enhance%')) improvements) SELECT category, count FROM feedback_categories WHERE count > 0 ORDER BY count DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "pieType": "pie",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        }
+      },
+      "pluginVersion": "10.2.0"
+    },
+    {
+      "id": 10,
+      "title": "Recent Feedback Messages",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 21},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH recent_feedback AS (SELECT 'Discord' as platform, COALESCE(author_display_name, author_username) as author, content as message, created_at as time, CASE WHEN content ILIKE '%great%' OR content ILIKE '%awesome%' OR content ILIKE '%excellent%' OR content ILIKE '%amazing%' OR content ILIKE '%love%' OR content ILIKE '%perfect%' OR content ILIKE '%thank%' OR content ILIKE '%good%' THEN 'Positive' WHEN content ILIKE '%bad%' OR content ILIKE '%terrible%' OR content ILIKE '%hate%' OR content ILIKE '%worst%' OR content ILIKE '%awful%' OR content ILIKE '%frustrat%' OR content ILIKE '%disappoint%' OR content ILIKE '%broken%' THEN 'Negative' ELSE 'Neutral' END as sentiment FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false AND (content ILIKE '%feedback%' OR content ILIKE '%suggestion%' OR content ILIKE '%improve%' OR content ILIKE '%better%' OR content ILIKE '%issue%' OR content ILIKE '%problem%' OR content ILIKE '%bug%' OR content ILIKE '%feature%' OR content ILIKE '%request%') UNION ALL SELECT 'Telegram' as platform, COALESCE(NULLIF(TRIM(from_user_first_name || ' ' || COALESCE(from_user_last_name, '')), ''), from_user_first_name, from_user_username, 'Unknown') as author, text as message, date as time, CASE WHEN text ILIKE '%great%' OR text ILIKE '%awesome%' OR text ILIKE '%excellent%' OR text ILIKE '%amazing%' OR text ILIKE '%love%' OR text ILIKE '%perfect%' OR text ILIKE '%thank%' OR text ILIKE '%good%' THEN 'Positive' WHEN text ILIKE '%bad%' OR text ILIKE '%terrible%' OR text ILIKE '%hate%' OR text ILIKE '%worst%' OR text ILIKE '%awful%' OR text ILIKE '%frustrat%' OR text ILIKE '%disappoint%' OR text ILIKE '%broken%' THEN 'Negative' ELSE 'Neutral' END as sentiment FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() AND (text ILIKE '%feedback%' OR text ILIKE '%suggestion%' OR text ILIKE '%improve%' OR text ILIKE '%better%' OR text ILIKE '%issue%' OR text ILIKE '%problem%' OR text ILIKE '%bug%' OR text ILIKE '%feature%' OR text ILIKE '%request%')) SELECT platform AS \"Platform\", author AS \"Author\", CASE WHEN LENGTH(message) > 100 THEN SUBSTRING(message, 1, 100) || '...' ELSE message END AS \"Message\", time AS \"Time\", sentiment AS \"Sentiment\" FROM recent_feedback ORDER BY time DESC LIMIT 20;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sentiment"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "colored-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "Positive": {
+                        "color": "green",
+                        "index": 0
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "Negative": {
+                        "color": "red",
+                        "index": 1
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "Neutral": {
+                        "color": "blue",
+                        "index": 2
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Platform"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "colored-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "Discord": {
+                        "color": "blue",
+                        "index": 0
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "Telegram": {
+                        "color": "purple",
+                        "index": 1
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": ["sum"],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Time"
+          }
+        ]
+      },
+      "pluginVersion": "10.2.0"
+    }
+  ],
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "refresh": "5m",
+  "schemaVersion": 37,
+  "version": 1,
+  "weekStart": ""
+}

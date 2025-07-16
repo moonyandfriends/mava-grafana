@@ -747,14 +747,14 @@
     },
     {
       "id": 105,
-      "title": "Latest Community Messages",
+      "title": "Latest Discord Messages",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 16, "w": 24, "x": 0, "y": 34},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 34},
       "targets": [
         {
           "format": "table",
-          "rawSql": "-- Latest Discord Messages\nSELECT \n  'Discord' AS \"Platform\",\n  COALESCE(dm.author_avatar_url, \n           'https://cdn.discordapp.com/embed/avatars/' || \n           ((dm.author_id::bigint >> 22) % 6) || '.png') AS \"Avatar\",\n  COALESCE(dm.author_display_name, dm.author_username) AS \"Username\",\n  dm.author_username AS \"Handle\",\n  CASE \n    WHEN LENGTH(dm.content) > 200 THEN \n      SUBSTRING(dm.content, 1, 200) || '...'\n    ELSE dm.content \n  END AS \"Message\",\n  dm.created_at AS \"Timestamp\",\n  'https://discord.com/channels/' || dm.guild_id || '/' || dm.channel_id || '/' || dm.id AS \"Message URL\",\n  dm.author_id::text AS \"User ID\"\nFROM discord_messages dm\nWHERE dm.author_is_bot = false\n  AND dm.content IS NOT NULL\n  AND dm.content != ''\n  AND dm.created_at >= NOW() - INTERVAL '7 days'\nORDER BY dm.created_at DESC\nLIMIT 25\n\nUNION ALL\n\n-- Latest Telegram Messages\nSELECT \n  'Telegram' AS \"Platform\",\n  'https://ui-avatars.com/api/?name=' || \n  COALESCE(tm.from_user_first_name, '') || '+' || \n  COALESCE(tm.from_user_last_name, '') || \n  '&size=128&background=0088CC&color=ffffff' AS \"Avatar\",\n  COALESCE(tm.from_user_first_name, '') || ' ' || \n  COALESCE(tm.from_user_last_name, '') AS \"Username\",\n  COALESCE(tm.from_user_username, 'N/A') AS \"Handle\",\n  CASE \n    WHEN LENGTH(tm.text) > 200 THEN \n      SUBSTRING(tm.text, 1, 200) || '...'\n    ELSE tm.text \n  END AS \"Message\",\n  tm.date AS \"Timestamp\",\n  'https://t.me/' || COALESCE(tm.from_user_username, tm.from_user_id::text) AS \"Message URL\",\n  tm.from_user_id::text AS \"User ID\"\nFROM telegram_messages tm\nWHERE tm.text IS NOT NULL\n  AND tm.text != ''\n  AND tm.date >= NOW() - INTERVAL '7 days'\nORDER BY tm.date DESC\nLIMIT 25\n\nORDER BY \"Timestamp\" DESC\nLIMIT 50;",
+          "rawSql": "SELECT \n  COALESCE(dm.author_avatar_url, \n           'https://cdn.discordapp.com/embed/avatars/' || \n           ((dm.author_id::bigint >> 22) % 6) || '.png') AS \"Avatar\",\n  COALESCE(dm.author_display_name, dm.author_username) AS \"Username\",\n  dm.author_username AS \"Handle\",\n  CASE \n    WHEN LENGTH(dm.content) > 200 THEN \n      SUBSTRING(dm.content, 1, 200) || '...'\n    ELSE dm.content \n  END AS \"Message\",\n  dm.created_at AS \"Timestamp\",\n  'https://discord.com/channels/' || dm.guild_id || '/' || dm.channel_id || '/' || dm.id AS \"Message URL\",\n  dm.author_id::text AS \"User ID\"\nFROM discord_messages dm\nWHERE dm.author_is_bot = false\n  AND dm.content IS NOT NULL\n  AND dm.content != ''\n  AND dm.created_at >= NOW() - INTERVAL '7 days'\nORDER BY dm.created_at DESC\nLIMIT 25;",
           "refId": "A"
         }
       ],
@@ -779,16 +779,107 @@
         },
         "overrides": [
           {
-            "matcher": {"id": "byName", "options": "Platform"},
+            "matcher": {"id": "byName", "options": "Avatar"},
             "properties": [
-              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "custom.displayMode", "value": "image"},
+              {"id": "custom.width", "value": 60}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Username"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "light-green"}},
+              {"id": "custom.width", "value": 120}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Handle"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}},
+              {"id": "custom.width", "value": 120}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Message"},
+            "properties": [
+              {"id": "custom.width", "value": 400}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Timestamp"},
+            "properties": [
+              {"id": "custom.width", "value": 140}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Message URL"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "yellow"}},
               {"id": "custom.width", "value": 80},
-              {"id": "mappings", "value": [
-                {"options": {"Discord": {"color": "blue", "index": 0}}, "type": "value"},
-                {"options": {"Telegram": {"color": "light-blue", "index": 1}}, "type": "value"}
+              {"id": "links", "value": [
+                {
+                  "title": "View Message",
+                  "url": "${__value.text}",
+                  "targetBlank": true
+                }
               ]}
             ]
           },
+          {
+            "matcher": {"id": "byName", "options": "User ID"},
+            "properties": [
+              {"id": "custom.hidden", "value": true}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"desc": true, "displayName": "Timestamp"}],
+        "footer": {
+          "show": false,
+          "reducer": ["sum"],
+          "countRows": false,
+          "fields": ""
+        }
+      }
+    },
+    {
+      "id": 106,
+      "title": "Latest Telegram Messages",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 46},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT \n  'https://ui-avatars.com/api/?name=' || \n  COALESCE(tm.from_user_first_name, '') || '+' || \n  COALESCE(tm.from_user_last_name, '') || \n  '&size=128&background=0088CC&color=ffffff' AS \"Avatar\",\n  COALESCE(tm.from_user_first_name, '') || ' ' || \n  COALESCE(tm.from_user_last_name, '') AS \"Username\",\n  COALESCE(tm.from_user_username, 'N/A') AS \"Handle\",\n  CASE \n    WHEN LENGTH(tm.text) > 200 THEN \n      SUBSTRING(tm.text, 1, 200) || '...'\n    ELSE tm.text \n  END AS \"Message\",\n  tm.date AS \"Timestamp\",\n  'https://t.me/' || COALESCE(tm.from_user_username, tm.from_user_id::text) AS \"Message URL\",\n  tm.from_user_id::text AS \"User ID\"\nFROM telegram_messages tm\nWHERE tm.text IS NOT NULL\n  AND tm.text != ''\n  AND tm.date >= NOW() - INTERVAL '7 days'\nORDER BY tm.date DESC\nLIMIT 25;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false,
+            "filterable": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null}
+            ]
+          }
+        },
+        "overrides": [
           {
             "matcher": {"id": "byName", "options": "Avatar"},
             "properties": [
