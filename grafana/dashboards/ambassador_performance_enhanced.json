@@ -1,0 +1,449 @@
+{
+  "id": null,
+  "uid": "ambassador-performance-enhanced",
+  "title": "Ambassador Performance Analytics",
+  "description": "Advanced ambassador performance tracking with cross-platform analytics and ROI metrics",
+  "tags": ["ambassador", "performance", "analytics", "cross-platform"],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "hideControls": false,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Ambassador Performance Leaderboard",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH ambassador_performance AS (\n  SELECT \n    ca.ambassador,\n    ca.role,\n    ca.discord_id,\n    ca.telegram_id,\n    ca.x_handle,\n    -- Discord activity\n    COUNT(dm.id) as discord_messages,\n    COUNT(DISTINCT DATE(dm.created_at)) as discord_active_days,\n    COUNT(DISTINCT dm.channel_id) as discord_channels_used,\n    COUNT(CASE WHEN dm.mentions != '{}' THEN 1 END) as discord_mentions_given,\n    -- Telegram activity\n    COUNT(tm.message_id) as telegram_messages,\n    COUNT(DISTINCT DATE(tm.date)) as telegram_active_days,\n    -- Cross-platform engagement score\n    ROUND(\n      (COUNT(dm.id) * 1.0 + \n       COUNT(tm.message_id) * 1.5 + \n       COUNT(DISTINCT DATE(dm.created_at)) * 3.0 + \n       COUNT(DISTINCT DATE(tm.date)) * 4.0 + \n       COUNT(DISTINCT dm.channel_id) * 2.0 + \n       COUNT(CASE WHEN dm.mentions != '{}' THEN 1 END) * 1.5), 2\n    ) as activity_score\n  FROM community_ambassadors ca\n  LEFT JOIN discord_messages dm ON dm.author_id::text = ca.discord_id::text\n    AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n    AND dm.author_is_bot = false\n  LEFT JOIN telegram_messages tm ON tm.from_user_id::text = ca.telegram_id::text\n    AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\n  GROUP BY ca.ambassador, ca.role, ca.discord_id, ca.telegram_id, ca.x_handle\n),\nperformance_rankings AS (\n  SELECT *,\n    RANK() OVER (ORDER BY activity_score DESC) as performance_rank,\n    CASE \n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 3 THEN 'Excellent'\n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 8 THEN 'Good'\n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 15 THEN 'Average'\n      ELSE 'Needs Improvement'\n    END as performance_tier,\n    NTILE(10) OVER (ORDER BY activity_score DESC) as performance_decile\n  FROM ambassador_performance\n)\nSELECT \n  ambassador as \"Ambassador\",\n  role as \"Role\",\n  discord_messages as \"Discord Messages\",\n  telegram_messages as \"Telegram Messages\",\n  discord_active_days as \"Discord Days\",\n  telegram_active_days as \"Telegram Days\",\n  discord_channels_used as \"Discord Channels\",\n  discord_mentions_given as \"Mentions Given\",\n  activity_score as \"Activity Score\",\n  performance_rank as \"Rank\",\n  performance_tier as \"Performance Tier\",\n  performance_decile as \"Decile\"\nFROM performance_rankings\nORDER BY activity_score DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null}
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Performance Tier"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "mappings", "value": [
+                {"options": {"Excellent": {"color": "dark-green", "index": 0}}, "type": "value"},
+                {"options": {"Good": {"color": "green", "index": 1}}, "type": "value"},
+                {"options": {"Average": {"color": "yellow", "index": 2}}, "type": "value"},
+                {"options": {"Needs Improvement": {"color": "red", "index": 3}}, "type": "value"}
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Ambassador"},
+            "properties": [
+              {"id": "custom.width", "value": 150},
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Activity Score"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "max", "value": 1000},
+              {"id": "min", "value": 0}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Rank"},
+            "properties": [
+              {"id": "custom.width", "value": 80},
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "thresholds"}},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "gold", "value": 1},
+                  {"color": "silver", "value": 2},
+                  {"color": "dark-orange", "value": 3},
+                  {"color": "green", "value": 4},
+                  {"color": "blue", "value": 8},
+                  {"color": "gray", "value": 15}
+                ]
+              }}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"desc": true, "displayName": "Activity Score"}]
+      }
+    },
+    {
+      "id": 2,
+      "title": "Ambassador Activity Timeline",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT \n  DATE_TRUNC('day', dm.created_at) as time,\n  COUNT(dm.id) as \"Discord Activity\",\n  COUNT(DISTINCT dm.author_id) as \"Active Ambassadors\"\nFROM discord_messages dm\nINNER JOIN community_ambassadors ca ON dm.author_id::text = ca.discord_id::text\nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\n  AND dm.author_is_bot = false\nGROUP BY time\nORDER BY time;",
+          "refId": "A"
+        },
+        {
+          "format": "time_series",
+          "rawSql": "SELECT \n  DATE_TRUNC('day', tm.date) as time,\n  COUNT(tm.message_id) as \"Telegram Activity\",\n  COUNT(DISTINCT tm.from_user_id) as \"Active Telegram Ambassadors\"\nFROM telegram_messages tm\nINNER JOIN community_ambassadors ca ON tm.from_user_id::text = ca.telegram_id::text\nWHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\nGROUP BY time\nORDER BY time;",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null}
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Discord Activity"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "#5865F2"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Telegram Activity"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "#0088CC"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Performance Distribution",
+      "type": "piechart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH ambassador_performance AS (\n  SELECT \n    ca.ambassador,\n    ROUND(\n      (COUNT(dm.id) * 1.0 + \n       COUNT(tm.message_id) * 1.5 + \n       COUNT(DISTINCT DATE(dm.created_at)) * 3.0 + \n       COUNT(DISTINCT DATE(tm.date)) * 4.0), 2\n    ) as activity_score\n  FROM community_ambassadors ca\n  LEFT JOIN discord_messages dm ON dm.author_id::text = ca.discord_id::text\n    AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n    AND dm.author_is_bot = false\n  LEFT JOIN telegram_messages tm ON tm.from_user_id::text = ca.telegram_id::text\n    AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\n  GROUP BY ca.ambassador\n),\nperformance_tiers AS (\n  SELECT \n    CASE \n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 3 THEN 'Top Performers'\n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 8 THEN 'Good Performers'\n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 15 THEN 'Average Performers'\n      ELSE 'Needs Improvement'\n    END as performance_tier,\n    COUNT(*) as ambassador_count\n  FROM ambassador_performance\n  GROUP BY \n    CASE \n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 3 THEN 'Top Performers'\n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 8 THEN 'Good Performers'\n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 15 THEN 'Average Performers'\n      ELSE 'Needs Improvement'\n    END\n)\nSELECT performance_tier, ambassador_count FROM performance_tiers;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Top Performers"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "dark-green"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Good Performers"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "green"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Average Performers"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "yellow"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Needs Improvement"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": "/^ambassador_count$/"
+        },
+        "pieType": "donut",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "visible",
+          "placement": "right"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Top Ambassador Statistics",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 20},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH ambassador_stats AS (\n  SELECT \n    COUNT(DISTINCT ca.ambassador) as total_ambassadors,\n    COUNT(DISTINCT dm.author_id) as active_discord_ambassadors,\n    COUNT(DISTINCT tm.from_user_id) as active_telegram_ambassadors,\n    COUNT(dm.id) as total_discord_messages,\n    COUNT(tm.message_id) as total_telegram_messages\n  FROM community_ambassadors ca\n  LEFT JOIN discord_messages dm ON dm.author_id::text = ca.discord_id::text\n    AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n    AND dm.author_is_bot = false\n  LEFT JOIN telegram_messages tm ON tm.from_user_id::text = ca.telegram_id::text\n    AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\n)\nSELECT \n  total_ambassadors,\n  active_discord_ambassadors,\n  active_telegram_ambassadors,\n  total_discord_messages,\n  total_telegram_messages\nFROM ambassador_stats;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null}
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "total_ambassadors"},
+            "properties": [
+              {"id": "displayName", "value": "Total Ambassadors"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "blue"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "active_discord_ambassadors"},
+            "properties": [
+              {"id": "displayName", "value": "Active Discord"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "#5865F2"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "active_telegram_ambassadors"},
+            "properties": [
+              {"id": "displayName", "value": "Active Telegram"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "#0088CC"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 5,
+      "title": "Ambassador Engagement Rate",
+      "type": "gauge",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 8, "x": 8, "y": 20},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH ambassador_engagement AS (\n  SELECT \n    COUNT(DISTINCT ca.ambassador) as total_ambassadors,\n    COUNT(DISTINCT CASE WHEN dm.id IS NOT NULL OR tm.message_id IS NOT NULL THEN ca.ambassador END) as active_ambassadors\n  FROM community_ambassadors ca\n  LEFT JOIN discord_messages dm ON dm.author_id::text = ca.discord_id::text\n    AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n    AND dm.author_is_bot = false\n  LEFT JOIN telegram_messages tm ON tm.from_user_id::text = ca.telegram_id::text\n    AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\n)\nSELECT \n  ROUND(active_ambassadors::decimal / total_ambassadors * 100, 1) as engagement_rate\nFROM ambassador_engagement;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 50},
+              {"color": "green", "value": 75}
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 6,
+      "title": "Average Activity Score",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 8, "x": 16, "y": 20},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH ambassador_performance AS (\n  SELECT \n    ca.ambassador,\n    ROUND(\n      (COUNT(dm.id) * 1.0 + \n       COUNT(tm.message_id) * 1.5 + \n       COUNT(DISTINCT DATE(dm.created_at)) * 3.0 + \n       COUNT(DISTINCT DATE(tm.date)) * 4.0), 2\n    ) as activity_score\n  FROM community_ambassadors ca\n  LEFT JOIN discord_messages dm ON dm.author_id::text = ca.discord_id::text\n    AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n    AND dm.author_is_bot = false\n  LEFT JOIN telegram_messages tm ON tm.from_user_id::text = ca.telegram_id::text\n    AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\n  GROUP BY ca.ambassador\n)\nSELECT \n  ROUND(AVG(activity_score), 1) as avg_activity_score,\n  ROUND(STDDEV(activity_score), 1) as score_stddev,\n  MAX(activity_score) as max_score,\n  MIN(activity_score) as min_score\nFROM ambassador_performance;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 50},
+              {"color": "green", "value": 100}
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "avg_activity_score"},
+            "properties": [
+              {"id": "displayName", "value": "Average Score"}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "max_score"},
+            "properties": [
+              {"id": "displayName", "value": "Highest Score"}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "min_score"},
+            "properties": [
+              {"id": "displayName", "value": "Lowest Score"}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": ["ambassador", "performance", "analytics"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Ambassador Performance Analytics",
+  "uid": "ambassador-performance-enhanced",
+  "version": 1,
+  "weekStart": ""
+}

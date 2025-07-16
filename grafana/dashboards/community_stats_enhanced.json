@@ -1,0 +1,483 @@
+{
+  "id": null,
+  "uid": "community-stats-enhanced",
+  "title": "Community Analytics - Enhanced",
+  "description": "Advanced community analytics with engagement scoring, sentiment analysis, and predictive insights",
+  "tags": ["community", "analytics", "discord", "telegram", "enhanced"],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "hideControls": false,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Community Health Score",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH health_metrics AS (\n  SELECT \n    COUNT(DISTINCT dm.author_id) as active_users,\n    COUNT(dm.id) as total_messages,\n    COUNT(DISTINCT dm.channel_id) as active_channels,\n    AVG(LENGTH(dm.content)) as avg_message_length,\n    COUNT(CASE WHEN dm.mentions != '{}' THEN 1 END) as social_interactions\n  FROM discord_messages dm \n  WHERE dm.created_at >= NOW() - INTERVAL '7 days' \n    AND dm.author_is_bot = false\n),\nsentiment_metrics AS (\n  SELECT \n    COUNT(CASE WHEN LOWER(content) ~ '.*(great|awesome|amazing|love|excellent|fantastic|perfect|good|thanks|thank you|helpful|appreciate).*' THEN 1 END) as positive_messages,\n    COUNT(CASE WHEN LOWER(content) ~ '.*(bad|terrible|awful|hate|horrible|worst|sucks|disappointed|frustrating|annoying|broken).*' THEN 1 END) as negative_messages,\n    COUNT(*) as total_analyzed\n  FROM discord_messages \n  WHERE created_at >= NOW() - INTERVAL '7 days' \n    AND author_is_bot = false \n    AND content IS NOT NULL\n)\nSELECT \n  ROUND(\n    (LEAST(hm.active_users / 100.0, 1.0) * 25 + \n     LEAST(hm.total_messages / 1000.0, 1.0) * 25 + \n     LEAST(hm.active_channels / 10.0, 1.0) * 15 + \n     LEAST(hm.avg_message_length / 50.0, 1.0) * 10 + \n     LEAST(hm.social_interactions / 100.0, 1.0) * 15 + \n     LEAST(COALESCE(sm.positive_messages::decimal / NULLIF(sm.total_analyzed, 0), 0) * 100 / 20.0, 1.0) * 10) * 1.0\n  , 1) as health_score\nFROM health_metrics hm\nCROSS JOIN sentiment_metrics sm;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 50},
+              {"color": "light-green", "value": 75},
+              {"color": "green", "value": 85}
+            ]
+          },
+          "unit": "none",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "8.0.0"
+    },
+    {
+      "id": 2,
+      "title": "Weekly Active Users",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH current_week AS (\n  SELECT COUNT(DISTINCT author_id) as current_users\n  FROM discord_messages\n  WHERE created_at >= DATE_TRUNC('week', NOW())\n    AND author_is_bot = false\n),\nprevious_week AS (\n  SELECT COUNT(DISTINCT author_id) as previous_users\n  FROM discord_messages\n  WHERE created_at >= DATE_TRUNC('week', NOW() - INTERVAL '1 week')\n    AND created_at < DATE_TRUNC('week', NOW())\n    AND author_is_bot = false\n)\nSELECT \n  cw.current_users,\n  ROUND((cw.current_users - pw.previous_users)::decimal / pw.previous_users * 100, 1) as growth_rate\nFROM current_week cw\nCROSS JOIN previous_week pw;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 50},
+              {"color": "green", "value": 100}
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "current_users"},
+            "properties": [
+              {"id": "displayName", "value": "Weekly Active Users"},
+              {"id": "unit", "value": "none"}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "growth_rate"},
+            "properties": [
+              {"id": "displayName", "value": "Growth Rate"},
+              {"id": "unit", "value": "percent"},
+              {"id": "color", "value": {"mode": "thresholds"}},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "red", "value": -10},
+                  {"color": "yellow", "value": 0},
+                  {"color": "green", "value": 5}
+                ]
+              }}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Messages per Platform",
+      "type": "piechart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 6, "x": 12, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH discord_data AS (\n  SELECT \n    'Discord' as platform,\n    COUNT(*) as message_count,\n    COUNT(DISTINCT author_id) as unique_users\n  FROM discord_messages\n  WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo()\n    AND author_is_bot = false\n),\ntelegram_data AS (\n  SELECT \n    'Telegram' as platform,\n    COUNT(*) as message_count,\n    COUNT(DISTINCT from_user_id) as unique_users\n  FROM telegram_messages\n  WHERE date >= $__timeFrom() AND date <= $__timeTo()\n)\nSELECT platform, message_count, unique_users\nFROM discord_data\nUNION ALL\nSELECT platform, message_count, unique_users\nFROM telegram_data;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Discord"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "#5865F2"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Telegram"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "#0088CC"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": "/^message_count$/"
+        },
+        "pieType": "pie",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "visible",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Real-time Sentiment Analysis",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 6, "x": 18, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH sentiment_analysis AS (\n  SELECT \n    COUNT(CASE WHEN LOWER(content) ~ '.*(great|awesome|amazing|love|excellent|fantastic|perfect|good|thanks|thank you|helpful|appreciate).*' THEN 1 END) as positive_messages,\n    COUNT(CASE WHEN LOWER(content) ~ '.*(bad|terrible|awful|hate|horrible|worst|sucks|disappointed|frustrating|annoying|broken).*' THEN 1 END) as negative_messages,\n    COUNT(*) as total_messages\n  FROM discord_messages\n  WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo()\n    AND author_is_bot = false\n    AND content IS NOT NULL\n    AND LENGTH(content) > 5\n)\nSELECT \n  ROUND(\n    (positive_messages - negative_messages)::decimal / NULLIF(total_messages, 0) * 100, 1\n  ) as sentiment_score,\n  positive_messages,\n  negative_messages,\n  total_messages\nFROM sentiment_analysis;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": -20},
+              {"color": "yellow", "value": 0},
+              {"color": "green", "value": 10}
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "sentiment_score"},
+            "properties": [
+              {"id": "displayName", "value": "Sentiment Score"},
+              {"id": "unit", "value": "percent"}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": "/^sentiment_score$/"
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 5,
+      "title": "Community Activity Timeline",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 6},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT \n  DATE_TRUNC('hour', created_at) as time,\n  COUNT(*) as \"Discord Messages\",\n  COUNT(DISTINCT author_id) as \"Unique Users\"\nFROM discord_messages\nWHERE created_at >= $__timeFrom() AND created_at <= $__timeTo()\n  AND author_is_bot = false\nGROUP BY time\nORDER BY time;",
+          "refId": "A"
+        },
+        {
+          "format": "time_series",
+          "rawSql": "SELECT \n  DATE_TRUNC('hour', date) as time,\n  COUNT(*) as \"Telegram Messages\",\n  COUNT(DISTINCT from_user_id) as \"Telegram Users\"\nFROM telegram_messages\nWHERE date >= $__timeFrom() AND date <= $__timeTo()\nGROUP BY time\nORDER BY time;",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "red", "value": 80}
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Discord Messages"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "#5865F2"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Telegram Messages"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "#0088CC"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Top Community Contributors",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 14},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH user_engagement AS (\n  SELECT \n    author_id,\n    COALESCE(author_display_name, author_username) AS display_name,\n    author_username,\n    COALESCE(MAX(author_avatar_url), 'https://cdn.discordapp.com/embed/avatars/' || ((author_id::bigint >> 22) % 6) || '.png') AS avatar_url,\n    COUNT(*) as message_count,\n    COUNT(DISTINCT channel_id) as channels_used,\n    COUNT(DISTINCT DATE(created_at)) as active_days,\n    COUNT(CASE WHEN mentions != '{}' THEN 1 END) as mentions_given,\n    AVG(LENGTH(content)) as avg_message_length,\n    -- Enhanced engagement score\n    ROUND(\n      (COUNT(*) * 0.3 + \n       COUNT(DISTINCT DATE(created_at)) * 2.0 + \n       COUNT(DISTINCT channel_id) * 1.5 + \n       AVG(LENGTH(content)) * 0.01 + \n       COUNT(CASE WHEN mentions != '{}' THEN 1 END) * 0.5), 2\n    ) as engagement_score\n  FROM discord_messages\n  WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo()\n    AND author_is_bot = false\n  GROUP BY author_id, author_username, author_display_name\n),\nuser_rankings AS (\n  SELECT *,\n    RANK() OVER (ORDER BY engagement_score DESC) as rank,\n    CASE \n      WHEN RANK() OVER (ORDER BY engagement_score DESC) <= 3 THEN 'Champion'\n      WHEN RANK() OVER (ORDER BY engagement_score DESC) <= 10 THEN 'Expert'\n      WHEN RANK() OVER (ORDER BY engagement_score DESC) <= 25 THEN 'Active'\n      ELSE 'Regular'\n    END as tier\n  FROM user_engagement\n)\nSELECT \n  avatar_url as \"Avatar\",\n  display_name as \"Community Member\",\n  author_username as \"Username\",\n  message_count as \"Messages\",\n  active_days as \"Active Days\",\n  channels_used as \"Channels\",\n  mentions_given as \"Mentions\",\n  engagement_score as \"Engagement Score\",\n  rank as \"Rank\",\n  tier as \"Tier\",\n  author_id as \"UserID\"\nFROM user_rankings\nORDER BY engagement_score DESC\nLIMIT 25;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "red", "value": 80}
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Avatar"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "image"},
+              {"id": "custom.width", "value": 60}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Username"},
+            "properties": [
+              {"id": "links", "value": [
+                {
+                  "title": "View Discord Profile",
+                  "url": "https://discord.com/users/${__data.fields.UserID}"
+                }
+              ]},
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Tier"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "mappings", "value": [
+                {"options": {"Champion": {"color": "gold", "index": 0}}, "type": "value"},
+                {"options": {"Expert": {"color": "green", "index": 1}}, "type": "value"},
+                {"options": {"Active": {"color": "blue", "index": 2}}, "type": "value"},
+                {"options": {"Regular": {"color": "gray", "index": 3}}, "type": "value"}
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "UserID"},
+            "properties": [
+              {"id": "custom.hidden", "value": true}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"desc": true, "displayName": "Engagement Score"}]
+      }
+    },
+    {
+      "id": 7,
+      "title": "Channel Activity Heatmap",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 14},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH channel_stats AS (\n  SELECT \n    dc.name as channel_name,\n    dc.channel_type,\n    COUNT(dm.id) as message_count,\n    COUNT(DISTINCT dm.author_id) as unique_users,\n    COUNT(DISTINCT DATE(dm.created_at)) as active_days,\n    ROUND(COUNT(dm.id)::decimal / COUNT(DISTINCT DATE(dm.created_at)), 1) as messages_per_day,\n    ROUND(COUNT(dm.id)::decimal / COUNT(DISTINCT dm.author_id), 1) as messages_per_user,\n    MAX(dm.created_at) as last_activity\n  FROM discord_channels dc\n  LEFT JOIN discord_messages dm ON dc.channel_id = dm.channel_id\n    AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\n    AND dm.author_is_bot = false\n  WHERE dc.channel_type IN ('text', 'voice', 'news', 'public_thread')\n  GROUP BY dc.name, dc.channel_type\n  HAVING COUNT(dm.id) > 0\n),\nactivity_scores AS (\n  SELECT *,\n    CASE \n      WHEN messages_per_day >= 100 THEN 'Very High'\n      WHEN messages_per_day >= 50 THEN 'High'\n      WHEN messages_per_day >= 20 THEN 'Medium'\n      WHEN messages_per_day >= 5 THEN 'Low'\n      ELSE 'Very Low'\n    END as activity_level\n  FROM channel_stats\n)\nSELECT \n  channel_name as \"Channel\",\n  channel_type as \"Type\",\n  message_count as \"Messages\",\n  unique_users as \"Users\",\n  active_days as \"Active Days\",\n  messages_per_day as \"Msgs/Day\",\n  messages_per_user as \"Msgs/User\",\n  activity_level as \"Activity Level\",\n  last_activity as \"Last Activity\"\nFROM activity_scores\nORDER BY message_count DESC\nLIMIT 20;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null}
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Activity Level"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "mappings", "value": [
+                {"options": {"Very High": {"color": "dark-red", "index": 0}}, "type": "value"},
+                {"options": {"High": {"color": "red", "index": 1}}, "type": "value"},
+                {"options": {"Medium": {"color": "yellow", "index": 2}}, "type": "value"},
+                {"options": {"Low": {"color": "green", "index": 3}}, "type": "value"},
+                {"options": {"Very Low": {"color": "dark-green", "index": 4}}, "type": "value"}
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Last Activity"},
+            "properties": [
+              {"id": "unit", "value": "dateTimeFromNow"}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"desc": true, "displayName": "Messages"}]
+      }
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": ["community", "analytics", "enhanced"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Community Analytics - Enhanced",
+  "uid": "community-stats-enhanced",
+  "version": 1,
+  "weekStart": ""
+}

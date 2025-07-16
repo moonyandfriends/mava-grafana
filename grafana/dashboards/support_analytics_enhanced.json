@@ -1,0 +1,467 @@
+{
+  "id": null,
+  "uid": "support-analytics-enhanced",
+  "title": "Support Analytics - Enhanced",
+  "description": "Advanced support ticket analytics with SLA tracking, agent performance, and predictive insights",
+  "tags": ["support", "tickets", "analytics", "mava", "performance"],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "hideControls": false,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Support Ticket Overview",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH ticket_stats AS (\n  SELECT \n    COUNT(*) as total_tickets,\n    COUNT(CASE WHEN status = 'open' THEN 1 END) as open_tickets,\n    COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_tickets,\n    COUNT(CASE WHEN status = 'waiting' THEN 1 END) as waiting_tickets,\n    COUNT(CASE WHEN status = 'resolved' THEN 1 END) as resolved_tickets,\n    COUNT(CASE WHEN status = 'closed' THEN 1 END) as closed_tickets,\n    COUNT(CASE WHEN priority = 'high' THEN 1 END) as high_priority,\n    COUNT(CASE WHEN priority = 'medium' THEN 1 END) as medium_priority,\n    COUNT(CASE WHEN priority = 'low' THEN 1 END) as low_priority\n  FROM tickets\n  WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo()\n)\nSELECT \n  total_tickets,\n  open_tickets,\n  pending_tickets,\n  waiting_tickets,\n  resolved_tickets,\n  closed_tickets,\n  high_priority,\n  medium_priority,\n  low_priority,\n  ROUND(resolved_tickets::decimal / NULLIF(total_tickets, 0) * 100, 1) as resolution_rate\nFROM ticket_stats;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null}
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "total_tickets"},
+            "properties": [
+              {"id": "displayName", "value": "Total Tickets"}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "open_tickets"},
+            "properties": [
+              {"id": "displayName", "value": "Open"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "pending_tickets"},
+            "properties": [
+              {"id": "displayName", "value": "Pending"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "yellow"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "waiting_tickets"},
+            "properties": [
+              {"id": "displayName", "value": "Waiting"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "orange"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "resolved_tickets"},
+            "properties": [
+              {"id": "displayName", "value": "Resolved"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "green"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "high_priority"},
+            "properties": [
+              {"id": "displayName", "value": "High Priority"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "dark-red"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "resolution_rate"},
+            "properties": [
+              {"id": "displayName", "value": "Resolution Rate"},
+              {"id": "unit", "value": "percent"},
+              {"id": "color", "value": {"mode": "thresholds"}},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "red", "value": 0},
+                  {"color": "yellow", "value": 70},
+                  {"color": "green", "value": 85}
+                ]
+              }}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Agent Performance Analytics",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 6},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH agent_metrics AS (\n  SELECT \n    t.assigned_to,\n    COUNT(*) as total_assigned,\n    COUNT(CASE WHEN t.status = 'resolved' THEN 1 END) as resolved_tickets,\n    COUNT(CASE WHEN t.status = 'closed' THEN 1 END) as closed_tickets,\n    COUNT(CASE WHEN t.priority = 'high' THEN 1 END) as high_priority_tickets,\n    COUNT(CASE WHEN t.priority = 'medium' THEN 1 END) as medium_priority_tickets,\n    COUNT(CASE WHEN t.priority = 'low' THEN 1 END) as low_priority_tickets,\n    -- Calculate average response time in hours\n    AVG(EXTRACT(EPOCH FROM (t.first_agent_message_created_at - t.first_customer_message_created_at))/3600) as avg_response_time_hours,\n    -- Calculate average resolution time in hours\n    AVG(CASE WHEN t.status IN ('resolved', 'closed') THEN \n      EXTRACT(EPOCH FROM (t.updated_at - t.created_at))/3600 \n    END) as avg_resolution_time_hours,\n    -- Calculate SLA performance\n    COUNT(CASE \n      WHEN t.priority = 'high' AND t.first_agent_message_created_at <= t.first_customer_message_created_at + INTERVAL '2 hours' THEN 1\n      WHEN t.priority = 'medium' AND t.first_agent_message_created_at <= t.first_customer_message_created_at + INTERVAL '4 hours' THEN 1\n      WHEN t.priority = 'low' AND t.first_agent_message_created_at <= t.first_customer_message_created_at + INTERVAL '24 hours' THEN 1\n    END) as sla_met_count\n  FROM tickets t\n  WHERE t.assigned_to IS NOT NULL\n    AND t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo()\n  GROUP BY t.assigned_to\n),\nagent_rankings AS (\n  SELECT *,\n    ROUND((resolved_tickets + closed_tickets)::decimal / total_assigned * 100, 1) as closure_rate,\n    ROUND(sla_met_count::decimal / total_assigned * 100, 1) as sla_compliance_rate,\n    RANK() OVER (ORDER BY (resolved_tickets + closed_tickets)::decimal / total_assigned DESC) as productivity_rank,\n    RANK() OVER (ORDER BY avg_response_time_hours ASC) as response_rank,\n    RANK() OVER (ORDER BY avg_resolution_time_hours ASC) as resolution_rank,\n    CASE \n      WHEN (resolved_tickets + closed_tickets)::decimal / total_assigned >= 0.9 AND avg_response_time_hours <= 2 THEN 'Excellent'\n      WHEN (resolved_tickets + closed_tickets)::decimal / total_assigned >= 0.8 AND avg_response_time_hours <= 4 THEN 'Good'\n      WHEN (resolved_tickets + closed_tickets)::decimal / total_assigned >= 0.7 AND avg_response_time_hours <= 8 THEN 'Average'\n      ELSE 'Needs Improvement'\n    END as performance_rating\n  FROM agent_metrics\n)\nSELECT \n  assigned_to as \"Agent\",\n  total_assigned as \"Total Assigned\",\n  resolved_tickets as \"Resolved\",\n  closed_tickets as \"Closed\",\n  closure_rate as \"Closure Rate %\",\n  high_priority_tickets as \"High Priority\",\n  medium_priority_tickets as \"Medium Priority\",\n  low_priority_tickets as \"Low Priority\",\n  ROUND(avg_response_time_hours, 2) as \"Avg Response Time (hrs)\",\n  ROUND(avg_resolution_time_hours, 2) as \"Avg Resolution Time (hrs)\",\n  sla_compliance_rate as \"SLA Compliance %\",\n  productivity_rank as \"Productivity Rank\",\n  response_rank as \"Response Rank\",\n  resolution_rank as \"Resolution Rank\",\n  performance_rating as \"Performance Rating\"\nFROM agent_rankings\nORDER BY productivity_rank;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null}
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Performance Rating"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "mappings", "value": [
+                {"options": {"Excellent": {"color": "dark-green", "index": 0}}, "type": "value"},
+                {"options": {"Good": {"color": "green", "index": 1}}, "type": "value"},
+                {"options": {"Average": {"color": "yellow", "index": 2}}, "type": "value"},
+                {"options": {"Needs Improvement": {"color": "red", "index": 3}}, "type": "value"}
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Closure Rate %"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "max", "value": 100},
+              {"id": "min", "value": 0},
+              {"id": "color", "value": {"mode": "thresholds"}},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "red", "value": 0},
+                  {"color": "yellow", "value": 70},
+                  {"color": "green", "value": 85}
+                ]
+              }}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "SLA Compliance %"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "max", "value": 100},
+              {"id": "min", "value": 0},
+              {"id": "color", "value": {"mode": "thresholds"}},
+              {"id": "thresholds", "value": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "red", "value": 0},
+                  {"color": "yellow", "value": 80},
+                  {"color": "green", "value": 95}
+                ]
+              }}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Agent"},
+            "properties": [
+              {"id": "custom.width", "value": 120},
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"desc": false, "displayName": "Productivity Rank"}]
+      }
+    },
+    {
+      "id": 3,
+      "title": "Ticket Resolution Timeline",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT \n  DATE_TRUNC('day', created_at) as time,\n  COUNT(*) as \"Total Created\",\n  COUNT(CASE WHEN status = 'resolved' THEN 1 END) as \"Resolved\",\n  COUNT(CASE WHEN status = 'closed' THEN 1 END) as \"Closed\",\n  COUNT(CASE WHEN priority = 'high' THEN 1 END) as \"High Priority\"\nFROM tickets\nWHERE created_at >= $__timeFrom() AND created_at <= $__timeTo()\nGROUP BY time\nORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null}
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Total Created"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "blue"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Resolved"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "green"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Closed"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "dark-green"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "High Priority"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Priority Distribution",
+      "type": "piechart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT \n  priority,\n  COUNT(*) as ticket_count,\n  ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600), 2) as avg_resolution_hours\nFROM tickets\nWHERE created_at >= $__timeFrom() AND created_at <= $__timeTo()\n  AND priority IS NOT NULL\nGROUP BY priority\nORDER BY \n  CASE priority \n    WHEN 'high' THEN 1 \n    WHEN 'medium' THEN 2 \n    WHEN 'low' THEN 3 \n  END;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "high"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "red"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "medium"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "yellow"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "low"},
+            "properties": [
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "green"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": "/^ticket_count$/"
+        },
+        "pieType": "donut",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "visible",
+          "placement": "right"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Response Time Analysis",
+      "type": "histogram",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT \n  EXTRACT(EPOCH FROM (first_agent_message_created_at - first_customer_message_created_at))/3600 as response_time_hours,\n  priority,\n  status\nFROM tickets\nWHERE created_at >= $__timeFrom() AND created_at <= $__timeTo()\n  AND first_agent_message_created_at IS NOT NULL\n  AND first_customer_message_created_at IS NOT NULL\n  AND EXTRACT(EPOCH FROM (first_agent_message_created_at - first_customer_message_created_at))/3600 < 48\nORDER BY response_time_hours;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": [],
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "visible",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Customer Satisfaction Estimate",
+      "type": "gauge",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH satisfaction_metrics AS (\n  SELECT \n    -- Calculate satisfaction score based on resolution time and response time\n    AVG(\n      CASE \n        -- Fast response and resolution gets high score\n        WHEN EXTRACT(EPOCH FROM (first_agent_message_created_at - first_customer_message_created_at))/3600 <= 2 \n          AND EXTRACT(EPOCH FROM (updated_at - created_at))/3600 <= 24 \n          AND status IN ('resolved', 'closed') THEN 95\n        -- Good response and resolution gets good score\n        WHEN EXTRACT(EPOCH FROM (first_agent_message_created_at - first_customer_message_created_at))/3600 <= 4 \n          AND EXTRACT(EPOCH FROM (updated_at - created_at))/3600 <= 72 \n          AND status IN ('resolved', 'closed') THEN 80\n        -- Average response and resolution gets average score\n        WHEN EXTRACT(EPOCH FROM (first_agent_message_created_at - first_customer_message_created_at))/3600 <= 8 \n          AND status IN ('resolved', 'closed') THEN 65\n        -- Slow response or unresolved gets low score\n        WHEN status NOT IN ('resolved', 'closed') THEN 40\n        ELSE 50\n      END\n    ) as estimated_satisfaction\n  FROM tickets\n  WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo()\n    AND first_agent_message_created_at IS NOT NULL\n    AND first_customer_message_created_at IS NOT NULL\n)\nSELECT ROUND(estimated_satisfaction, 1) as satisfaction_score\nFROM satisfaction_metrics;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 60},
+              {"color": "green", "value": 80}
+            ]
+          },
+          "unit": "none",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": ["support", "tickets", "analytics"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Support Analytics - Enhanced",
+  "uid": "support-analytics-enhanced",
+  "version": 1,
+  "weekStart": ""
+}
