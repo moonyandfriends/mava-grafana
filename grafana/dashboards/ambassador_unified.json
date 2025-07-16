@@ -78,7 +78,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(*) AS discord_posts,\n  COUNT(DISTINCT dm.author_id) AS active_ambassadors,\n  ROUND(COUNT(*)::numeric / NULLIF(COUNT(DISTINCT dm.author_id), 0), 1) AS avg_posts_per_ambassador\nFROM discord_messages dm \nJOIN community_ambassadors ca ON dm.author_id::bigint = ca.discord_id \nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false;",
+          "rawSql": "SELECT \n  COUNT(*) AS discord_posts,\n  COUNT(DISTINCT dm.author_id) AS active_ambassadors,\n  ROUND(COUNT(*)::numeric / NULLIF(COUNT(DISTINCT dm.author_id), 0), 1) AS avg_posts_per_ambassador\nFROM discord_messages dm \nJOIN community_ambassadors ca ON dm.author_id::text = ca.discord_id::text \nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false;",
           "refId": "A"
         }
       ],
@@ -137,7 +137,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(*) AS telegram_posts,\n  COUNT(DISTINCT tm.from_user_id) AS active_ambassadors,\n  ROUND(COUNT(*)::numeric / NULLIF(COUNT(DISTINCT tm.from_user_id), 0), 1) AS avg_posts_per_ambassador\nFROM telegram_messages tm \nJOIN community_ambassadors ca ON tm.from_user_id = ca.telegram_id \nWHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo();",
+          "rawSql": "SELECT \n  COUNT(*) AS telegram_posts,\n  COUNT(DISTINCT tm.from_user_id) AS active_ambassadors,\n  ROUND(COUNT(*)::numeric / NULLIF(COUNT(DISTINCT tm.from_user_id), 0), 1) AS avg_posts_per_ambassador\nFROM telegram_messages tm \nJOIN community_ambassadors ca ON tm.from_user_id::text = ca.telegram_id::text \nWHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo();",
           "refId": "A"
         }
       ],
@@ -481,7 +481,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  'Discord' as platform, \n  COUNT(dm.id) as posts,\n  COUNT(DISTINCT dm.author_id) as active_ambassadors,\n  ROUND(AVG(LENGTH(dm.content)), 0) as avg_message_length\nFROM discord_messages dm \nJOIN community_ambassadors ca ON dm.author_id::bigint = ca.discord_id \nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false\nUNION ALL \nSELECT \n  'Telegram' as platform, \n  COUNT(tm.message_id) as posts,\n  COUNT(DISTINCT tm.from_user_id) as active_ambassadors,\n  ROUND(AVG(LENGTH(tm.text)), 0) as avg_message_length\nFROM telegram_messages tm \nJOIN community_ambassadors ca ON tm.from_user_id = ca.telegram_id \nWHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\nUNION ALL \nSELECT \n  'X/Twitter' as platform, \n  COUNT(DISTINCT dm.id) as posts,\n  COUNT(DISTINCT ca.ambassador) as active_ambassadors,\n  ROUND(AVG(LENGTH(dm.content)), 0) as avg_message_length\nFROM discord_messages dm \nCROSS JOIN community_ambassadors ca \nWHERE dm.channel_id = '1248750328896295084' \nAND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false \nAND dm.content ILIKE '%' || ca.x_handle || '%';",
+          "rawSql": "SELECT \n  platform,\n  posts\nFROM (\n  SELECT \n    'Discord' as platform, \n    COUNT(dm.id) as posts\n  FROM discord_messages dm \n  JOIN community_ambassadors ca ON dm.author_id::text = ca.discord_id::text\n  WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n  AND dm.author_is_bot = false\n  UNION ALL \n  SELECT \n    'Telegram' as platform, \n    COUNT(tm.message_id) as posts\n  FROM telegram_messages tm \n  JOIN community_ambassadors ca ON tm.from_user_id::text = ca.telegram_id::text\n  WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\n  UNION ALL \n  SELECT \n    'X/Twitter' as platform, \n    COUNT(DISTINCT dm.id) as posts\n  FROM discord_messages dm \n  CROSS JOIN community_ambassadors ca \n  WHERE dm.channel_id = '1248750328896295084' \n  AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n  AND dm.author_is_bot = false \n  AND dm.content ILIKE '%' || ca.x_handle || '%'\n) subquery\nWHERE posts > 0\nORDER BY posts DESC;",
           "refId": "A"
         }
       ],
@@ -498,12 +498,6 @@
           "mappings": []
         },
         "overrides": [
-          {
-            "matcher": {"id": "byName", "options": "posts"},
-            "properties": [
-              {"id": "displayName", "value": "Posts"}
-            ]
-          },
           {
             "matcher": {"id": "byName", "options": "Discord"},
             "properties": [
@@ -528,7 +522,7 @@
         "reduceOptions": {
           "values": false,
           "calcs": ["lastNotNull"],
-          "fields": "/^posts$/"
+          "fields": ""
         },
         "pieType": "donut",
         "tooltip": {
@@ -632,7 +626,7 @@
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "SELECT \n  DATE_TRUNC('day', dm.created_at) as time, \n  'Discord' as metric, \n  COUNT(dm.id) as value \nFROM discord_messages dm \nJOIN community_ambassadors ca ON dm.author_id::bigint = ca.discord_id \nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false \nGROUP BY time \nUNION ALL \nSELECT \n  DATE_TRUNC('day', tm.date) as time, \n  'Telegram' as metric, \n  COUNT(tm.message_id) as value \nFROM telegram_messages tm \nJOIN community_ambassadors ca ON tm.from_user_id = ca.telegram_id \nWHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() \nGROUP BY time \nORDER BY time;",
+          "rawSql": "SELECT \n  DATE_TRUNC('day', dm.created_at) as time, \n  'Discord' as metric, \n  COUNT(dm.id) as value \nFROM discord_messages dm \nJOIN community_ambassadors ca ON dm.author_id::text = ca.discord_id::text \nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false \nGROUP BY time \nUNION ALL \nSELECT \n  DATE_TRUNC('day', tm.date) as time, \n  'Telegram' as metric, \n  COUNT(tm.message_id) as value \nFROM telegram_messages tm \nJOIN community_ambassadors ca ON tm.from_user_id::text = ca.telegram_id::text \nWHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo() \nGROUP BY time \nORDER BY time;",
           "refId": "A"
         }
       ],
@@ -651,7 +645,8 @@
             "showPoints": "auto",
             "pointSize": 8,
             "stacking": {"mode": "none", "group": "A"}
-          }
+          },
+          "unit": "short"
         },
         "overrides": [
           {
@@ -690,7 +685,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH ambassador_response_times AS (\n  SELECT \n    ca.ambassador,\n    dm.channel_id,\n    dm.created_at,\n    LAG(dm.created_at) OVER (PARTITION BY dm.channel_id ORDER BY dm.created_at) as prev_message_time,\n    EXTRACT(EPOCH FROM (dm.created_at - LAG(dm.created_at) OVER (PARTITION BY dm.channel_id ORDER BY dm.created_at))) / 60 as response_time_minutes\n  FROM discord_messages dm\n  JOIN community_ambassadors ca ON dm.author_id::text = ca.discord_id::text\n  WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\n  AND dm.author_is_bot = false\n),\nresponse_categories AS (\n  SELECT \n    ambassador,\n    CASE \n      WHEN response_time_minutes IS NULL THEN 'First Message'\n      WHEN response_time_minutes <= 5 THEN 'Very Fast (<5min)'\n      WHEN response_time_minutes <= 30 THEN 'Fast (5-30min)'\n      WHEN response_time_minutes <= 120 THEN 'Medium (30min-2h)'\n      WHEN response_time_minutes <= 1440 THEN 'Slow (2h-24h)'\n      ELSE 'Very Slow (>24h)'\n    END as response_category,\n    COUNT(*) as message_count\n  FROM ambassador_response_times\n  GROUP BY ambassador, response_category\n)\nSELECT \n  ambassador,\n  response_category,\n  message_count\nFROM response_categories\nWHERE response_category != 'First Message'\nORDER BY ambassador, \n  CASE response_category\n    WHEN 'Very Fast (<5min)' THEN 1\n    WHEN 'Fast (5-30min)' THEN 2\n    WHEN 'Medium (30min-2h)' THEN 3\n    WHEN 'Slow (2h-24h)' THEN 4\n    WHEN 'Very Slow (>24h)' THEN 5\n  END;",
+          "rawSql": "WITH response_categories AS (\n  SELECT \n    CASE \n      WHEN EXTRACT(EPOCH FROM (dm.created_at - LAG(dm.created_at) OVER (PARTITION BY dm.channel_id ORDER BY dm.created_at))) / 60 <= 5 THEN 'Very Fast (<5min)'\n      WHEN EXTRACT(EPOCH FROM (dm.created_at - LAG(dm.created_at) OVER (PARTITION BY dm.channel_id ORDER BY dm.created_at))) / 60 <= 30 THEN 'Fast (5-30min)'\n      WHEN EXTRACT(EPOCH FROM (dm.created_at - LAG(dm.created_at) OVER (PARTITION BY dm.channel_id ORDER BY dm.created_at))) / 60 <= 120 THEN 'Medium (30min-2h)'\n      WHEN EXTRACT(EPOCH FROM (dm.created_at - LAG(dm.created_at) OVER (PARTITION BY dm.channel_id ORDER BY dm.created_at))) / 60 <= 1440 THEN 'Slow (2h-24h)'\n      ELSE 'Very Slow (>24h)'\n    END as response_category,\n    COUNT(*) as message_count\n  FROM discord_messages dm\n  JOIN community_ambassadors ca ON dm.author_id::text = ca.discord_id::text\n  WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\n  AND dm.author_is_bot = false\n  AND LAG(dm.created_at) OVER (PARTITION BY dm.channel_id ORDER BY dm.created_at) IS NOT NULL\n  GROUP BY response_category\n)\nSELECT \n  response_category,\n  message_count\nFROM response_categories\nORDER BY \n  CASE response_category\n    WHEN 'Very Fast (<5min)' THEN 1\n    WHEN 'Fast (5-30min)' THEN 2\n    WHEN 'Medium (30min-2h)' THEN 3\n    WHEN 'Slow (2h-24h)' THEN 4\n    WHEN 'Very Slow (>24h)' THEN 5\n  END;",
           "refId": "A"
         }
       ],
@@ -740,6 +735,7 @@
         ]
       },
       "options": {
+        "orientation": "vertical",
         "legend": {
           "calcs": [],
           "displayMode": "list",
@@ -798,13 +794,13 @@
     {
       "id": 12,
       "title": "Ambassador Channel Distribution",
-      "type": "treemap",
+      "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 41},
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH channel_info AS (\n  SELECT DISTINCT \n    dc.channel_id,\n    dc.channel_name,\n    dc.channel_type\n  FROM discord_channels dc\n),\nambassador_channel_activity AS (\n  SELECT \n    ca.ambassador,\n    ci.channel_name,\n    ci.channel_type,\n    COUNT(dm.id) as message_count,\n    COUNT(DISTINCT DATE(dm.created_at)) as active_days\n  FROM community_ambassadors ca\n  JOIN discord_messages dm ON dm.author_id::text = ca.discord_id::text\n  LEFT JOIN channel_info ci ON dm.channel_id = ci.channel_id\n  WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\n  AND dm.author_is_bot = false\n  GROUP BY ca.ambassador, ci.channel_name, ci.channel_type\n  HAVING COUNT(dm.id) > 0\n)\nSELECT \n  COALESCE(channel_name, 'Unknown Channel') as channel_name,\n  ambassador,\n  message_count,\n  active_days\nFROM ambassador_channel_activity\nORDER BY message_count DESC;",
+          "rawSql": "WITH channel_info AS (\n  SELECT DISTINCT \n    dc.channel_id,\n    dc.channel_name,\n    dc.channel_type\n  FROM discord_channels dc\n),\nambassador_channel_activity AS (\n  SELECT \n    ca.ambassador,\n    ci.channel_name,\n    ci.channel_type,\n    COUNT(dm.id) as message_count,\n    COUNT(DISTINCT DATE(dm.created_at)) as active_days\n  FROM community_ambassadors ca\n  JOIN discord_messages dm ON dm.author_id::text = ca.discord_id::text\n  LEFT JOIN channel_info ci ON dm.channel_id = ci.channel_id\n  WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\n  AND dm.author_is_bot = false\n  GROUP BY ca.ambassador, ci.channel_name, ci.channel_type\n  HAVING COUNT(dm.id) > 0\n)\nSELECT \n  COALESCE(channel_name, 'Unknown Channel') as channel_name,\n  SUM(message_count) as message_count\nFROM ambassador_channel_activity\nGROUP BY channel_name\nORDER BY message_count DESC\nLIMIT 15;",
           "refId": "A"
         }
       ],
@@ -822,6 +818,7 @@
         }
       },
       "options": {
+        "orientation": "horizontal",
         "legend": {
           "displayMode": "list",
           "placement": "bottom"
@@ -873,6 +870,92 @@
         "tooltip": {
           "mode": "multi",
           "sort": "desc"
+        }
+      },
+      "pluginVersion": "9.0.0"
+    },
+    {
+      "id": 14,
+      "title": "Platform Comparison",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 49},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH platform_metrics AS (\n  SELECT \n    'Discord' as platform,\n    COUNT(dm.id) as total_messages,\n    COUNT(DISTINCT dm.author_id) as active_ambassadors,\n    COUNT(DISTINCT dm.channel_id) as channels_used,\n    COUNT(DISTINCT DATE(dm.created_at)) as active_days,\n    ROUND(AVG(LENGTH(dm.content)), 0) as avg_message_length,\n    COUNT(CASE WHEN dm.mentions != '{}' THEN 1 END) as messages_with_mentions,\n    COUNT(CASE WHEN dm.attachments != '{}' THEN 1 END) as messages_with_attachments\n  FROM discord_messages dm \n  JOIN community_ambassadors ca ON dm.author_id::text = ca.discord_id::text\n  WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n  AND dm.author_is_bot = false\n  UNION ALL \n  SELECT \n    'Telegram' as platform,\n    COUNT(tm.message_id) as total_messages,\n    COUNT(DISTINCT tm.from_user_id) as active_ambassadors,\n    COUNT(DISTINCT tm.chat_id) as channels_used,\n    COUNT(DISTINCT DATE(tm.date)) as active_days,\n    ROUND(AVG(LENGTH(tm.text)), 0) as avg_message_length,\n    0 as messages_with_mentions,\n    COUNT(CASE WHEN tm.photo IS NOT NULL OR tm.document IS NOT NULL THEN 1 END) as messages_with_attachments\n  FROM telegram_messages tm \n  JOIN community_ambassadors ca ON tm.from_user_id::text = ca.telegram_id::text\n  WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\n  UNION ALL \n  SELECT \n    'X/Twitter' as platform,\n    COUNT(DISTINCT dm.id) as total_messages,\n    COUNT(DISTINCT ca.ambassador) as active_ambassadors,\n    1 as channels_used,\n    COUNT(DISTINCT DATE(dm.created_at)) as active_days,\n    ROUND(AVG(LENGTH(dm.content)), 0) as avg_message_length,\n    0 as messages_with_mentions,\n    COUNT(CASE WHEN dm.attachments != '{}' THEN 1 END) as messages_with_attachments\n  FROM discord_messages dm \n  CROSS JOIN community_ambassadors ca \n  WHERE dm.channel_id = '1248750328896295084' \n  AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n  AND dm.author_is_bot = false \n  AND dm.content ILIKE '%' || ca.x_handle || '%'\n)\nSELECT \n  platform as \"Platform\",\n  total_messages as \"Total Messages\",\n  active_ambassadors as \"Active Ambassadors\",\n  channels_used as \"Channels/Chats\",\n  active_days as \"Active Days\",\n  avg_message_length as \"Avg Message Length\",\n  messages_with_mentions as \"With Mentions\",\n  messages_with_attachments as \"With Attachments\",\n  ROUND(total_messages::numeric / NULLIF(active_ambassadors, 0), 1) as \"Msgs per Ambassador\",\n  ROUND(total_messages::numeric / NULLIF(active_days, 0), 1) as \"Msgs per Day\"\nFROM platform_metrics\nORDER BY total_messages DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false,
+            "filterable": true,
+            "cellOptions": {
+              "type": "auto"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{"color": "rgba(50, 172, 45, 0.97)", "value": null}]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Platform"},
+            "properties": [
+              {"id": "custom.width", "value": 120},
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "mappings", "value": [
+                {"options": {"Discord": {"color": "rgba(114, 137, 218, 0.97)", "index": 0}}, "type": "value"},
+                {"options": {"Telegram": {"color": "rgba(34, 139, 206, 0.97)", "index": 1}}, "type": "value"},
+                {"options": {"X/Twitter": {"color": "rgba(29, 161, 242, 0.97)", "index": 2}}, "type": "value"}
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Total Messages"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "custom.width", "value": 130},
+              {"id": "max", "value": 5000},
+              {"id": "min", "value": 0},
+              {"id": "color", "value": {"mode": "continuous-BlPu"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Active Ambassadors"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "gradient-gauge"},
+              {"id": "custom.width", "value": 140},
+              {"id": "max", "value": 50},
+              {"id": "min", "value": 0},
+              {"id": "color", "value": {"mode": "continuous-GrYlRd"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byRegexp", "options": "Msgs per|Avg"},
+            "properties": [
+              {"id": "custom.width", "value": 110},
+              {"id": "unit", "value": "short"},
+              {"id": "decimals", "value": 1}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"desc": true, "displayName": "Total Messages"}],
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": ["sum"],
+          "fields": ""
         }
       },
       "pluginVersion": "9.0.0"

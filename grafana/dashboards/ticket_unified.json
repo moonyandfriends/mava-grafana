@@ -87,7 +87,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH first_responses AS (SELECT t.id, t.created_at, MIN(m.created_at) as first_response FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE m.from_customer = false AND m.created_at > t.created_at AND t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() GROUP BY t.id, t.created_at) SELECT COALESCE(ROUND(AVG(EXTRACT(epoch FROM (first_response - created_at))/3600), 2), 0) as value FROM first_responses;",
+          "rawSql": "WITH first_responses AS (SELECT t.id, t.created_at, MIN(m.created_at) as first_response FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE m.from_customer = false AND m.created_at > t.created_at AND t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() GROUP BY t.id, t.created_at HAVING MIN(m.created_at) IS NOT NULL) SELECT COALESCE(ROUND(AVG(EXTRACT(epoch FROM (first_response - created_at))/3600)::numeric, 2), 0) as value FROM first_responses;",
           "refId": "A"
         }
       ],
@@ -130,7 +130,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT ROUND((COUNT(CASE WHEN status = 'resolved' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0)), 1) AS value FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "rawSql": "SELECT COALESCE(ROUND((COUNT(CASE WHEN status = 'resolved' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0))::numeric, 1), 0) AS value FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
           "refId": "A"
         }
       ],
@@ -174,7 +174,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH sla_metrics AS (SELECT t.id, CASE WHEN t.status = 'resolved' AND EXTRACT(epoch FROM (t.updated_at - t.created_at))/3600 <= 48 THEN 1 ELSE 0 END as met_sla FROM mava_tickets t WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo()) SELECT ROUND(AVG(met_sla) * 100, 1) as value FROM sla_metrics;",
+          "rawSql": "WITH sla_metrics AS (SELECT t.id, CASE WHEN t.status = 'resolved' AND t.updated_at IS NOT NULL AND EXTRACT(epoch FROM (t.updated_at - t.created_at))/3600 <= 48 THEN 1 ELSE 0 END as met_sla FROM mava_tickets t WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo()) SELECT COALESCE(ROUND((AVG(met_sla) * 100)::numeric, 1), 0) as value FROM sla_metrics;",
           "refId": "A"
         }
       ],
@@ -218,7 +218,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT ROUND(AVG(message_count), 1) as value FROM (SELECT COUNT(*) as message_count FROM mava_messages m JOIN mava_tickets t ON m.ticket_id = t.id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() GROUP BY m.ticket_id) subq;",
+          "rawSql": "SELECT COALESCE(ROUND(AVG(message_count)::numeric, 1), 0) as value FROM (SELECT COUNT(*) as message_count FROM mava_messages m JOIN mava_tickets t ON m.ticket_id = t.id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() GROUP BY m.ticket_id) subq;",
           "refId": "A"
         }
       ],
@@ -418,7 +418,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH agent_metrics AS (SELECT t.assigned_to as agent, COUNT(*) as total_tickets, COUNT(CASE WHEN t.status = 'resolved' THEN 1 END) as resolved_tickets, COUNT(CASE WHEN t.status IN ('open', 'pending', 'waiting') THEN 1 END) as active_tickets, COUNT(CASE WHEN t.priority = 'high' THEN 1 END) as high_priority, COUNT(CASE WHEN t.priority = 'medium' THEN 1 END) as medium_priority, COUNT(CASE WHEN t.priority = 'low' THEN 1 END) as low_priority, ROUND(AVG(EXTRACT(epoch FROM (COALESCE(t.updated_at, NOW()) - t.created_at))/3600), 2) as avg_resolution_hours FROM mava_tickets t WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND t.assigned_to IS NOT NULL GROUP BY t.assigned_to), response_metrics AS (SELECT t.assigned_to as agent, AVG(EXTRACT(epoch FROM (m.created_at - t.created_at))/3600) as avg_first_response_hours FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND t.assigned_to IS NOT NULL AND m.from_customer = false AND m.created_at = (SELECT MIN(m2.created_at) FROM mava_messages m2 WHERE m2.ticket_id = t.id AND m2.from_customer = false AND m2.created_at > t.created_at) GROUP BY t.assigned_to) SELECT am.agent AS \"👤 Agent\", am.total_tickets AS \"📊 Total Tickets\", am.resolved_tickets AS \"✅ Resolved\", am.active_tickets AS \"🔥 Active\", ROUND((am.resolved_tickets * 100.0 / NULLIF(am.total_tickets, 0)), 1) AS \"📈 Resolution Rate (%)\", COALESCE(ROUND(rm.avg_first_response_hours, 2), 0) AS \"⚡ Avg First Response (h)\", COALESCE(am.avg_resolution_hours, 0) AS \"🏁 Avg Resolution Time (h)\", am.high_priority AS \"🔴 High Priority\", am.medium_priority AS \"🟡 Medium Priority\", am.low_priority AS \"🟢 Low Priority\" FROM agent_metrics am LEFT JOIN response_metrics rm ON am.agent = rm.agent ORDER BY am.total_tickets DESC;",
+          "rawSql": "WITH agent_metrics AS (SELECT t.assigned_to as agent, COUNT(*) as total_tickets, COUNT(CASE WHEN t.status = 'resolved' THEN 1 END) as resolved_tickets, COUNT(CASE WHEN t.status IN ('open', 'pending', 'waiting') THEN 1 END) as active_tickets, COUNT(CASE WHEN t.priority = 'high' THEN 1 END) as high_priority, COUNT(CASE WHEN t.priority = 'medium' THEN 1 END) as medium_priority, COUNT(CASE WHEN t.priority = 'low' THEN 1 END) as low_priority, COALESCE(ROUND(AVG(EXTRACT(epoch FROM (COALESCE(t.updated_at, NOW()) - t.created_at))/3600)::numeric, 2), 0) as avg_resolution_hours FROM mava_tickets t WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND t.assigned_to IS NOT NULL AND TRIM(t.assigned_to) <> '' GROUP BY t.assigned_to), response_metrics AS (SELECT t.assigned_to as agent, COALESCE(ROUND(AVG(EXTRACT(epoch FROM (m.created_at - t.created_at))/3600)::numeric, 2), 0) as avg_first_response_hours FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND t.assigned_to IS NOT NULL AND TRIM(t.assigned_to) <> '' AND m.from_customer = false AND m.created_at = (SELECT MIN(m2.created_at) FROM mava_messages m2 WHERE m2.ticket_id = t.id AND m2.from_customer = false AND m2.created_at > t.created_at) GROUP BY t.assigned_to) SELECT am.agent AS \"👤 Agent\", am.total_tickets AS \"📊 Total Tickets\", am.resolved_tickets AS \"✅ Resolved\", am.active_tickets AS \"🔥 Active\", COALESCE(ROUND((am.resolved_tickets * 100.0 / NULLIF(am.total_tickets, 0))::numeric, 1), 0) AS \"📈 Resolution Rate (%)\", COALESCE(rm.avg_first_response_hours, 0) AS \"⚡ Avg First Response (h)\", am.avg_resolution_hours AS \"🏁 Avg Resolution Time (h)\", am.high_priority AS \"🔴 High Priority\", am.medium_priority AS \"🟡 Medium Priority\", am.low_priority AS \"🟢 Low Priority\" FROM agent_metrics am LEFT JOIN response_metrics rm ON am.agent = rm.agent ORDER BY am.total_tickets DESC;",
           "refId": "A"
         }
       ],
@@ -519,94 +519,10 @@
       }
     },
     {
-      "id": 13,
-      "title": "📊 Response Time Analysis",
-      "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 29},
-      "collapsed": false,
-      "panels": []
-    },
-    {
-      "id": 14,
-      "title": "🕒 Response Time Distribution",
-      "type": "histogram",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 30},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "WITH response_times AS (SELECT t.id, EXTRACT(epoch FROM (MIN(m.created_at) - t.created_at))/3600 as response_hours FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND m.from_customer = false AND m.created_at > t.created_at GROUP BY t.id, t.created_at) SELECT response_hours as \"Response Time (Hours)\" FROM response_times WHERE response_hours IS NOT NULL AND response_hours <= 48 ORDER BY response_hours;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "continuous-BlPu"},
-          "custom": {
-            "hideFrom": {"tooltip": false, "vis": false, "legend": false}
-          },
-          "unit": "h"
-        }
-      },
-      "options": {
-        "bucketSize": 2,
-        "bucketCount": 24
-      },
-      "transparent": false
-    },
-    {
-      "id": 15,
-      "title": "📅 Response Time Heatmap",
-      "type": "heatmap",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 30},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "WITH response_times AS (SELECT DATE_TRUNC('day', t.created_at) as day, EXTRACT(hour FROM t.created_at) as hour, AVG(EXTRACT(epoch FROM (MIN(m.created_at) - t.created_at))/3600) as avg_response_hours FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND m.from_customer = false AND m.created_at > t.created_at GROUP BY DATE_TRUNC('day', t.created_at), EXTRACT(hour FROM t.created_at), t.id) SELECT day as time, hour as \"Hour\", AVG(avg_response_hours) as \"Avg Response Time\" FROM response_times GROUP BY day, hour ORDER BY day, hour;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "continuous-RdYlBu",
-            "exponent": 0.5
-          },
-          "custom": {
-            "hideFrom": {"tooltip": false, "vis": false, "legend": false}
-          },
-          "unit": "h"
-        }
-      },
-      "options": {
-        "calculate": false,
-        "calculation": {},
-        "cellGap": 1,
-        "cellValues": {},
-        "color": {
-          "exponent": 0.5,
-          "fill": "dark-orange",
-          "mode": "scheme",
-          "reverse": false,
-          "scale": "exponential",
-          "scheme": "RdYlBu",
-          "steps": 128
-        },
-        "exemplars": {"color": "rgba(255,0,255,0.7)"},
-        "filterValues": {"le": 1e-9},
-        "legend": {"show": true},
-        "rowsFrame": {"layout": "auto"},
-        "tooltip": {"show": true, "yHistogram": false},
-        "yAxis": {"axisPlacement": "left", "reverse": false, "unit": "short"}
-      },
-      "transparent": false
-    },
-    {
       "id": 16,
       "title": "🎫 Active Ticket Management",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 39},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 29},
       "collapsed": false,
       "panels": []
     },
@@ -615,11 +531,11 @@
       "title": "🚨 Priority Tickets Dashboard",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 40},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 30},
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH ticket_details AS (SELECT t.id, t.customer_id, c.name as customer_name, t.status, t.priority, t.assigned_to, t.created_at, t.updated_at, EXTRACT(EPOCH FROM (NOW() - t.created_at))/3600 AS age_hours, COUNT(m.id) as message_count, MAX(m.created_at) as last_message_time, STRING_AGG(CASE WHEN m.content IS NOT NULL THEN SUBSTRING(m.content, 1, 50) END, ' | ' ORDER BY m.created_at DESC) as recent_messages FROM mava_tickets t LEFT JOIN mava_customers c ON t.customer_id = c.id LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.status IN ('open', 'pending', 'waiting') AND t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() GROUP BY t.id, t.customer_id, c.name, t.status, t.priority, t.assigned_to, t.created_at, t.updated_at) SELECT id AS \"🎫 Ticket ID\", customer_name AS \"👤 Customer\", status AS \"📊 Status\", priority AS \"⚡ Priority\", assigned_to AS \"👥 Agent\", ROUND(age_hours, 1) AS \"⏰ Age (Hours)\", message_count AS \"💬 Messages\", CASE WHEN last_message_time IS NOT NULL THEN ROUND(EXTRACT(EPOCH FROM (NOW() - last_message_time))/3600, 1) ELSE NULL END AS \"🕒 Last Activity (h)\", COALESCE(SUBSTRING(recent_messages, 1, 100), 'No messages') AS \"📝 Recent Messages\", created_at AS \"📅 Created\", updated_at AS \"🔄 Updated\" FROM ticket_details ORDER BY CASE WHEN priority = 'high' THEN 1 WHEN priority = 'medium' THEN 2 WHEN priority = 'low' THEN 3 ELSE 4 END, age_hours DESC;",
+          "rawSql": "WITH ticket_details AS (SELECT t.id, t.customer_id, COALESCE(c.name, 'Unknown Customer') as customer_name, t.status, COALESCE(t.priority, 'none') as priority, COALESCE(t.assigned_to, 'Unassigned') as assigned_to, t.created_at, t.updated_at, ROUND(EXTRACT(EPOCH FROM (NOW() - t.created_at))/3600::numeric, 1) AS age_hours, COUNT(m.id) as message_count, MAX(m.created_at) as last_message_time, STRING_AGG(CASE WHEN m.content IS NOT NULL AND LENGTH(TRIM(m.content)) > 0 THEN SUBSTRING(TRIM(m.content), 1, 50) END, ' | ' ORDER BY m.created_at DESC) as recent_messages FROM mava_tickets t LEFT JOIN mava_customers c ON t.customer_id = c.id LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.status IN ('open', 'pending', 'waiting') AND t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() GROUP BY t.id, t.customer_id, c.name, t.status, t.priority, t.assigned_to, t.created_at, t.updated_at) SELECT id AS \"🎫 Ticket ID\", customer_name AS \"👤 Customer\", status AS \"📊 Status\", priority AS \"⚡ Priority\", assigned_to AS \"👥 Agent\", age_hours AS \"⏰ Age (Hours)\", message_count AS \"💬 Messages\", CASE WHEN last_message_time IS NOT NULL THEN ROUND(EXTRACT(EPOCH FROM (NOW() - last_message_time))/3600::numeric, 1) ELSE NULL END AS \"🕒 Last Activity (h)\", COALESCE(SUBSTRING(recent_messages, 1, 100), 'No messages') AS \"📝 Recent Messages\", created_at AS \"📅 Created\", updated_at AS \"🔄 Updated\" FROM ticket_details ORDER BY CASE WHEN priority = 'high' THEN 1 WHEN priority = 'medium' THEN 2 WHEN priority = 'low' THEN 3 ELSE 4 END, age_hours DESC;",
           "refId": "A"
         }
       ],
@@ -730,7 +646,7 @@
       "id": 18,
       "title": "📈 Customer Satisfaction & Insights",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 52},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 42},
       "collapsed": false,
       "panels": []
     },
@@ -739,7 +655,7 @@
       "title": "🔍 Content Analysis - Top Keywords",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 53},
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 43},
       "targets": [
         {
           "format": "table",
@@ -811,7 +727,7 @@
       "title": "📊 Ticket Resolution Time Distribution",
       "type": "bargauge",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 53},
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 43},
       "targets": [
         {
           "format": "table",
@@ -882,7 +798,7 @@
       "id": 21,
       "title": "⏱️ SLA Performance Tracking",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 62},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 52},
       "collapsed": false,
       "panels": []
     },
@@ -891,11 +807,11 @@
       "title": "📊 SLA Compliance by Priority",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 63},
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 53},
       "targets": [
         {
           "format": "time_series",
-          "rawSql": "WITH sla_tracking AS (SELECT DATE_TRUNC('day', created_at) as time, priority, COUNT(*) as total_tickets, COUNT(CASE WHEN status = 'resolved' AND EXTRACT(epoch FROM (updated_at - created_at))/3600 <= CASE WHEN priority = 'high' THEN 4 WHEN priority = 'medium' THEN 24 WHEN priority = 'low' THEN 48 ELSE 48 END THEN 1 END) as sla_met FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND priority IS NOT NULL GROUP BY DATE_TRUNC('day', created_at), priority) SELECT time, priority || ' Priority' as metric, ROUND((sla_met * 100.0 / NULLIF(total_tickets, 0)), 2) as value FROM sla_tracking WHERE total_tickets > 0 ORDER BY time;",
+          "rawSql": "WITH sla_tracking AS (SELECT DATE_TRUNC('day', created_at) as time, priority, COUNT(*) as total_tickets, COUNT(CASE WHEN status = 'resolved' AND updated_at IS NOT NULL AND EXTRACT(epoch FROM (updated_at - created_at))/3600 <= CASE WHEN priority = 'high' THEN 4 WHEN priority = 'medium' THEN 24 WHEN priority = 'low' THEN 48 ELSE 48 END THEN 1 END) as sla_met FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND priority IS NOT NULL AND TRIM(priority) <> '' GROUP BY DATE_TRUNC('day', created_at), priority) SELECT time, priority || ' Priority' as metric, COALESCE(ROUND((sla_met * 100.0 / NULLIF(total_tickets, 0))::numeric, 2), 0) as value FROM sla_tracking WHERE total_tickets > 0 ORDER BY time;",
           "refId": "A"
         }
       ],
@@ -951,11 +867,11 @@
       "title": "🎯 First Response SLA Tracking",
       "type": "gauge",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 63},
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 53},
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH first_response_sla AS (SELECT t.priority, COUNT(*) as total_tickets, COUNT(CASE WHEN m.created_at <= t.created_at + INTERVAL '1 hour' AND t.priority = 'high' THEN 1 WHEN m.created_at <= t.created_at + INTERVAL '4 hours' AND t.priority = 'medium' THEN 1 WHEN m.created_at <= t.created_at + INTERVAL '8 hours' AND t.priority = 'low' THEN 1 END) as sla_met FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND t.priority IS NOT NULL AND m.from_customer = false AND m.created_at = (SELECT MIN(m2.created_at) FROM mava_messages m2 WHERE m2.ticket_id = t.id AND m2.from_customer = false AND m2.created_at > t.created_at) GROUP BY t.priority) SELECT priority || ' Priority' as metric, ROUND((sla_met * 100.0 / NULLIF(total_tickets, 0)), 1) as value FROM first_response_sla WHERE total_tickets > 0 ORDER BY priority;",
+          "rawSql": "WITH first_response_sla AS (SELECT t.priority, COUNT(*) as total_tickets, COUNT(CASE WHEN m.created_at <= t.created_at + INTERVAL '1 hour' AND t.priority = 'high' THEN 1 WHEN m.created_at <= t.created_at + INTERVAL '4 hours' AND t.priority = 'medium' THEN 1 WHEN m.created_at <= t.created_at + INTERVAL '8 hours' AND t.priority = 'low' THEN 1 END) as sla_met FROM mava_tickets t LEFT JOIN mava_messages m ON t.id = m.ticket_id WHERE t.created_at >= $__timeFrom() AND t.created_at <= $__timeTo() AND t.priority IS NOT NULL AND TRIM(t.priority) <> '' AND m.from_customer = false AND m.created_at = (SELECT MIN(m2.created_at) FROM mava_messages m2 WHERE m2.ticket_id = t.id AND m2.from_customer = false AND m2.created_at > t.created_at) GROUP BY t.priority) SELECT priority || ' Priority' as metric, COALESCE(ROUND((sla_met * 100.0 / NULLIF(total_tickets, 0))::numeric, 1), 0) as value FROM first_response_sla WHERE total_tickets > 0 ORDER BY priority;",
           "refId": "A"
         }
       ],
