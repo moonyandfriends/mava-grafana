@@ -18,7 +18,6 @@ This guide provides step-by-step instructions for deploying the enhanced Grafana
 ### 2. Enhanced Dashboards
 - `community_stats_enhanced.json` - Advanced community analytics
 - `ambassador_performance_enhanced.json` - Ambassador performance tracking
-- `support_analytics_enhanced.json` - Support ticket analytics
 
 ### 3. Documentation
 - `dashboard_deployment_guide.md` - This deployment guide
@@ -63,9 +62,6 @@ This guide provides step-by-step instructions for deploying the enhanced Grafana
    - Repeat process with `ambassador_performance_enhanced.json`
    - Ensure proper data source mapping
 
-   **Support Analytics Dashboard**:
-   - Repeat process with `support_analytics_enhanced.json`
-   - Verify ticket table references are correct
 
 ### Step 3: Data Source Configuration
 
