@@ -598,7 +598,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH telegram_activity AS (\n  SELECT \n    from_user_id,\n    COALESCE(from_user_first_name, '') || ' ' || COALESCE(from_user_last_name, '') AS display_name,\n    from_user_username,\n    COUNT(*) as message_count,\n    COUNT(DISTINCT chat_id) as chats_used,\n    COUNT(DISTINCT DATE(date)) as active_days,\n    COUNT(CASE WHEN photo IS NOT NULL THEN 1 END) as media_shared,\n    AVG(LENGTH(text)) as avg_message_length\n  FROM telegram_messages\n  WHERE date >= $__timeFrom() AND date <= $__timeTo()\n  GROUP BY from_user_id, from_user_first_name, from_user_last_name, from_user_username\n  HAVING COUNT(*) > 0\n)\nSELECT \n  display_name as \"Name\",\n  from_user_username as \"Username\",\n  message_count as \"Messages\",\n  active_days as \"Active Days\",\n  chats_used as \"Chats\",\n  media_shared as \"Media Shared\",\n  ROUND(avg_message_length, 1) as \"Avg Length\",\n  from_user_id as \"UserID\"\nFROM telegram_activity\nORDER BY message_count DESC\nLIMIT 20;",
+          "rawSql": "WITH telegram_activity AS (\n  SELECT \n    from_user_id,\n    COALESCE(from_user_first_name, '') || ' ' || COALESCE(from_user_last_name, '') AS display_name,\n    from_user_username,\n    from_user_first_name,\n    from_user_last_name,\n    COUNT(*) as message_count,\n    COUNT(DISTINCT chat_id) as chats_used,\n    COUNT(DISTINCT DATE(date)) as active_days,\n    COUNT(CASE WHEN photo IS NOT NULL THEN 1 END) as media_shared,\n    AVG(LENGTH(text)) as avg_message_length\n  FROM telegram_messages\n  WHERE date >= $__timeFrom() AND date <= $__timeTo()\n  GROUP BY from_user_id, from_user_first_name, from_user_last_name, from_user_username\n  HAVING COUNT(*) > 0\n)\nSELECT \n  'https://ui-avatars.com/api/?name=' || \n  COALESCE(from_user_first_name, '') || '+' || \n  COALESCE(from_user_last_name, '') || \n  '&size=128&background=0088CC&color=ffffff' as \"Avatar\",\n  display_name as \"Name\",\n  from_user_username as \"Username\",\n  message_count as \"Messages\",\n  active_days as \"Active Days\",\n  chats_used as \"Chats\",\n  media_shared as \"Media Shared\",\n  ROUND(avg_message_length, 1) as \"Avg Length\",\n  from_user_id as \"UserID\"\nFROM telegram_activity\nORDER BY message_count DESC\nLIMIT 20;",
           "refId": "A"
         }
       ],
@@ -622,6 +622,13 @@
         },
         "overrides": [
           {
+            "matcher": {"id": "byName", "options": "Avatar"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "image"},
+              {"id": "custom.width", "value": 60}
+            ]
+          },
+          {
             "matcher": {"id": "byName", "options": "Username"},
             "properties": [
               {"id": "custom.displayMode", "value": "color-text"},
@@ -639,6 +646,216 @@
       "options": {
         "showHeader": true,
         "sortBy": [{"desc": true, "displayName": "Messages"}]
+      }
+    },
+    {
+      "id": 104,
+      "title": "Server Joins & Leaves Timeline",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 26},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "-- Discord Server Joins & Leaves\nSELECT date_trunc('day', occurred_at) AS time, \n       'Discord Joins' AS metric, \n       COUNT(*) AS value \nFROM discord_actions \nWHERE action_type = 'member_join' \n  AND occurred_at >= $__timeFrom() \n  AND occurred_at <= $__timeTo() \nGROUP BY time\n\nUNION ALL\n\nSELECT date_trunc('day', occurred_at) AS time, \n       'Discord Leaves' AS metric, \n       COUNT(*) AS value \nFROM discord_actions \nWHERE action_type = 'member_leave' \n  AND occurred_at >= $__timeFrom() \n  AND occurred_at <= $__timeTo() \nGROUP BY time\n\nUNION ALL\n\n-- Telegram Server Joins & Leaves\nSELECT date_trunc('day', date) AS time, \n       'Telegram Joins' AS metric, \n       COUNT(*) AS value \nFROM telegram_messages \nWHERE (new_chat_members IS NOT NULL \n       AND new_chat_members::text != '' \n       AND new_chat_members::text != '[]' \n       AND new_chat_members::text != 'null') \n  AND date >= $__timeFrom() \n  AND date <= $__timeTo() \nGROUP BY time\n\nUNION ALL\n\nSELECT date_trunc('day', date) AS time, \n       'Telegram Leaves' AS metric, \n       COUNT(*) AS value \nFROM telegram_messages \nWHERE (left_chat_member IS NOT NULL \n       AND left_chat_member::text != '' \n       AND left_chat_member::text != '{}' \n       AND left_chat_member::text != 'null') \n  AND date >= $__timeFrom() \n  AND date <= $__timeTo() \nGROUP BY time\n\nORDER BY time, metric;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "auto",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "Events",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "red", "value": 80}
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Discord Joins"},
+            "properties": [
+              {"id": "color", "value": {"fixedColor": "green", "mode": "fixed"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Discord Leaves"},
+            "properties": [
+              {"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Telegram Joins"},
+            "properties": [
+              {"id": "color", "value": {"fixedColor": "light-green", "mode": "fixed"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Telegram Leaves"},
+            "properties": [
+              {"id": "color", "value": {"fixedColor": "orange", "mode": "fixed"}}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["sum", "lastNotNull"],
+          "showLegend": true
+        }
+      }
+    },
+    {
+      "id": 105,
+      "title": "Latest Community Messages",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 16, "w": 24, "x": 0, "y": 34},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "-- Latest Discord Messages\nSELECT \n  'Discord' AS \"Platform\",\n  COALESCE(dm.author_avatar_url, \n           'https://cdn.discordapp.com/embed/avatars/' || \n           ((dm.author_id::bigint >> 22) % 6) || '.png') AS \"Avatar\",\n  COALESCE(dm.author_display_name, dm.author_username) AS \"Username\",\n  dm.author_username AS \"Handle\",\n  CASE \n    WHEN LENGTH(dm.content) > 200 THEN \n      SUBSTRING(dm.content, 1, 200) || '...'\n    ELSE dm.content \n  END AS \"Message\",\n  dm.created_at AS \"Timestamp\",\n  'https://discord.com/channels/' || dm.guild_id || '/' || dm.channel_id || '/' || dm.id AS \"Message URL\",\n  dm.author_id::text AS \"User ID\"\nFROM discord_messages dm\nWHERE dm.author_is_bot = false\n  AND dm.content IS NOT NULL\n  AND dm.content != ''\n  AND dm.created_at >= NOW() - INTERVAL '7 days'\nORDER BY dm.created_at DESC\nLIMIT 25\n\nUNION ALL\n\n-- Latest Telegram Messages\nSELECT \n  'Telegram' AS \"Platform\",\n  'https://ui-avatars.com/api/?name=' || \n  COALESCE(tm.from_user_first_name, '') || '+' || \n  COALESCE(tm.from_user_last_name, '') || \n  '&size=128&background=0088CC&color=ffffff' AS \"Avatar\",\n  COALESCE(tm.from_user_first_name, '') || ' ' || \n  COALESCE(tm.from_user_last_name, '') AS \"Username\",\n  COALESCE(tm.from_user_username, 'N/A') AS \"Handle\",\n  CASE \n    WHEN LENGTH(tm.text) > 200 THEN \n      SUBSTRING(tm.text, 1, 200) || '...'\n    ELSE tm.text \n  END AS \"Message\",\n  tm.date AS \"Timestamp\",\n  'https://t.me/' || COALESCE(tm.from_user_username, tm.from_user_id::text) AS \"Message URL\",\n  tm.from_user_id::text AS \"User ID\"\nFROM telegram_messages tm\nWHERE tm.text IS NOT NULL\n  AND tm.text != ''\n  AND tm.date >= NOW() - INTERVAL '7 days'\nORDER BY tm.date DESC\nLIMIT 25\n\nORDER BY \"Timestamp\" DESC\nLIMIT 50;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false,
+            "filterable": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null}
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "Platform"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-background"},
+              {"id": "custom.width", "value": 80},
+              {"id": "mappings", "value": [
+                {"options": {"Discord": {"color": "blue", "index": 0}}, "type": "value"},
+                {"options": {"Telegram": {"color": "light-blue", "index": 1}}, "type": "value"}
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Avatar"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "image"},
+              {"id": "custom.width", "value": 60}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Username"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "light-green"}},
+              {"id": "custom.width", "value": 120}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Handle"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "light-blue"}},
+              {"id": "custom.width", "value": 120}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Message"},
+            "properties": [
+              {"id": "custom.width", "value": 400}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Timestamp"},
+            "properties": [
+              {"id": "custom.width", "value": 140}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "Message URL"},
+            "properties": [
+              {"id": "custom.displayMode", "value": "color-text"},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "yellow"}},
+              {"id": "custom.width", "value": 80},
+              {"id": "links", "value": [
+                {
+                  "title": "View Message",
+                  "url": "${__value.text}",
+                  "targetBlank": true
+                }
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "User ID"},
+            "properties": [
+              {"id": "custom.hidden", "value": true}
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{"desc": true, "displayName": "Timestamp"}],
+        "footer": {
+          "show": false,
+          "reducer": ["sum"],
+          "countRows": false,
+          "fields": ""
+        }
       }
     }
   ],
