@@ -1,0 +1,904 @@
+{
+  "id": null,
+  "uid": "mava-ticket-overview",
+  "title": "Mava Tickets",
+  "tags": ["mava_tickets_with_customers", "overview", "support", "performance"],
+  "timezone": "browser",
+  "schemaVersion": 37,
+  "version": 8,
+  "refresh": "5m",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "hideControls": false,
+  "links": [],
+  "liveNow": false,
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Open Tickets",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 5, "x": 0, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets_with_customers WHERE status = 'Open';",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": 0},
+              {"color": "yellow", "value": 5},
+              {"color": "red", "value": 20}
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "Pending Tickets",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 5, "x": 5, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets_with_customers WHERE status = 'Pending';",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": 0},
+              {"color": "yellow", "value": 3},
+              {"color": "red", "value": 10}
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "Waiting Tickets",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 5, "x": 10, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets_with_customers WHERE status = 'Waiting';",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": 0},
+              {"color": "yellow", "value": 3},
+              {"color": "red", "value": 10}
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "Resolved Tickets",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 5, "x": 15, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS count FROM mava_tickets_with_customers WHERE status = 'Resolved';",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 10},
+              {"color": "green", "value": 30}
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Total Tickets",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 4, "x": 20, "y": 0},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS total_mava_tickets_with_customers FROM mava_tickets_with_customers;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 50},
+              {"color": "green", "value": 100}
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 101,
+      "title": "Average Resolution Time",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT \n  ROUND(\n    AVG(\n      EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600\n    )::numeric, 1\n  ) AS avg_resolution_hours\nFROM mava_tickets_with_customers \nWHERE status IN ('Resolved', 'Closed') \n  AND created_at >= $__timeFrom() \n  AND created_at <= $__timeTo()\n  AND updated_at IS NOT NULL;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": 0},
+              {"color": "yellow", "value": 24},
+              {"color": "orange", "value": 48},
+              {"color": "red", "value": 72}
+            ]
+          },
+          "unit": "h"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 102,
+      "title": "Support Satisfaction Score",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH satisfaction_metrics AS (\n  SELECT \n    COUNT(CASE WHEN LOWER(m.content) ~ '.*(thank|thanks|helpful|great|excellent|perfect|solved|fixed|resolved).*' THEN 1 END) as positive_feedback,\n    COUNT(CASE WHEN LOWER(m.content) ~ '.*(bad|terrible|awful|useless|frustrated|slow|poor|disappointed).*' THEN 1 END) as negative_feedback,\n    COUNT(*) as total_messages\n  FROM mava_messages m\n  JOIN mava_tickets_with_customers t ON m.ticket_id = t.id\n  WHERE m.from_customer = true\n    AND t.status IN ('Resolved', 'Closed')\n    AND m.created_at >= $__timeFrom()\n    AND m.created_at <= $__timeTo()\n    AND m.content IS NOT NULL\n)\nSELECT \n  ROUND(\n    CASE \n      WHEN total_messages > 0 THEN \n        ((positive_feedback::decimal / total_messages) * 100)\n      ELSE 0 \n    END, 1\n  ) as satisfaction_score\nFROM satisfaction_metrics;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 30},
+              {"color": "light-green", "value": 60},
+              {"color": "green", "value": 80}
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 103,
+      "title": "SLA Compliance Rate",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 8},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH sla_metrics AS (\n  SELECT \n    COUNT(CASE WHEN EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600 <= 24 THEN 1 END) as within_sla,\n    COUNT(*) as total_tickets\n  FROM mava_tickets_with_customers\n  WHERE status IN ('Resolved', 'Closed')\n    AND created_at >= $__timeFrom()\n    AND created_at <= $__timeTo()\n    AND updated_at IS NOT NULL\n)\nSELECT \n  ROUND(\n    CASE \n      WHEN total_tickets > 0 THEN \n        (within_sla::decimal / total_tickets) * 100\n      ELSE 0 \n    END, 1\n  ) as sla_compliance_rate\nFROM sla_metrics;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "red", "value": 0},
+              {"color": "yellow", "value": 70},
+              {"color": "light-green", "value": 85},
+              {"color": "green", "value": 95}
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Created Over Time",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT date_trunc('day', created_at) AS time, COUNT(*) AS count FROM mava_tickets_with_customers WHERE created_at IS NOT NULL GROUP BY time ORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "Tickets Created",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 19,
+      "type": "timeseries",
+      "title": "Closed Over Time",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT date_trunc('day', updated_at) AS time, COUNT(*) AS count FROM mava_tickets_with_customers WHERE status IN ('Closed', 'Resolved') AND updated_at IS NOT NULL GROUP BY time ORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "Tickets Closed",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 104,
+      "title": "Agent Performance Analytics",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 24},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH agent_stats AS (\n  SELECT \n    t.assigned_to AS \"Agent\",\n    COUNT(t.id) AS \"Total Tickets\",\n    COUNT(CASE WHEN t.status = 'Resolved' THEN 1 END) AS \"Resolved\",\n    COUNT(CASE WHEN t.status = 'Open' THEN 1 END) AS \"Open\",\n    COUNT(CASE WHEN t.status = 'Pending' THEN 1 END) AS \"Pending\",\n    ROUND(\n      AVG(\n        CASE \n          WHEN t.status IN ('Resolved', 'Closed') AND t.updated_at IS NOT NULL THEN \n            EXTRACT(EPOCH FROM (t.updated_at - t.created_at)) / 3600\n          ELSE NULL\n        END\n      )::numeric, 1\n    ) AS \"Avg Resolution Time (hrs)\",\n    ROUND(\n      (COUNT(CASE WHEN t.status = 'Resolved' THEN 1 END)::decimal / NULLIF(COUNT(t.id), 0)) * 100, 1\n    ) AS \"Resolution Rate (%)\",\n    ROUND(\n      (COUNT(CASE WHEN t.status IN ('Resolved', 'Closed') AND EXTRACT(EPOCH FROM (t.updated_at - t.created_at)) / 3600 <= 24 THEN 1 END)::decimal / \n       NULLIF(COUNT(CASE WHEN t.status IN ('Resolved', 'Closed') THEN 1 END), 0)) * 100, 1\n    ) AS \"SLA Compliance (%)\"\n  FROM mava_tickets_with_customers t\n  WHERE t.assigned_to IS NOT NULL\n    AND t.created_at >= $__timeFrom()\n    AND t.created_at <= $__timeTo()\n  GROUP BY t.assigned_to\n)\nSELECT *\nFROM agent_stats\nWHERE \"Total Tickets\" > 0\nORDER BY \"Resolution Rate (%)\" DESC, \"Total Tickets\" DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Agent"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "light-blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Resolution Rate (%)"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "gradient-gauge"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-GrYlRd"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SLA Compliance (%)"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "gradient-gauge"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-BlPu"
+                }
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg Resolution Time (hrs)"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "gradient-gauge"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-RdYlGr",
+                  "reverse": true
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Tickets"
+            },
+            "properties": [
+              {
+                "id": "custom.displayMode",
+                "value": "gradient-gauge"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "continuous-GrYlRd"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "fontSize": "100%"
+      }
+    },
+    {
+      "id": 18,
+      "title": "Open Tickets",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 36},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH latest_messages AS (SELECT m.ticket_id, m.content, m.created_at as message_created_at, m.sender, m.from_customer, ROW_NUMBER() OVER (PARTITION BY m.ticket_id ORDER BY m.created_at DESC) as rn FROM mava_messages m WHERE m.is_deleted = false AND m.content IS NOT NULL AND m.content != ''), discord_customers AS (SELECT DISTINCT m.ticket_id, dm.author_id::text as user_id, dm.author_username FROM mava_messages m JOIN discord_messages dm ON m.sender = dm.author_id::text WHERE m.from_customer = true), telegram_customers AS (SELECT DISTINCT m.ticket_id, tm.from_user_id::text as user_id, tm.from_user_username FROM mava_messages m JOIN telegram_messages tm ON m.sender = tm.from_user_id::text WHERE m.from_customer = true) SELECT t.id AS \"Ticket ID\", t.category AS \"Category\", COALESCE(t.customer_name, 'Unknown') AS \"Customer\", t.source_type AS \"Source\", t.assigned_to AS \"Assigned To\", t.created_at AS \"Created\", t.updated_at AS \"Last Updated\", CASE WHEN lm.content IS NOT NULL THEN CASE WHEN LENGTH(lm.content) > 100 THEN SUBSTRING(lm.content, 1, 100) || '...' ELSE lm.content END ELSE 'No messages' END AS \"Latest Message\", lm.message_created_at AS \"Last Message Time\", CASE WHEN t.source_type = 'Discord' THEN dc.user_id WHEN t.source_type = 'Telegram' THEN tc.user_id END AS \"CustomerID\", CASE WHEN t.source_type = 'Discord' AND dc.user_id IS NOT NULL THEN 'https://discord.com/users/' || dc.user_id WHEN t.source_type = 'Telegram' AND tc.user_id IS NOT NULL THEN 'https://t.me/' || tc.user_id ELSE '' END AS \"CustomerURL\" FROM mava_tickets_with_customers t LEFT JOIN latest_messages lm ON t.id = lm.ticket_id AND lm.rn = 1 LEFT JOIN discord_customers dc ON t.id = dc.ticket_id AND t.source_type = 'Discord' LEFT JOIN telegram_customers tc ON t.id = tc.ticket_id AND t.source_type = 'Telegram' WHERE t.status IN ('Open', 'Pending', 'Waiting') ORDER BY t.updated_at DESC LIMIT 50;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "displayMode": "table",
+            "filterable": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Ticket ID"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open in Mava Dashboard",
+                    "url": "https://dashboard.mava.app/dashboard/ticket?space=653191231792c3d3a69b4946&id=${__value.text}",
+                    "targetBlank": true
+                  }
+                ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "light-blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Source"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Category"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Customer"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View Profile",
+                    "url": "${__data.fields.CustomerURL:raw}",
+                    "targetBlank": true
+                  }
+                ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "light-pink"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Assigned To"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "light-green"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Created"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last Updated"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Latest Message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last Message Time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CustomerID"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CustomerURL"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "fontSize": "100%"
+      }
+    },
+    {
+      "id": 105,
+      "title": "Support Volume by Category",
+      "type": "barchart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 48},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT \n  COALESCE(category, 'Uncategorized') AS \"Category\",\n  COUNT(*) AS \"Tickets\"\nFROM mava_tickets_with_customers\nWHERE created_at >= $__timeFrom()\n  AND created_at <= $__timeTo()\nGROUP BY category\nORDER BY \"Tickets\" DESC\nLIMIT 10;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "displayMode": "gradient",
+            "orientation": "horizontal"
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showValue": "always",
+        "groupWidth": 0.7,
+        "barWidth": 0.97
+      }
+    },
+    {
+      "id": 10,
+      "title": "Most Common Words in Support Tickets",
+      "type": "barchart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 48},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH words AS (SELECT unnest(string_to_array(lower(regexp_replace(m.content, '[^a-zA-Z0-9\\s]', '', 'g')), ' ')) AS word FROM mava_messages m WHERE m.content IS NOT NULL AND m.content <> '' AND LENGTH(m.content) > 3 AND m.is_deleted = false AND m.created_at >= $__timeFrom() AND m.created_at <= $__timeTo()), filtered_words AS (SELECT word FROM words WHERE LENGTH(word) > 3 AND word NOT IN ('this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'about', 'would', 'there', 'could', 'more', 'very', 'than', 'just', 'like', 'only', 'into', 'over', 'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us', 'hello', 'thanks', 'please', 'issue', 'problem', 'help', 'need', 'can', 'get', 'see', 'know', 'think', 'make', 'time', 'good', 'now', 'here', 'out', 'when', 'come', 'its', 'take')) SELECT word AS \"Word\", COUNT(*) AS \"Frequency\" FROM filtered_words GROUP BY word ORDER BY COUNT(*) DESC LIMIT 20;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "displayMode": "gradient",
+            "orientation": "vertical"
+          }
+        }
+      },
+      "options": {
+        "orientation": "vertical",
+        "displayMode": "gradient",
+        "xTickLabelRotation": 45,
+        "xTickLabelSpacing": 0,
+        "showValue": "always",
+        "groupWidth": 0.7,
+        "barWidth": 0.97
+      }
+    }
+  ]
+}
