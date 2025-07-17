@@ -320,7 +320,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COALESCE(avatar_dm.author_avatar_url, 'https://cdn.discordapp.com/embed/avatars/0.png') as discord_avatar,\n  ca.ambassador,\n  ca.role,\n  COUNT(DISTINCT dm.id) as discord_posts,\n  COUNT(DISTINCT tm.id) as telegram_posts,\n  (COUNT(DISTINCT dm.id) + COUNT(DISTINCT tm.id)) as total_posts,\n  ca.discord_id,\n  ca.telegram_id,\n  ca.x_handle\nFROM community_ambassadors ca\nLEFT JOIN discord_messages dm ON CAST(ca.discord_id AS text) = dm.author_id \n  AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\nLEFT JOIN telegram_messages tm ON ca.telegram_id = tm.from_user_id \n  AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\nLEFT JOIN (\n  SELECT DISTINCT \n    author_id, \n    FIRST_VALUE(author_avatar_url) OVER (PARTITION BY author_id ORDER BY created_at DESC) as author_avatar_url\n  FROM discord_messages \n  WHERE author_avatar_url IS NOT NULL\n) avatar_dm ON CAST(ca.discord_id AS text) = avatar_dm.author_id\nGROUP BY ca.ambassador, ca.role, ca.discord_id, ca.telegram_id, ca.x_handle, avatar_dm.author_avatar_url\nORDER BY total_posts DESC;",
+          "rawSql": "SELECT \n  COALESCE(avatar_dm.author_avatar_url, 'https://cdn.discordapp.com/embed/avatars/0.png') as discord_avatar,\n  ca.ambassador,\n  ca.role,\n  COUNT(DISTINCT dm.id) as discord_posts,\n  COUNT(DISTINCT tm.id) as telegram_posts,\n  0 as x_posts,\n  (COUNT(DISTINCT dm.id) + COUNT(DISTINCT tm.id) + 0) as total_posts,\n  ca.discord_id,\n  ca.telegram_id,\n  ca.x_handle\nFROM community_ambassadors ca\nLEFT JOIN discord_messages dm ON CAST(ca.discord_id AS text) = dm.author_id \n  AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\nLEFT JOIN telegram_messages tm ON ca.telegram_id = tm.from_user_id \n  AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\nLEFT JOIN (\n  SELECT DISTINCT \n    author_id, \n    FIRST_VALUE(author_avatar_url) OVER (PARTITION BY author_id ORDER BY created_at DESC) as author_avatar_url\n  FROM discord_messages \n  WHERE author_avatar_url IS NOT NULL\n) avatar_dm ON CAST(ca.discord_id AS text) = avatar_dm.author_id\nGROUP BY ca.ambassador, ca.role, ca.discord_id, ca.telegram_id, ca.x_handle, avatar_dm.author_avatar_url\nORDER BY total_posts DESC;",
           "refId": "A"
         }
       ],
@@ -445,6 +445,14 @@
               {"id": "displayName", "value": "Telegram Posts"},
               {"id": "custom.width", "value": 120},
               {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(34, 139, 206, 0.97)"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "x_posts"},
+            "properties": [
+              {"id": "displayName", "value": "X Posts"},
+              {"id": "custom.width", "value": 90},
+              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(29, 161, 242, 0.97)"}}
             ]
           },
           {
