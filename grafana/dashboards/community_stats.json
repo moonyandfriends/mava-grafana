@@ -966,7 +966,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COALESCE(dm.author_avatar_url, 'https://cdn.discordapp.com/embed/avatars/' || ((dm.author_id::bigint >> 22) % 6) || '.png') AS \"🖼️\", COALESCE(dm.author_display_name, dm.author_username) AS \"👤 Author\", SUBSTRING(dm.content, 1, 100) || CASE WHEN LENGTH(dm.content) > 100 THEN '...' ELSE '' END AS \"💬 Message\", TO_CHAR(dm.created_at, 'MM/DD HH24:MI') AS \"🕐 Time\", dc.name AS \"📍 Channel\", dm.author_id AS \"AuthorID\", dm.id AS \"MessageID\", dm.channel_id AS \"ChannelID\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content IS NOT NULL AND dm.content <> '' ORDER BY dm.created_at DESC LIMIT 30;",
+          "rawSql": "SELECT COALESCE(dm.author_avatar_url, 'https://cdn.discordapp.com/embed/avatars/' || ((dm.author_id::bigint >> 22) % 6) || '.png') AS \"🖼️\", COALESCE(dm.author_display_name, dm.author_username) AS \"👤 Author\", SUBSTRING(dm.content, 1, 100) || CASE WHEN LENGTH(dm.content) > 100 THEN '...' ELSE '' END AS \"💬 Message\", TO_CHAR(dm.created_at, 'MM/DD HH24:MI') AS \"🕐 Time\", dm.author_id AS \"AuthorID\", dm.id AS \"MessageID\", dm.channel_id AS \"ChannelID\" FROM discord_messages dm LEFT JOIN discord_channels dc ON dm.channel_id = dc.channel_id WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false AND dm.content IS NOT NULL AND dm.content <> '' AND dc.name NOT IN ('automod', 'bot-logs', 'mod-logs') ORDER BY dm.created_at DESC LIMIT 30;",
           "refId": "A"
         }
       ],
@@ -1055,23 +1055,6 @@
               "options": "🕐 Time"
             },
             "properties": []
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "📍 Channel"
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "View Discord Channel",
-                    "url": "https://discord.com/channels/1063532490829598760/${__data.fields.ChannelID}"
-                  }
-                ]
-              }
-            ]
           },
           {
             "matcher": {
