@@ -1029,6 +1029,10 @@
                   "mode": "fixed",
                   "fixedColor": "#7289da"
                 }
+              },
+              {
+                "id": "custom.width",
+                "value": 96
               }
             ]
           },
@@ -1054,7 +1058,12 @@
               "id": "byName",
               "options": "🕐 Time"
             },
-            "properties": []
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 70
+              }
+            ]
           },
           {
             "matcher": {
@@ -1167,6 +1176,10 @@
                   "mode": "fixed",
                   "fixedColor": "#0088CC"
                 }
+              },
+              {
+                "id": "custom.width",
+                "value": 96
               }
             ]
           },
@@ -1192,7 +1205,12 @@
               "id": "byName",
               "options": "🕐 Time"
             },
-            "properties": []
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 70
+              }
+            ]
           },
           {
             "matcher": {
