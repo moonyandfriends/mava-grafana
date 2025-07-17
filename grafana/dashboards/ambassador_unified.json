@@ -78,7 +78,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(DISTINCT dm.id) AS discord_posts\nFROM discord_messages dm \nJOIN community_ambassadors ca ON CAST(ca.discord_id AS text) = dm.author_id\nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false;",
+          "rawSql": "SELECT \n  COUNT(DISTINCT dm.id) AS discord_posts\nFROM discord_messages dm \nJOIN community_ambassadors ca ON CAST(ca.discord_id AS text) = dm.author_id\nWHERE dm.created_at >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n  AND dm.created_at <= COALESCE($__timeTo(), NOW())\n  AND dm.author_is_bot = false;",
           "refId": "A"
         }
       ],
@@ -137,7 +137,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(DISTINCT tm.id) AS telegram_posts\nFROM telegram_messages tm \nJOIN community_ambassadors ca ON ca.telegram_id = tm.from_user_id\nWHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo();",
+          "rawSql": "SELECT \n  COUNT(DISTINCT tm.id) AS telegram_posts\nFROM telegram_messages tm \nJOIN community_ambassadors ca ON ca.telegram_id = tm.from_user_id\nWHERE tm.date >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n  AND tm.date <= COALESCE($__timeTo(), NOW());",
           "refId": "A"
         }
       ],
@@ -196,7 +196,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(DISTINCT xm.id) AS x_posts\nFROM discord_messages xm\nJOIN community_ambassadors ca ON \n  ca.x_handle IS NOT NULL\n  AND (xm.content ILIKE '%' || ca.x_handle || '%' OR xm.content ILIKE '%' || REPLACE(ca.x_handle, '@', '') || '%')\nWHERE xm.channel_id = '1108219971273756725'\n  AND xm.created_at >= $__timeFrom() AND xm.created_at <= $__timeTo();",
+          "rawSql": "SELECT \n  COUNT(DISTINCT xm.id) AS x_posts\nFROM discord_messages xm\nJOIN community_ambassadors ca ON \n  ca.x_handle IS NOT NULL\n  AND (xm.content ILIKE '%' || ca.x_handle || '%' OR xm.content ILIKE '%' || REPLACE(ca.x_handle, '@', '') || '%')\nWHERE xm.channel_id = '1108219971273756725'\n  AND xm.created_at >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n  AND xm.created_at <= COALESCE($__timeTo(), NOW());",
           "refId": "A"
         }
       ],
