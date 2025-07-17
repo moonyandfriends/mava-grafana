@@ -805,7 +805,7 @@
             "properties": [
               {"id": "custom.width", "value": 120},
               {"id": "links", "value": [
-                {"title": "View in Mava", "url": "https://mava.app/tickets/${__data.fields[\"🎫 Ticket ID\"]}"}
+                {"title": "View in Mava", "url": "https://dashboard.mava.app/dashboard/ticket?id=${__data.fields[\"🎫 Ticket ID\"]}"}
               ]}
             ]
           }
