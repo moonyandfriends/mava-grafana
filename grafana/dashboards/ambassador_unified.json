@@ -320,7 +320,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT * FROM community_ambassadors ORDER BY ambassador;",
+          "rawSql": "SELECT \n  ambassador,\n  role,\n  discord_posts,\n  telegram_posts,\n  discord_days,\n  telegram_days,\n  channels,\n  mentions,\n  attachments,\n  avg_msg_length,\n  platform_presence,\n  activity_score,\n  daily_rate,\n  rank,\n  tier,\n  decile,\n  discord_id,\n  telegram_id,\n  x_handle\nFROM community_ambassadors \nORDER BY ambassador;",
           "refId": "A"
         }
       ],
@@ -376,6 +376,48 @@
               {"id": "custom.width", "value": 150},
               {"id": "custom.displayMode", "value": "color-text"},
               {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(33, 150, 243, 0.97)"}}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "discord_id"},
+            "properties": [
+              {"id": "displayName", "value": "Discord Profile"},
+              {"id": "custom.width", "value": 120},
+              {"id": "links", "value": [
+                {
+                  "title": "Open Discord Profile",
+                  "url": "https://discordapp.com/users/${__value.raw}",
+                  "targetBlank": true
+                }
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "telegram_id"},
+            "properties": [
+              {"id": "displayName", "value": "Telegram Profile"},
+              {"id": "custom.width", "value": 120},
+              {"id": "links", "value": [
+                {
+                  "title": "Open Telegram Profile",
+                  "url": "https://t.me/${__value.raw}",
+                  "targetBlank": true
+                }
+              ]}
+            ]
+          },
+          {
+            "matcher": {"id": "byName", "options": "x_handle"},
+            "properties": [
+              {"id": "displayName", "value": "X/Twitter Profile"},
+              {"id": "custom.width", "value": 130},
+              {"id": "links", "value": [
+                {
+                  "title": "Open X/Twitter Profile",
+                  "url": "https://twitter.com/${__value.raw}",
+                  "targetBlank": true
+                }
+              ]}
             ]
           },
           {
