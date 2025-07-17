@@ -123,7 +123,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "continuous-YlOrRd"},
+          "color": {"mode": "continuous-YlRd"},
           "custom": {
             "neutral": 0,
             "hideFrom": {
@@ -295,7 +295,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-spectrum"},
+          "color": {"mode": "palette-classic"},
           "custom": {
             "axisLabel": "",
             "axisPlacement": "auto",
@@ -418,7 +418,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-spectrum"},
+          "color": {"mode": "palette-classic"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -507,7 +507,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-spectrum"},
+          "color": {"mode": "palette-classic"},
           "custom": {
             "neutral": 0,
             "hideFrom": {

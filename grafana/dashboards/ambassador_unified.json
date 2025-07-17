@@ -487,7 +487,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-spectrum"},
+          "color": {"mode": "palette-classic"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -632,7 +632,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-modern"},
+          "color": {"mode": "palette-classic"},
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
@@ -691,7 +691,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-spectrum"},
+          "color": {"mode": "palette-classic"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -806,7 +806,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-spectrum"},
+          "color": {"mode": "palette-classic"},
           "custom": {
             "hideFrom": {
               "legend": false,
@@ -845,7 +845,7 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "color": {"mode": "palette-spectrum"},
+          "color": {"mode": "palette-classic"},
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "smooth",
