@@ -320,7 +320,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  ca.ambassador,\n  ca.role,\n  COUNT(DISTINCT dm.id) as discord_posts,\n  COUNT(DISTINCT tm.id) as telegram_posts,\n  (COUNT(DISTINCT dm.id) + COUNT(DISTINCT tm.id)) as total_posts,\n  ca.discord_id,\n  ca.telegram_id,\n  ca.x_handle\nFROM community_ambassadors ca\nLEFT JOIN discord_messages dm ON CAST(ca.discord_id AS text) = dm.author_id \n  AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\nLEFT JOIN telegram_messages tm ON ca.telegram_id = tm.from_user_id \n  AND tm.created_at >= $__timeFrom() AND tm.created_at <= $__timeTo()\nGROUP BY ca.ambassador, ca.role, ca.discord_id, ca.telegram_id, ca.x_handle\nORDER BY total_posts DESC;",
+          "rawSql": "SELECT \n  ca.ambassador,\n  ca.role,\n  COUNT(DISTINCT dm.id) as discord_posts,\n  COUNT(DISTINCT tm.id) as telegram_posts,\n  (COUNT(DISTINCT dm.id) + COUNT(DISTINCT tm.id)) as total_posts,\n  ca.discord_id,\n  ca.telegram_id,\n  ca.x_handle\nFROM community_ambassadors ca\nLEFT JOIN discord_messages dm ON CAST(ca.discord_id AS text) = dm.author_id \n  AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\nLEFT JOIN telegram_messages tm ON ca.telegram_id = tm.from_user_id \n  AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\nGROUP BY ca.ambassador, ca.role, ca.discord_id, ca.telegram_id, ca.x_handle\nORDER BY total_posts DESC;",
           "refId": "A"
         }
       ],
