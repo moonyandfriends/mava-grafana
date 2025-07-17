@@ -117,7 +117,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) as active_tickets FROM tickets WHERE status IN ('open', 'pending', 'waiting');",
+          "rawSql": "SELECT COUNT(*) as active_tickets FROM mava_tickets WHERE status IN ('open', 'pending', 'waiting');",
           "refId": "A"
         }
       ],
@@ -496,7 +496,7 @@
         },
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(*) as total_tickets FROM tickets;",
+          "rawSql": "SELECT COUNT(*) as total_tickets FROM mava_tickets;",
           "refId": "B"
         },
         {
@@ -610,7 +610,7 @@
       "targets": [
         {
           "format": "logs",
-          "rawSql": "SELECT created_at as time, 'Discord' as platform, CONCAT('Message from ', author_display_name, ' in #', channel_name) as message, content as details FROM discord_messages WHERE created_at >= NOW() - INTERVAL '2 hours' AND author_is_bot = false UNION ALL SELECT date as time, 'Telegram' as platform, CONCAT('Message from ', from_user_display_name, ' in ', chat_title) as message, text as details FROM telegram_messages WHERE date >= NOW() - INTERVAL '2 hours' UNION ALL SELECT created_at as time, 'Mava' as platform, CONCAT('Ticket #', ticket_id, ' - ', subject) as message, CONCAT('Status: ', status, ' | Priority: ', priority) as details FROM tickets WHERE created_at >= NOW() - INTERVAL '2 hours' ORDER BY time DESC LIMIT 50;",
+          "rawSql": "SELECT created_at as time, 'Discord' as platform, CONCAT('Message from ', author_display_name, ' in #', channel_name) as message, content as details FROM discord_messages WHERE created_at >= NOW() - INTERVAL '2 hours' AND author_is_bot = false UNION ALL SELECT date as time, 'Telegram' as platform, CONCAT('Message from ', from_user_display_name, ' in ', chat_title) as message, text as details FROM telegram_messages WHERE date >= NOW() - INTERVAL '2 hours' UNION ALL SELECT created_at as time, 'Mava' as platform, CONCAT('Ticket #', id, ' - ', COALESCE(raw_data->>'subject', 'No Subject')) as message, CONCAT('Status: ', status, ' | Priority: ', priority) as details FROM mava_tickets WHERE created_at >= NOW() - INTERVAL '2 hours' ORDER BY time DESC LIMIT 50;",
           "refId": "A"
         }
       ],

@@ -29,21 +29,21 @@ ON telegram_messages USING GIN(to_tsvector('english', text))
 WHERE text IS NOT NULL AND LENGTH(text) > 0;
 
 -- Mava Tickets Indexes
-CREATE INDEX IF NOT EXISTS idx_tickets_status_priority_created 
-ON tickets(status, priority, created_at);
+CREATE INDEX IF NOT EXISTS idx_mava_tickets_status_priority_created 
+ON mava_tickets(status, priority, created_at);
 
-CREATE INDEX IF NOT EXISTS idx_tickets_assigned_created 
-ON tickets(assigned_to, created_at) WHERE assigned_to IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_mava_tickets_assigned_created 
+ON mava_tickets(assigned_to, created_at) WHERE assigned_to IS NOT NULL;
 
-CREATE INDEX IF NOT EXISTS idx_tickets_customer_created 
-ON tickets(customer_id, created_at) WHERE customer_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_mava_tickets_customer_created 
+ON mava_tickets(customer_id, created_at) WHERE customer_id IS NOT NULL;
 
 -- Messages Indexes
-CREATE INDEX IF NOT EXISTS idx_messages_ticket_created 
-ON messages(ticket_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_mava_messages_ticket_created 
+ON mava_messages(ticket_id, created_at);
 
-CREATE INDEX IF NOT EXISTS idx_messages_sender_created 
-ON messages(sender, created_at);
+CREATE INDEX IF NOT EXISTS idx_mava_messages_sender_created 
+ON mava_messages(sender, created_at);
 
 -- 2. MATERIALIZED VIEWS FOR FREQUENTLY ACCESSED AGGREGATIONS
 
@@ -117,7 +117,7 @@ SELECT
     COUNT(DISTINCT customer_id) as unique_customers,
     COUNT(DISTINCT assigned_to) as agents_involved,
     AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600) as avg_resolution_hours
-FROM tickets
+FROM mava_tickets
 WHERE created_at IS NOT NULL
 GROUP BY DATE(created_at), status, priority;
 
