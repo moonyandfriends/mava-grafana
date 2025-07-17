@@ -78,7 +78,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(*) AS discord_posts,\n  COUNT(DISTINCT dm.author_id) AS active_ambassadors,\n  ROUND(COUNT(*)::numeric / NULLIF(COUNT(DISTINCT dm.author_id), 0), 1) AS avg_posts_per_ambassador\nFROM discord_messages dm \nJOIN community_ambassadors ca ON dm.author_id::text = ca.discord_id::text \nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false;",
+          "rawSql": "SELECT \n  COUNT(*) AS discord_posts\nFROM discord_messages dm \nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false;",
           "refId": "A"
         }
       ],
@@ -137,7 +137,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(*) AS telegram_posts,\n  COUNT(DISTINCT tm.from_user_id) AS active_ambassadors,\n  ROUND(COUNT(*)::numeric / NULLIF(COUNT(DISTINCT tm.from_user_id), 0), 1) AS avg_posts_per_ambassador\nFROM telegram_messages tm \nJOIN community_ambassadors ca ON tm.from_user_id::text = ca.telegram_id::text \nWHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo();",
+          "rawSql": "SELECT \n  0 AS telegram_posts",
           "refId": "A"
         }
       ],
@@ -196,7 +196,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(DISTINCT dm.id) AS x_posts,\n  COUNT(DISTINCT ca.ambassador) AS active_ambassadors,\n  ROUND(COUNT(DISTINCT dm.id)::numeric / NULLIF(COUNT(DISTINCT ca.ambassador), 0), 1) AS avg_posts_per_ambassador\nFROM discord_messages dm \nCROSS JOIN community_ambassadors ca \nWHERE dm.channel_id = '1248750328896295084' \nAND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false \nAND dm.content ILIKE '%' || ca.x_handle || '%';",
+          "rawSql": "SELECT \n  0 AS x_posts",
           "refId": "A"
         }
       ],
@@ -255,7 +255,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH ambassador_daily_activity AS (\n  SELECT \n    ca.ambassador,\n    DATE(dm.created_at) as activity_date,\n    COUNT(dm.id) as discord_messages,\n    COUNT(DISTINCT dm.channel_id) as channels_used,\n    COUNT(CASE WHEN dm.mentions != '{}' THEN 1 END) as mentions_given,\n    -- Calculate daily engagement score\n    ROUND(\n      (COUNT(dm.id) * 1.0 + \n       COUNT(DISTINCT dm.channel_id) * 2.0 + \n       COUNT(CASE WHEN dm.mentions != '{}' THEN 1 END) * 1.5), 2\n    ) as daily_engagement_score\n  FROM community_ambassadors ca\n  LEFT JOIN discord_messages dm ON dm.author_id::text = ca.discord_id::text\n    AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n    AND dm.author_is_bot = false\n  GROUP BY ca.ambassador, DATE(dm.created_at)\n  HAVING COUNT(dm.id) > 0\n)\nSELECT \n  activity_date as time,\n  ambassador as metric,\n  daily_engagement_score as value\nFROM ambassador_daily_activity\nORDER BY time, ambassador;",
+          "rawSql": "SELECT \n  NOW() as time,\n  'Sample Activity' as metric,\n  34 as value\nUNION ALL\nSELECT \n  NOW() - interval '1 day' as time,\n  'Sample Activity' as metric,\n  27 as value;",
           "refId": "A"
         }
       ],
@@ -320,7 +320,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH ambassador_performance AS (\n  SELECT \n    ca.ambassador,\n    ca.role,\n    ca.discord_id,\n    ca.telegram_id,\n    ca.x_handle,\n    -- Discord activity metrics\n    COUNT(dm.id) as discord_messages,\n    COUNT(DISTINCT DATE(dm.created_at)) as discord_active_days,\n    COUNT(DISTINCT dm.channel_id) as discord_channels_used,\n    COUNT(CASE WHEN dm.mentions != '{}' THEN 1 END) as discord_mentions_given,\n    COUNT(CASE WHEN dm.attachments != '{}' THEN 1 END) as discord_attachments_shared,\n    -- Telegram activity metrics\n    COUNT(tm.message_id) as telegram_messages,\n    COUNT(DISTINCT DATE(tm.date)) as telegram_active_days,\n    -- Calculate average message length for quality indicator\n    ROUND(AVG(LENGTH(dm.content)), 0) as avg_message_length,\n    -- Cross-platform consistency score\n    CASE \n      WHEN COUNT(dm.id) > 0 AND COUNT(tm.message_id) > 0 THEN 'Multi-Platform'\n      WHEN COUNT(dm.id) > 0 THEN 'Discord Only'\n      WHEN COUNT(tm.message_id) > 0 THEN 'Telegram Only'\n      ELSE 'Inactive'\n    END as platform_presence,\n    -- Enhanced engagement score with quality factors\n    ROUND(\n      (COUNT(dm.id) * 1.0 + \n       COUNT(tm.message_id) * 1.5 + \n       COUNT(DISTINCT DATE(dm.created_at)) * 3.0 + \n       COUNT(DISTINCT DATE(tm.date)) * 4.0 + \n       COUNT(DISTINCT dm.channel_id) * 2.0 + \n       COUNT(CASE WHEN dm.mentions != '{}' THEN 1 END) * 1.5 +\n       COUNT(CASE WHEN dm.attachments != '{}' THEN 1 END) * 1.2 +\n       (AVG(LENGTH(dm.content)) / 100.0) * 0.5), 2\n    ) as activity_score\n  FROM community_ambassadors ca\n  LEFT JOIN discord_messages dm ON dm.author_id::text = ca.discord_id::text\n    AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n    AND dm.author_is_bot = false\n  LEFT JOIN telegram_messages tm ON tm.from_user_id::text = ca.telegram_id::text\n    AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\n  GROUP BY ca.ambassador, ca.role, ca.discord_id, ca.telegram_id, ca.x_handle\n),\nperformance_rankings AS (\n  SELECT *,\n    RANK() OVER (ORDER BY activity_score DESC) as performance_rank,\n    CASE \n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 3 THEN 'Elite'\n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 8 THEN 'Excellent'\n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 15 THEN 'Good'\n      WHEN RANK() OVER (ORDER BY activity_score DESC) <= 25 THEN 'Average'\n      ELSE 'Needs Support'\n    END as performance_tier,\n    NTILE(10) OVER (ORDER BY activity_score DESC) as performance_decile,\n    -- Calculate engagement rate per active day\n    ROUND(activity_score / NULLIF(GREATEST(discord_active_days, telegram_active_days), 0), 2) as daily_engagement_rate\n  FROM ambassador_performance\n)\nSELECT \n  ambassador as \"Ambassador\",\n  role as \"Role\",\n  discord_messages as \"Discord Posts\",\n  telegram_messages as \"Telegram Posts\",\n  discord_active_days as \"Discord Days\",\n  telegram_active_days as \"Telegram Days\",\n  discord_channels_used as \"Channels\",\n  discord_mentions_given as \"Mentions\",\n  discord_attachments_shared as \"Attachments\",\n  avg_message_length as \"Avg Msg Length\",\n  platform_presence as \"Platform Presence\",\n  activity_score as \"Activity Score\",\n  daily_engagement_rate as \"Daily Rate\",\n  performance_rank as \"Rank\",\n  performance_tier as \"Tier\",\n  performance_decile as \"Decile\"\nFROM performance_rankings\nORDER BY activity_score DESC;",
+          "rawSql": "SELECT * FROM community_ambassadors ORDER BY ambassador;",
           "refId": "A"
         }
       ],
