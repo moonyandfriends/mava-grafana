@@ -78,7 +78,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(*) AS discord_posts\nFROM discord_messages dm \nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false;",
+          "rawSql": "SELECT \n  COUNT(DISTINCT dm.id) AS discord_posts\nFROM discord_messages dm \nJOIN community_ambassadors ca ON CAST(ca.discord_id AS text) = dm.author_id\nWHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \nAND dm.author_is_bot = false;",
           "refId": "A"
         }
       ],
@@ -137,7 +137,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  0 AS telegram_posts",
+          "rawSql": "SELECT \n  COUNT(DISTINCT tm.id) AS telegram_posts\nFROM telegram_messages tm \nJOIN community_ambassadors ca ON ca.telegram_id = tm.from_user_id\nWHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo();",
           "refId": "A"
         }
       ],
