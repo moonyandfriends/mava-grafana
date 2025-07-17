@@ -196,7 +196,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  0 AS x_posts",
+          "rawSql": "SELECT \n  COUNT(DISTINCT xm.id) AS x_posts\nFROM discord_messages xm\nJOIN community_ambassadors ca ON \n  ca.x_handle IS NOT NULL\n  AND (xm.content ILIKE '%' || ca.x_handle || '%' OR xm.content ILIKE '%' || REPLACE(ca.x_handle, '@', '') || '%')\nWHERE xm.channel_id = '1108219971273756725'\n  AND xm.created_at >= $__timeFrom() AND xm.created_at <= $__timeTo();",
           "refId": "A"
         }
       ],
@@ -320,7 +320,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COALESCE(avatar_dm.author_avatar_url, 'https://cdn.discordapp.com/embed/avatars/0.png') as discord_avatar,\n  ca.ambassador,\n  ca.role,\n  COUNT(DISTINCT dm.id) as discord_posts,\n  COUNT(DISTINCT tm.id) as telegram_posts,\n  0 as x_posts,\n  (COUNT(DISTINCT dm.id) + COUNT(DISTINCT tm.id) + 0) as total_posts,\n  ca.discord_id,\n  ca.telegram_id,\n  ca.x_handle\nFROM community_ambassadors ca\nLEFT JOIN discord_messages dm ON CAST(ca.discord_id AS text) = dm.author_id \n  AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\nLEFT JOIN telegram_messages tm ON ca.telegram_id = tm.from_user_id \n  AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\nLEFT JOIN (\n  SELECT DISTINCT \n    author_id, \n    FIRST_VALUE(author_avatar_url) OVER (PARTITION BY author_id ORDER BY created_at DESC) as author_avatar_url\n  FROM discord_messages \n  WHERE author_avatar_url IS NOT NULL\n) avatar_dm ON CAST(ca.discord_id AS text) = avatar_dm.author_id\nGROUP BY ca.ambassador, ca.role, ca.discord_id, ca.telegram_id, ca.x_handle, avatar_dm.author_avatar_url\nORDER BY total_posts DESC;",
+          "rawSql": "SELECT \n  COALESCE(avatar_dm.author_avatar_url, 'https://cdn.discordapp.com/embed/avatars/0.png') as discord_avatar,\n  ca.ambassador,\n  ca.role,\n  COUNT(DISTINCT dm.id) as discord_posts,\n  COUNT(DISTINCT tm.id) as telegram_posts,\n  COUNT(DISTINCT xm.id) as x_posts,\n  (COUNT(DISTINCT dm.id) + COUNT(DISTINCT tm.id) + COUNT(DISTINCT xm.id)) as total_posts,\n  ca.discord_id,\n  ca.telegram_id,\n  ca.x_handle\nFROM community_ambassadors ca\nLEFT JOIN discord_messages dm ON CAST(ca.discord_id AS text) = dm.author_id \n  AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\nLEFT JOIN telegram_messages tm ON ca.telegram_id = tm.from_user_id \n  AND tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\nLEFT JOIN discord_messages xm ON xm.channel_id = '1108219971273756725'\n  AND xm.created_at >= $__timeFrom() AND xm.created_at <= $__timeTo()\n  AND ca.x_handle IS NOT NULL\n  AND (xm.content ILIKE '%' || ca.x_handle || '%' OR xm.content ILIKE '%' || REPLACE(ca.x_handle, '@', '') || '%')\nLEFT JOIN (\n  SELECT DISTINCT \n    author_id, \n    FIRST_VALUE(author_avatar_url) OVER (PARTITION BY author_id ORDER BY created_at DESC) as author_avatar_url\n  FROM discord_messages \n  WHERE author_avatar_url IS NOT NULL\n) avatar_dm ON CAST(ca.discord_id AS text) = avatar_dm.author_id\nGROUP BY ca.ambassador, ca.role, ca.discord_id, ca.telegram_id, ca.x_handle, avatar_dm.author_avatar_url\nORDER BY total_posts DESC;",
           "refId": "A"
         }
       ],
