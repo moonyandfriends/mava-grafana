@@ -31,7 +31,7 @@
       "gridPos": {"h": 3, "w": 24, "x": 0, "y": 0},
       "options": {
         "mode": "html",
-        "content": "<div style=\"text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; margin-bottom: 20px;\">\n  <h1 style=\"color: white; font-size: 2.5em; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);\">🚀 Community Analytics Hub</h1>\n  <p style=\"color: rgba(255,255,255,0.9); font-size: 1.2em; margin: 10px 0 0 0;\">Real-time insights across Discord, Telegram & Support Systems</p>\n</div>"
+        "content": "<div style=\"text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; margin-bottom: 20px;\">\n  <h1 style=\"color: white; font-size: 2.5em; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);\">🚀 Community Analytics Hub</h1>\n  <p style=\"color: rgba(255,255,255,0.9); font-size: 1.2em; margin: 10px 0 0 0;\">Real-time insights across Discord & Telegram Communities</p>\n</div>"
       },
       "transparent": false
     },
@@ -827,224 +827,11 @@
       }
     },
     {
-      "id": 8,
-      "title": "📊 Platform Activity Distribution",
-      "type": "piechart",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 29},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT 'Discord' as platform, COUNT(*) as messages FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false UNION ALL SELECT 'Telegram' as platform, COUNT(*) as messages FROM telegram_messages WHERE date >= $__timeFrom() AND date <= $__timeTo() UNION ALL SELECT 'Support Tickets' as platform, COUNT(*) as messages FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "pieType": "donut",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "values": ["percent", "value"]
-        },
-        "displayLabels": ["name", "percent"]
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Discord"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#5865F2"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Telegram"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#0088CC"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Support Tickets"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#FF6B6B"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "pluginVersion": "8.5.0"
-    },
-    {
-      "id": 9,
-      "title": "📈 Community Growth Rate",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 8, "x": 8, "y": 29},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "WITH current_period AS (SELECT COUNT(DISTINCT author_id) as current_users FROM discord_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND author_is_bot = false), previous_period AS (SELECT COUNT(DISTINCT author_id) as previous_users FROM discord_messages WHERE created_at >= $__timeFrom() - ($__timeTo() - $__timeFrom()) AND created_at <= $__timeFrom() AND author_is_bot = false) SELECT CASE WHEN previous_users > 0 THEN ROUND(((current_users - previous_users)::float / previous_users * 100)::numeric, 1) ELSE 0 END as growth_rate FROM current_period, previous_period;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 0
-              },
-              {
-                "color": "green",
-                "value": 5
-              },
-              {
-                "color": "blue",
-                "value": 20
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      },
-      "pluginVersion": "8.5.0"
-    },
-    {
-      "id": 10,
-      "title": "⚡ Real-time Activity Score",
-      "type": "gauge",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 4, "w": 8, "x": 16, "y": 29},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "WITH recent_activity AS (SELECT COUNT(*) as recent_messages FROM discord_messages WHERE created_at >= NOW() - INTERVAL '1 hour' AND author_is_bot = false UNION ALL SELECT COUNT(*) FROM telegram_messages WHERE date >= NOW() - INTERVAL '1 hour') SELECT LEAST(SUM(recent_messages) * 2, 100) as activity_score FROM recent_activity;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 20
-              },
-              {
-                "color": "green",
-                "value": 50
-              },
-              {
-                "color": "blue",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "short",
-          "min": 0,
-          "max": 100
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      },
-      "pluginVersion": "8.5.0"
-    },
-    {
       "id": 11,
       "title": "🔥 Trending Topics - Discord",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 33},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 29},
       "targets": [
         {
           "format": "table",
@@ -1083,7 +870,7 @@
       "title": "🔥 Trending Topics - Telegram",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 33},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 29},
       "targets": [
         {
           "format": "table",
@@ -1122,7 +909,7 @@
       "title": "🌍 Community Activity Heatmap",
       "type": "heatmap",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 41},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 37},
       "targets": [
         {
           "format": "table",
@@ -1175,7 +962,7 @@
       "title": "📝 Recent Messages - Discord",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 12, "w": 12, "x": 0, "y": 49},
+      "gridPos": {"h": 12, "w": 12, "x": 0, "y": 45},
       "targets": [
         {
           "format": "table",
@@ -1347,7 +1134,7 @@
       "title": "📝 Recent Messages - Telegram",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 12, "w": 12, "x": 12, "y": 49},
+      "gridPos": {"h": 12, "w": 12, "x": 12, "y": 45},
       "targets": [
         {
           "format": "table",
@@ -1494,198 +1281,10 @@
       }
     },
     {
-      "id": 16,
-      "title": "🎯 Support Metrics",
-      "type": "timeseries",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 61},
-      "targets": [
-        {
-          "format": "time_series",
-          "rawSql": "SELECT date_trunc('day', created_at) as time, 'New Tickets' as metric, COUNT(*) as value FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY time UNION ALL SELECT date_trunc('day', updated_at) as time, 'Resolved Tickets' as metric, COUNT(*) as value FROM mava_tickets WHERE updated_at >= $__timeFrom() AND updated_at <= $__timeTo() AND status = 'closed' GROUP BY time ORDER BY time;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 20,
-            "gradientMode": "hue",
-            "spanNulls": false,
-            "insertNulls": false,
-            "showPoints": "auto",
-            "pointSize": 5,
-            "stacking": {
-              "mode": "none",
-              "group": "A"
-            },
-            "axisPlacement": "auto",
-            "axisLabel": "Tickets",
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "New Tickets"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#FF6B6B"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Resolved Tickets"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#4ECDC4"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "options": {
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        },
-        "legend": {
-          "calcs": ["lastNotNull", "sum"],
-          "displayMode": "table",
-          "placement": "bottom"
-        }
-      }
-    },
-    {
-      "id": 17,
-      "title": "📊 Support Status Overview",
-      "type": "piechart",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 61},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT CASE status WHEN 'open' THEN '🔴 Open' WHEN 'closed' THEN '✅ Closed' WHEN 'pending' THEN '🟡 Pending' ELSE '❓ ' || status END as status, COUNT(*) as count FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() GROUP BY status ORDER BY count DESC;",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "pieType": "donut",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "values": ["value", "percent"]
-        },
-        "displayLabels": ["name", "value", "percent"]
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "🔴 Open"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#FF6B6B"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "✅ Closed"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#4ECDC4"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "🟡 Pending"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#FFE66D"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "pluginVersion": "8.5.0"
-    },
-    {
       "id": 999,
       "title": "",
       "type": "text",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 69},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 57},
       "options": {
         "mode": "html",
         "content": "<style>\n/* Enhanced Modern Dashboard Styling */\n\n/* Global Background */\n.main-view {\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;\n  min-height: 100vh !important;\n}\n\n/* Enhanced Panel Styling */\n.panel-container {\n  background: rgba(255, 255, 255, 0.12) !important;\n  backdrop-filter: blur(20px) !important;\n  border-radius: 20px !important;\n  border: 1px solid rgba(255, 255, 255, 0.25) !important;\n  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n}\n\n.panel-container:hover {\n  transform: translateY(-3px) !important;\n  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.2) !important;\n  background: rgba(255, 255, 255, 0.18) !important;\n}\n\n/* Enhanced Table Styling */\n.table-panel {\n  background: rgba(255, 255, 255, 0.08) !important;\n  backdrop-filter: blur(25px) !important;\n  border-radius: 16px !important;\n  overflow: hidden !important;\n}\n\n/* Table Headers */\n.table-panel thead th {\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%) !important;\n  color: #ffffff !important;\n  font-weight: 600 !important;\n  text-transform: uppercase !important;\n  letter-spacing: 0.5px !important;\n  font-size: 0.9em !important;\n  padding: 16px 12px !important;\n  border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;\n}\n\n/* Table Rows */\n.table-panel tbody tr {\n  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;\n  transition: all 0.2s ease !important;\n}\n\n.table-panel tbody tr:hover {\n  background: rgba(255, 255, 255, 0.1) !important;\n  transform: scale(1.01) !important;\n}\n\n/* Table Cells */\n.table-panel tbody td {\n  padding: 14px 12px !important;\n  vertical-align: middle !important;\n  color: rgba(255, 255, 255, 0.9) !important;\n  font-size: 0.95em !important;\n}\n\n/* Enhanced Link Styling */\n.table-panel a {\n  color: #93c5fd !important;\n  text-decoration: none !important;\n  font-weight: 500 !important;\n  transition: all 0.2s ease !important;\n  border-radius: 6px !important;\n  padding: 4px 8px !important;\n}\n\n.table-panel a:hover {\n  color: #bfdbfe !important;\n  background: rgba(147, 197, 253, 0.1) !important;\n  transform: translateY(-1px) !important;\n}\n\n/* Avatar Images */\n.table-panel img {\n  width: 50px !important;\n  height: 50px !important;\n  border-radius: 50% !important;\n  border: 2px solid rgba(255, 255, 255, 0.3) !important;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;\n  transition: all 0.3s ease !important;\n}\n\n.table-panel img:hover {\n  transform: scale(1.1) !important;\n  border-color: rgba(255, 255, 255, 0.6) !important;\n  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;\n}\n\n/* Enhanced Stat Panels */\n.stat-panel {\n  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%) !important;\n  backdrop-filter: blur(20px) !important;\n  border-radius: 20px !important;\n  border: 1px solid rgba(255, 255, 255, 0.25) !important;\n  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n  overflow: hidden !important;\n}\n\n.stat-panel:hover {\n  transform: translateY(-4px) scale(1.02) !important;\n  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;\n}\n\n.stat-panel::before {\n  content: '' !important;\n  position: absolute !important;\n  top: 0 !important;\n  left: 0 !important;\n  width: 100% !important;\n  height: 100% !important;\n  background: linear-gradient(45deg, transparent 49%, rgba(255, 255, 255, 0.1) 50%, transparent 51%) !important;\n  opacity: 0 !important;\n  transition: opacity 0.3s ease !important;\n}\n\n.stat-panel:hover::before {\n  opacity: 1 !important;\n}\n\n/* Enhanced Chart Panels */\n.time-series-panel, .barchart-panel, .piechart-panel {\n  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%) !important;\n  backdrop-filter: blur(25px) !important;\n  border-radius: 18px !important;\n  border: 1px solid rgba(255, 255, 255, 0.2) !important;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;\n}\n\n/* Enhanced Panel Headers */\n.panel-header {\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%) !important;\n  backdrop-filter: blur(10px) !important;\n  border-radius: 16px 16px 0 0 !important;\n  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;\n  color: #ffffff !important;\n  font-weight: 600 !important;\n  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;\n}\n\n/* Enhanced Scrollbars */\n::-webkit-scrollbar {\n  width: 10px !important;\n  height: 10px !important;\n}\n\n::-webkit-scrollbar-track {\n  background: rgba(255, 255, 255, 0.05) !important;\n  border-radius: 12px !important;\n  margin: 4px !important;\n}\n\n::-webkit-scrollbar-thumb {\n  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1)) !important;\n  border-radius: 12px !important;\n  border: 2px solid transparent !important;\n  background-clip: content-box !important;\n  transition: all 0.2s ease !important;\n}\n\n::-webkit-scrollbar-thumb:hover {\n  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2)) !important;\n}\n\n/* Enhanced Typography */\n.panel-title {\n  font-weight: 700 !important;\n  font-size: 1.1em !important;\n  color: #ffffff !important;\n  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;\n  letter-spacing: 0.5px !important;\n}\n\n/* Enhanced Focus States */\n.table-panel tbody tr:focus-within {\n  background: rgba(255, 255, 255, 0.15) !important;\n  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3) !important;\n  border-radius: 8px !important;\n}\n\n/* Enhanced Animation */\n@keyframes shimmer {\n  0% { transform: translateX(-100%); }\n  100% { transform: translateX(100%); }\n}\n\n.panel-container::after {\n  content: '' !important;\n  position: absolute !important;\n  top: 0 !important;\n  left: -100% !important;\n  width: 100% !important;\n  height: 100% !important;\n  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent) !important;\n  animation: shimmer 3s infinite !important;\n  pointer-events: none !important;\n}\n\n/* Enhanced Mobile Responsiveness */\n@media (max-width: 768px) {\n  .table-panel img {\n    width: 40px !important;\n    height: 40px !important;\n  }\n  \n  .table-panel tbody td {\n    padding: 10px 8px !important;\n    font-size: 0.9em !important;\n  }\n  \n  .panel-container {\n    border-radius: 12px !important;\n    margin: 8px !important;\n  }\n}\n\n/* Enhanced Accessibility */\n.table-panel [role=\"button\"]:focus,\n.table-panel a:focus {\n  outline: 2px solid #93c5fd !important;\n  outline-offset: 2px !important;\n  border-radius: 4px !important;\n}\n</style>"
