@@ -287,10 +287,184 @@
       "transparent": false
     },
     {
+      "id": 28,
+      "title": "🎫 Support Tickets",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 7},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS total_tickets FROM mava_tickets_with_customers WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#ff9a9e",
+                "value": null
+              },
+              {
+                "color": "#fecfef",
+                "value": 10
+              },
+              {
+                "color": "#ffc3a0",
+                "value": 50
+              },
+              {
+                "color": "#ffafbd",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "8.5.0"
+    },
+    {
+      "id": 29,
+      "title": "💬 Support Messages",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 7},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS total_messages FROM mava_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#ffecd2",
+                "value": null
+              },
+              {
+                "color": "#fcb69f",
+                "value": 20
+              },
+              {
+                "color": "#ff9a9e",
+                "value": 100
+              },
+              {
+                "color": "#fecfef",
+                "value": 500
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "8.5.0"
+    },
+    {
+      "id": 30,
+      "title": "⚡ Avg Response Time",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 7},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600) AS avg_response_hours FROM mava_tickets_with_customers WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND updated_at IS NOT NULL AND updated_at != created_at;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#4ECDC4",
+                "value": null
+              },
+              {
+                "color": "#96CEB4",
+                "value": 12
+              },
+              {
+                "color": "#FFEAA7",
+                "value": 24
+              },
+              {
+                "color": "#FFB6C1",
+                "value": 48
+              }
+            ]
+          },
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "8.5.0"
+    },
+    {
       "id": 8,
       "title": "📈 Ticket Trends & Volume Analysis",
       "type": "row",
-      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 7},
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 12},
       "collapsed": false,
       "panels": []
     },

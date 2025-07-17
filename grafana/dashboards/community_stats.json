@@ -75,19 +75,19 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#4ECDC4",
+                "color": "#5865F2",
                 "value": null
               },
               {
-                "color": "#45B7D1",
+                "color": "#4752C4",
                 "value": 1000
               },
               {
-                "color": "#96CEB4",
+                "color": "#3C45A5",
                 "value": 5000
               },
               {
-                "color": "#FFEAA7",
+                "color": "#313687",
                 "value": 10000
               }
             ]
@@ -191,19 +191,19 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#00d2ff",
+                "color": "#0088CC",
                 "value": null
               },
               {
-                "color": "#3a7bd5",
+                "color": "#006BA6",
                 "value": 1000
               },
               {
-                "color": "#4facfe",
+                "color": "#004D80",
                 "value": 5000
               },
               {
-                "color": "#00f2fe",
+                "color": "#003359",
                 "value": 10000
               }
             ]
@@ -307,19 +307,19 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#667eea",
+                "color": "#5865F2",
                 "value": null
               },
               {
-                "color": "#764ba2",
+                "color": "#4752C4",
                 "value": 50
               },
               {
-                "color": "#f093fb",
+                "color": "#3C45A5",
                 "value": 200
               },
               {
-                "color": "#f5576c",
+                "color": "#313687",
                 "value": 500
               }
             ]
@@ -423,19 +423,19 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#a8edea",
+                "color": "#0088CC",
                 "value": null
               },
               {
-                "color": "#fed6e3",
+                "color": "#006BA6",
                 "value": 25
               },
               {
-                "color": "#d299c2",
+                "color": "#004D80",
                 "value": 100
               },
               {
-                "color": "#fef9d3",
+                "color": "#003359",
                 "value": 300
               }
             ]
@@ -512,242 +512,6 @@
         "textMode": "auto",
         "colorMode": "background",
         "graphMode": "none",
-        "justifyMode": "auto"
-      },
-      "pluginVersion": "8.5.0"
-    },
-    {
-      "id": 28,
-      "title": "Support Tickets",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 10},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_tickets FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#ff9a9e",
-                "value": null
-              },
-              {
-                "color": "#fecfef",
-                "value": 10
-              },
-              {
-                "color": "#ffc3a0",
-                "value": 50
-              },
-              {
-                "color": "#ffafbd",
-                "value": 100
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      },
-      "pluginVersion": "8.5.0"
-    },
-    {
-      "id": 29,
-      "title": "Support Messages",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 10},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT COUNT(*) AS total_messages FROM mava_messages WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo();",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#ffecd2",
-                "value": null
-              },
-              {
-                "color": "#fcb69f",
-                "value": 20
-              },
-              {
-                "color": "#ff9a9e",
-                "value": 100
-              },
-              {
-                "color": "#fecfef",
-                "value": 500
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      },
-      "pluginVersion": "8.5.0"
-    },
-    {
-      "id": 30,
-      "title": "Avg Response Time",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 10},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/3600) AS avg_response_hours FROM mava_tickets WHERE created_at >= $__timeFrom() AND created_at <= $__timeTo() AND updated_at IS NOT NULL AND updated_at != created_at;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#4ECDC4",
-                "value": null
-              },
-              {
-                "color": "#96CEB4",
-                "value": 12
-              },
-              {
-                "color": "#FFEAA7",
-                "value": 24
-              },
-              {
-                "color": "#FFB6C1",
-                "value": 48
-              }
-            ]
-          },
-          "unit": "h"
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto"
-      },
-      "pluginVersion": "8.5.0"
-    },
-    {
-      "id": 31,
-      "title": "Total Community Health Score",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 10},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "WITH community_metrics AS (SELECT COUNT(DISTINCT dm.author_id) * 10 as discord_users, COUNT(DISTINCT tm.from_user_id) * 10 as telegram_users, COUNT(DISTINCT dm.id) * 0.1 as discord_messages, COUNT(DISTINCT tm.id) * 0.1 as telegram_messages, COUNT(DISTINCT mt.id) * 5 as support_tickets FROM discord_messages dm FULL OUTER JOIN telegram_messages tm ON DATE(dm.created_at) = DATE(tm.date) FULL OUTER JOIN mava_tickets mt ON DATE(dm.created_at) = DATE(mt.created_at) WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() AND dm.author_is_bot = false) SELECT ROUND(discord_users + telegram_users + discord_messages + telegram_messages + support_tickets) as health_score FROM community_metrics;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#ff9a9e",
-                "value": null
-              },
-              {
-                "color": "#fecfef",
-                "value": 1000
-              },
-              {
-                "color": "#ffc3a0",
-                "value": 5000
-              },
-              {
-                "color": "#667eea",
-                "value": 10000
-              },
-              {
-                "color": "#764ba2",
-                "value": 20000
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "background",
-        "graphMode": "area",
         "justifyMode": "auto"
       },
       "pluginVersion": "8.5.0"
