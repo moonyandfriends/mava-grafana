@@ -246,71 +246,7 @@
       },
       "pluginVersion": "9.0.0"
     },
-    {
-      "id": 5,
-      "title": "Ambassador Engagement Score Overview",
-      "type": "heatmap",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 5},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT \n  NOW() as time,\n  'Sample Activity' as metric,\n  34 as value\nUNION ALL\nSELECT \n  NOW() - interval '1 day' as time,\n  'Sample Activity' as metric,\n  27 as value;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "spectrum",
-            "scheme": "Plasma"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          }
-        }
-      },
-      "options": {
-        "calculate": false,
-        "calculation": {},
-        "cellGap": 1,
-        "color": {
-          "exponent": 0.5,
-          "fill": "rgba(128, 0, 128, 0.1)",
-          "mode": "spectrum",
-          "reverse": false,
-          "scale": "exponential",
-          "scheme": "Plasma",
-          "steps": 256
-        },
-        "exemplars": {
-          "color": "rgba(255, 255, 255, 0.8)"
-        },
-        "filterValues": {
-          "le": 1e-9
-        },
-        "legend": {
-          "show": true
-        },
-        "rowsFrame": {
-          "layout": "auto"
-        },
-        "tooltip": {
-          "show": true,
-          "yHistogram": false
-        },
-        "yAxis": {
-          "axisPlacement": "left",
-          "reverse": false,
-          "unit": "short"
-        }
-      },
-      "pluginVersion": "9.0.0"
-    },
+
     {
       "id": 6,
       "title": "Ambassador Performance Leaderboard",
@@ -550,157 +486,15 @@
         }
       }
     },
-    {
-      "id": 7,
-      "title": "Cross-Platform Activity Distribution",
-      "type": "piechart",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 25},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT \n  platform,\n  posts\nFROM (\n  SELECT \n    'Discord' as platform, \n    COUNT(dm.id) as posts\n  FROM discord_messages dm \n  JOIN community_ambassadors ca ON dm.author_id = ca.discord_id::text\n  WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n  AND dm.author_is_bot = false\n  UNION ALL \n  SELECT \n    'Telegram' as platform, \n    COUNT(tm.message_id) as posts\n  FROM telegram_messages tm \n  JOIN community_ambassadors ca ON tm.from_user_id = ca.telegram_id\n  WHERE tm.date >= $__timeFrom() AND tm.date <= $__timeTo()\n  UNION ALL \n  SELECT \n    'X/Twitter' as platform, \n    COUNT(DISTINCT dm.id) as posts\n  FROM discord_messages dm \n  CROSS JOIN community_ambassadors ca \n  WHERE dm.channel_id = '1248750328896295084' \n  AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n  AND dm.author_is_bot = false \n  AND dm.content ILIKE '%' || ca.x_handle || '%'\n) subquery\nWHERE posts > 0\nORDER BY posts DESC;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "palette-classic"},
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          },
-          "mappings": []
-        },
-        "overrides": [
-          {
-            "matcher": {"id": "byName", "options": "Discord"},
-            "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(114, 137, 218, 0.97)"}}
-            ]
-          },
-          {
-            "matcher": {"id": "byName", "options": "Telegram"},
-            "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(34, 139, 206, 0.97)"}}
-            ]
-          },
-          {
-            "matcher": {"id": "byName", "options": "X/Twitter"},
-            "properties": [
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(29, 161, 242, 0.97)"}}
-            ]
-          }
-        ]
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "pieType": "donut",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "calcs": ["lastNotNull", "percent"]
-        },
-        "displayLabels": ["name", "percent"]
-      },
-      "pluginVersion": "9.0.0"
-    },
-    {
-      "id": 8,
-      "title": "Top Ambassador Performance Metrics",
-      "type": "stat",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 25},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "WITH top_performers AS (\n  SELECT \n    COALESCE(dm.author_display_name, dm.author_username, 'User ' || dm.author_id) as ambassador,\n    COUNT(dm.id) as total_posts,\n    COUNT(DISTINCT DATE(dm.created_at)) as total_active_days,\n    ROUND(\n      (COUNT(dm.id) * 1.0 + \n       COUNT(DISTINCT DATE(dm.created_at)) * 3.0), 2\n    ) as activity_score\n  FROM discord_messages dm\n  WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n    AND dm.author_is_bot = false\n    AND dm.content IS NOT NULL\n  GROUP BY dm.author_id, COALESCE(dm.author_display_name, dm.author_username, 'User ' || dm.author_id)\n  HAVING COUNT(dm.id) >= 3\n  ORDER BY activity_score DESC\n  LIMIT 5\n)\nSELECT \n  MAX(total_posts) as max_posts,\n  MAX(total_active_days) as max_active_days,\n  MAX(activity_score) as max_activity_score,\n  AVG(activity_score) as avg_top_score\nFROM top_performers;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "thresholds"},
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {"color": "rgba(76, 175, 80, 0.97)", "value": null},
-              {"color": "rgba(255, 193, 7, 0.97)", "value": 50},
-              {"color": "rgba(244, 67, 54, 0.97)", "value": 100}
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {"id": "byName", "options": "max_posts"},
-            "properties": [
-              {"id": "displayName", "value": "Max Posts"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(114, 137, 218, 0.97)"}}
-            ]
-          },
-          {
-            "matcher": {"id": "byName", "options": "max_active_days"},
-            "properties": [
-              {"id": "displayName", "value": "Max Active Days"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(76, 175, 80, 0.97)"}}
-            ]
-          },
-          {
-            "matcher": {"id": "byName", "options": "max_activity_score"},
-            "properties": [
-              {"id": "displayName", "value": "Max Activity Score"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(156, 39, 176, 0.97)"}}
-            ]
-          },
-          {
-            "matcher": {"id": "byName", "options": "avg_top_score"},
-            "properties": [
-              {"id": "displayName", "value": "Avg Top 5 Score"},
-              {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(255, 152, 0, 0.97)"}}
-            ]
-          }
-        ]
-      },
-      "options": {
-        "colorMode": "background_solid",
-        "graphMode": "area",
-        "justifyMode": "center",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "textMode": "value_and_name",
-        "wideLayout": true
-      },
-      "pluginVersion": "9.0.0"
-    },
+
+
+
     {
       "id": 9,
       "title": "Ambassador Activity Timeline",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 25},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 5},
       "targets": [
         {
           "format": "time_series",
@@ -913,7 +707,7 @@
       "title": "Ambassador Weekly Performance Trends",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 41},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 5},
       "targets": [
         {
           "format": "time_series",
@@ -1043,7 +837,7 @@
       "title": "Ambassador Messages (Discord & Telegram)",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 57},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 13},
       "targets": [
         {
           "format": "table",
@@ -1173,7 +967,7 @@
       "title": "Ambassador X Posts",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 67},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 23},
       "targets": [
         {
           "format": "table",
