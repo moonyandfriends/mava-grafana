@@ -170,7 +170,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT COUNT(DISTINCT ambassador) as active_ambassadors FROM community_ambassadors ca WHERE EXISTS (SELECT 1 FROM discord_messages dm WHERE dm.author_id::bigint = ca.discord_id AND dm.created_at >= NOW() - INTERVAL '7 days' AND dm.author_is_bot = false) OR EXISTS (SELECT 1 FROM telegram_messages tm WHERE tm.from_user_id = ca.telegram_id AND tm.date >= NOW() - INTERVAL '7 days');",
+          "rawSql": "SELECT COUNT(DISTINCT ambassador) as active_ambassadors FROM community_ambassadors ca WHERE EXISTS (SELECT 1 FROM discord_messages dm WHERE dm.author_id = ca.discord_id::text AND dm.created_at >= NOW() - INTERVAL '7 days' AND dm.author_is_bot = false) OR EXISTS (SELECT 1 FROM telegram_messages tm WHERE tm.from_user_id = ca.telegram_id AND tm.date >= NOW() - INTERVAL '7 days');",
           "refId": "A"
         }
       ],
