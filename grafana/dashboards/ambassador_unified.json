@@ -252,7 +252,7 @@
       "title": "Ambassador Performance Leaderboard",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 13},
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 13},
       "targets": [
         {
           "format": "table",
@@ -553,7 +553,7 @@
       "title": "Ambassador Response Time Analysis",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 33},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28},
       "targets": [
         {
           "format": "table",
@@ -626,7 +626,7 @@
       "title": "Ambassador Channel Distribution",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 33},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28},
       "targets": [
         {
           "format": "table",
@@ -709,7 +709,7 @@
       "title": "Platform Comparison",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 49},
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 22},
       "targets": [
         {
           "format": "table",
@@ -795,7 +795,7 @@
       "title": "Ambassador Messages (Discord & Telegram)",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 13},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 36},
       "targets": [
         {
           "format": "table",
@@ -923,7 +923,7 @@
       "title": "Ambassador X Posts",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 23},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 46},
       "targets": [
         {
           "format": "table",
