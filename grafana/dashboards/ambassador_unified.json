@@ -620,55 +620,13 @@
       },
       "pluginVersion": "9.0.0"
     },
-    {
-      "id": 11,
-      "title": "Ambassador Engagement Quality Score",
-      "type": "gauge",
-      "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 33},
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "WITH ambassador_quality_metrics AS (\n  SELECT \n    COALESCE(dm.author_display_name, dm.author_username, 'User ' || dm.author_id) as ambassador,\n    -- Message quality indicators\n    COUNT(dm.id) as total_messages,\n    COUNT(CASE WHEN dm.mentions != '{}' THEN 1 END) as messages_with_mentions,\n    COUNT(CASE WHEN dm.attachments != '{}' THEN 1 END) as messages_with_attachments,\n    COUNT(CASE WHEN dm.embeds != '{}' THEN 1 END) as messages_with_embeds,\n    COUNT(CASE WHEN LENGTH(dm.content) > 100 THEN 1 END) as long_messages,\n    COUNT(CASE WHEN dm.content ILIKE '%?%' THEN 1 END) as questions_asked,\n    COUNT(CASE WHEN dm.content ILIKE '%!%' THEN 1 END) as exclamatory_messages,\n    AVG(LENGTH(dm.content)) as avg_message_length,\n    -- Engagement score calculation\n    ROUND(\n      (COUNT(CASE WHEN dm.mentions != '{}' THEN 1 END) * 2.0 / NULLIF(COUNT(dm.id), 0) * 100 +\n       COUNT(CASE WHEN dm.attachments != '{}' THEN 1 END) * 1.5 / NULLIF(COUNT(dm.id), 0) * 100 +\n       COUNT(CASE WHEN LENGTH(dm.content) > 100 THEN 1 END) * 1.0 / NULLIF(COUNT(dm.id), 0) * 100 +\n       COUNT(CASE WHEN dm.content ILIKE '%?%' THEN 1 END) * 1.2 / NULLIF(COUNT(dm.id), 0) * 100 +\n       (AVG(LENGTH(dm.content)) / 200.0) * 20), 1\n    ) as engagement_quality_score\n  FROM discord_messages dm\n  WHERE dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo() \n    AND dm.author_is_bot = false\n    AND dm.content IS NOT NULL\n  GROUP BY dm.author_id, COALESCE(dm.author_display_name, dm.author_username, 'User ' || dm.author_id)\n  HAVING COUNT(dm.id) >= 5\n)\nSELECT \n  AVG(engagement_quality_score) as engagement_quality_score\nFROM ambassador_quality_metrics;",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {"mode": "thresholds"},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {"color": "rgba(244, 67, 54, 0.97)", "value": 0},
-              {"color": "rgba(255, 193, 7, 0.97)", "value": 30},
-              {"color": "rgba(139, 195, 74, 0.97)", "value": 60},
-              {"color": "rgba(76, 175, 80, 0.97)", "value": 80}
-            ]
-          },
-          "unit": "percent",
-          "min": 0,
-          "max": 100
-        }
-      },
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": ["lastNotNull"],
-          "fields": ""
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "9.0.0"
-    },
+
     {
       "id": 12,
       "title": "Ambassador Channel Distribution",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 41},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 33},
       "targets": [
         {
           "format": "table",
