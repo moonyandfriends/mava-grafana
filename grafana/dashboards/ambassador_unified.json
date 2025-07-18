@@ -78,7 +78,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH top_discord_contributors AS (\n  SELECT dm.author_id\n  FROM discord_messages dm\n  WHERE dm.created_at >= NOW() - INTERVAL '30 days'\n    AND dm.author_is_bot = false\n    AND dm.content IS NOT NULL\n  GROUP BY dm.author_id\n  HAVING COUNT(dm.id) >= 10\n)\nSELECT \n  COUNT(DISTINCT dm.id) AS discord_posts\nFROM discord_messages dm \nJOIN top_discord_contributors tdc ON dm.author_id = tdc.author_id\nWHERE dm.created_at >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n  AND dm.created_at <= COALESCE($__timeTo(), NOW())\n  AND dm.author_is_bot = false;",
+          "rawSql": "SELECT \n  COUNT(dm.id) AS discord_posts\nFROM discord_messages dm \nJOIN community_ambassadors ca ON dm.author_id = ca.discord_id::text\nWHERE dm.created_at >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n  AND dm.created_at <= COALESCE($__timeTo(), NOW())\n  AND dm.author_is_bot = false\n  AND dm.content IS NOT NULL;",
           "refId": "A"
         }
       ],
@@ -137,7 +137,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH top_telegram_contributors AS (\n  SELECT tm.from_user_id\n  FROM telegram_messages tm\n  WHERE tm.date >= NOW() - INTERVAL '30 days'\n    AND tm.from_user_is_bot = false\n    AND tm.text IS NOT NULL\n  GROUP BY tm.from_user_id\n  HAVING COUNT(tm.id) >= 5\n)\nSELECT \n  COUNT(DISTINCT tm.id) AS telegram_posts\nFROM telegram_messages tm \nJOIN top_telegram_contributors ttc ON tm.from_user_id = ttc.from_user_id\nWHERE tm.date >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n  AND tm.date <= COALESCE($__timeTo(), NOW());",
+          "rawSql": "SELECT \n  COUNT(tm.id) AS telegram_posts\nFROM telegram_messages tm \nJOIN community_ambassadors ca ON tm.from_user_id = ca.telegram_id\nWHERE tm.date >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n  AND tm.date <= COALESCE($__timeTo(), NOW())\n  AND tm.from_user_is_bot = false\n  AND tm.text IS NOT NULL;",
           "refId": "A"
         }
       ],
