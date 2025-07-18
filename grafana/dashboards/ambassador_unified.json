@@ -833,7 +833,7 @@
           {
             "matcher": {"id": "byName", "options": "Ambassador"},
             "properties": [
-              {"id": "custom.width", "value": 110},
+              {"id": "custom.width", "value": 130},
               {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(33, 150, 243, 0.97)"}}
             ]
           },
@@ -851,7 +851,7 @@
           {
             "matcher": {"id": "byName", "options": "Username"},
             "properties": [
-              {"id": "custom.width", "value": 120},
+              {"id": "custom.width", "value": 140},
               {"id": "links", "value": [
                 {
                   "title": "Open Profile",
@@ -863,9 +863,7 @@
           },
           {
             "matcher": {"id": "byName", "options": "Message Preview"},
-            "properties": [
-              {"id": "custom.width", "value": 500}
-            ]
+            "properties": []
           },
           {
             "matcher": {"id": "byName", "options": "Message Link"},
@@ -884,7 +882,7 @@
           {
             "matcher": {"id": "byName", "options": "Date"},
             "properties": [
-              {"id": "custom.width", "value": 150},
+              {"id": "custom.width", "value": 180},
               {"id": "unit", "value": "dateTimeAsIso"}
             ]
           },
@@ -955,14 +953,14 @@
           {
             "matcher": {"id": "byName", "options": "Ambassador"},
             "properties": [
-              {"id": "custom.width", "value": 120},
+              {"id": "custom.width", "value": 150},
               {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(33, 150, 243, 0.97)"}}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "X Handle"},
             "properties": [
-              {"id": "custom.width", "value": 130},
+              {"id": "custom.width", "value": 160},
               {"id": "color", "value": {"mode": "fixed", "fixedColor": "rgba(29, 161, 242, 0.97)"}},
               {"id": "links", "value": [
                 {
@@ -975,21 +973,19 @@
           },
           {
             "matcher": {"id": "byName", "options": "Bot Message Content"},
-            "properties": [
-              {"id": "custom.width", "value": 500}
-            ]
+            "properties": []
           },
           {
             "matcher": {"id": "byName", "options": "Posted Date"},
             "properties": [
-              {"id": "custom.width", "value": 150},
+              {"id": "custom.width", "value": 180},
               {"id": "unit", "value": "dateTimeAsIso"}
             ]
           },
           {
             "matcher": {"id": "byName", "options": "Bot Name"},
             "properties": [
-              {"id": "custom.width", "value": 100}
+              {"id": "custom.width", "value": 120}
             ]
           }
         ]
