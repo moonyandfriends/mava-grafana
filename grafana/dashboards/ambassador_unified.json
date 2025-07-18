@@ -78,7 +78,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(dm.id) AS discord_posts\nFROM discord_messages dm \nJOIN community_ambassadors ca ON dm.author_id = ca.discord_id::text\nWHERE dm.created_at >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n  AND dm.created_at <= COALESCE($__timeTo(), NOW())\n  AND dm.author_is_bot = false\n  AND dm.content IS NOT NULL;",
+          "rawSql": "-- Diagnostic query to check community_ambassadors table\nSELECT \n  'Table exists' as status,\n  COUNT(*) as total_ambassadors,\n  COUNT(CASE WHEN discord_id IS NOT NULL THEN 1 END) as with_discord_id,\n  COUNT(CASE WHEN telegram_id IS NOT NULL THEN 1 END) as with_telegram_id\nFROM community_ambassadors\nUNION ALL\nSELECT \n  'Sample Discord IDs' as status,\n  0 as total_ambassadors,\n  0 as with_discord_id, \n  0 as with_telegram_id\nFROM community_ambassadors \nLIMIT 3;",
           "refId": "A"
         }
       ],
@@ -137,7 +137,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(tm.id) AS telegram_posts\nFROM telegram_messages tm \nJOIN community_ambassadors ca ON tm.from_user_id = ca.telegram_id\nWHERE tm.date >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n  AND tm.date <= COALESCE($__timeTo(), NOW())\n  AND tm.from_user_is_bot = false\n  AND tm.text IS NOT NULL;",
+          "rawSql": "-- Diagnostic: Check if IDs match between tables\nSELECT \n  ca.ambassador,\n  ca.discord_id,\n  ca.telegram_id,\n  COALESCE(discord_matches.msg_count, 0) as discord_msg_count,\n  COALESCE(telegram_matches.msg_count, 0) as telegram_msg_count\nFROM community_ambassadors ca\nLEFT JOIN (\n  SELECT author_id, COUNT(*) as msg_count\n  FROM discord_messages \n  WHERE created_at >= NOW() - INTERVAL '7 days'\n    AND author_is_bot = false\n  GROUP BY author_id\n) discord_matches ON ca.discord_id::text = discord_matches.author_id\nLEFT JOIN (\n  SELECT from_user_id, COUNT(*) as msg_count\n  FROM telegram_messages \n  WHERE date >= NOW() - INTERVAL '7 days'\n    AND from_user_is_bot = false\n  GROUP BY from_user_id\n) telegram_matches ON ca.telegram_id = telegram_matches.from_user_id\nORDER BY ca.ambassador;",
           "refId": "A"
         }
       ],
