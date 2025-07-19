@@ -271,7 +271,15 @@
           },
           "mappings": [],
           "unit": "short"
-        }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "value"},
+            "properties": [
+              {"id": "displayName", "value": "Posts"}
+            ]
+          }
+        ]
       },
       "options": {
         "reduceOptions": {
@@ -282,8 +290,8 @@
         "pieType": "pie",
         "tooltip": {"mode": "single", "sort": "none"},
         "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
+          "displayMode": "table",
+          "placement": "right",
           "values": ["percent", "value"]
         },
         "displayLabels": ["name", "percent"]
@@ -315,7 +323,15 @@
           },
           "mappings": [],
           "unit": "short"
-        }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "value"},
+            "properties": [
+              {"id": "displayName", "value": "Posts"}
+            ]
+          }
+        ]
       },
       "options": {
         "reduceOptions": {
@@ -326,8 +342,8 @@
         "pieType": "pie",
         "tooltip": {"mode": "single", "sort": "none"},
         "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
+          "displayMode": "table",
+          "placement": "right",
           "values": ["percent", "value"]
         },
         "displayLabels": ["name", "percent"]
@@ -359,7 +375,15 @@
           },
           "mappings": [],
           "unit": "short"
-        }
+        },
+        "overrides": [
+          {
+            "matcher": {"id": "byName", "options": "value"},
+            "properties": [
+              {"id": "displayName", "value": "Posts"}
+            ]
+          }
+        ]
       },
       "options": {
         "reduceOptions": {
@@ -370,8 +394,8 @@
         "pieType": "pie",
         "tooltip": {"mode": "single", "sort": "none"},
         "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
+          "displayMode": "table",
+          "placement": "right",
           "values": ["percent", "value"]
         },
         "displayLabels": ["name", "percent"]
