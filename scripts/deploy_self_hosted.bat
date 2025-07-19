@@ -41,6 +41,16 @@ set /p GRAFANA_VIEWER_EMAIL="Enter viewer email [viewer@example.com]: "
 if "!GRAFANA_VIEWER_EMAIL!"=="" set GRAFANA_VIEWER_EMAIL=viewer@example.com
 
 echo.
+echo Ambassador User Configuration (optional):
+echo Leave empty to skip ambassador user creation
+set /p GRAFANA_AMBASSADOR_USER="Enter ambassador username (optional): "
+if not "!GRAFANA_AMBASSADOR_USER!"=="" (
+    set /p GRAFANA_AMBASSADOR_PASSWORD="Enter ambassador password: "
+    set /p GRAFANA_AMBASSADOR_EMAIL="Enter ambassador email [ambassador@example.com]: "
+    if "!GRAFANA_AMBASSADOR_EMAIL!"=="" set GRAFANA_AMBASSADOR_EMAIL=ambassador@example.com
+)
+
+echo.
 echo 📋 Environment Variables for Railway:
 echo =====================================
 echo.
@@ -58,6 +68,13 @@ echo GRAFANA_VIEWER_USER=!GRAFANA_VIEWER_USER!
 echo GRAFANA_VIEWER_PASSWORD=!GRAFANA_VIEWER_PASSWORD!
 echo GRAFANA_VIEWER_EMAIL=!GRAFANA_VIEWER_EMAIL!
 echo.
+if not "!GRAFANA_AMBASSADOR_USER!"=="" (
+    echo # Ambassador User Configuration
+    echo GRAFANA_AMBASSADOR_USER=!GRAFANA_AMBASSADOR_USER!
+    echo GRAFANA_AMBASSADOR_PASSWORD=!GRAFANA_AMBASSADOR_PASSWORD!
+    echo GRAFANA_AMBASSADOR_EMAIL=!GRAFANA_AMBASSADOR_EMAIL!
+    echo.
+)
 
 echo ✅ Setup complete!
 echo.

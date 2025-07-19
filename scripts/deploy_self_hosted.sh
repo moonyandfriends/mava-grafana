@@ -57,6 +57,15 @@ prompt_with_default "Enter viewer password" "" GRAFANA_VIEWER_PASSWORD
 prompt_with_default "Enter viewer email" "viewer@example.com" GRAFANA_VIEWER_EMAIL
 
 echo ""
+echo "Ambassador User Configuration (optional):"
+echo "Leave empty to skip ambassador user creation"
+prompt_with_default "Enter ambassador username (optional)" "" GRAFANA_AMBASSADOR_USER
+if [ -n "$GRAFANA_AMBASSADOR_USER" ]; then
+    prompt_with_default "Enter ambassador password" "" GRAFANA_AMBASSADOR_PASSWORD
+    prompt_with_default "Enter ambassador email" "ambassador@example.com" GRAFANA_AMBASSADOR_EMAIL
+fi
+
+echo ""
 echo "📋 Environment Variables for Railway:"
 echo "====================================="
 echo ""
@@ -74,6 +83,13 @@ echo "GRAFANA_VIEWER_USER=$GRAFANA_VIEWER_USER"
 echo "GRAFANA_VIEWER_PASSWORD=$GRAFANA_VIEWER_PASSWORD"
 echo "GRAFANA_VIEWER_EMAIL=$GRAFANA_VIEWER_EMAIL"
 echo ""
+if [ -n "$GRAFANA_AMBASSADOR_USER" ]; then
+    echo "# Ambassador User Configuration"
+    echo "GRAFANA_AMBASSADOR_USER=$GRAFANA_AMBASSADOR_USER"
+    echo "GRAFANA_AMBASSADOR_PASSWORD=$GRAFANA_AMBASSADOR_PASSWORD"
+    echo "GRAFANA_AMBASSADOR_EMAIL=$GRAFANA_AMBASSADOR_EMAIL"
+    echo ""
+fi
 
 echo "✅ Setup complete!"
 echo ""

@@ -93,6 +93,39 @@ GRAFANA_VIEWER_EMAIL=viewer@example.com \
 
 You can run this script as a Railway post-deploy command or as part of your Docker entrypoint to ensure a viewer user is always available.
 
+## Creating a Grafana Ambassador User
+
+To create a user with restricted access to only the ambassador dashboard, use the ambassador script:
+
+```
+scripts/create_grafana_ambassador.sh
+```
+
+### Required Environment Variables
+- `GRAFANA_URL` (default: http://localhost:3000)
+- `GRAFANA_ADMIN_USER` (default: admin)
+- `GRAFANA_ADMIN_PASSWORD` (default: admin)
+- `GRAFANA_AMBASSADOR_USER` (required)
+- `GRAFANA_AMBASSADOR_PASSWORD` (required)
+- `GRAFANA_AMBASSADOR_EMAIL` (required)
+
+### Example Usage
+
+```sh
+GRAFANA_AMBASSADOR_USER=ambassador \
+GRAFANA_AMBASSADOR_PASSWORD=secret \
+GRAFANA_AMBASSADOR_EMAIL=ambassador@example.com \
+./scripts/create_grafana_ambassador.sh
+```
+
+This script will:
+1. Create the ambassador user
+2. Create an "Ambassadors" team
+3. Add the user to the team
+4. Set dashboard permissions so only the ambassador team can view the ambassador dashboard
+
+The ambassador user will only see the community-ambassadors dashboard and nothing else.
+
 ## Troubleshooting
 
 ### Connection Issues
