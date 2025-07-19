@@ -246,6 +246,138 @@
       },
       "pluginVersion": "9.0.0"
     },
+    {
+      "id": 18,
+      "title": "Discord Activity Distribution",
+      "type": "piechart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 5},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT \n  ca.ambassador,\n  COUNT(dm.id) as discord_posts\nFROM community_ambassadors ca\nINNER JOIN discord_messages dm ON ca.discord_id::text = dm.author_id\nWHERE dm.created_at >= $__timeFrom() \n  AND dm.created_at <= $__timeTo()\n  AND dm.author_is_bot = false\n  AND dm.content IS NOT NULL\nGROUP BY ca.ambassador\nHAVING COUNT(dm.id) > 0\nORDER BY discord_posts DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": [],
+          "unit": "short"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "pieType": "pie",
+        "tooltip": {"mode": "single", "sort": "none"},
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "values": ["percent", "value"]
+        },
+        "displayLabels": ["name", "percent"]
+      },
+      "pluginVersion": "9.0.0"
+    },
+    {
+      "id": 19,
+      "title": "Telegram Activity Distribution", 
+      "type": "piechart",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 5},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT \n  ca.ambassador,\n  COUNT(tm.message_id) as telegram_posts\nFROM community_ambassadors ca\nINNER JOIN telegram_messages tm ON ca.telegram_id = tm.from_user_id\nWHERE tm.date >= $__timeFrom() \n  AND tm.date <= $__timeTo()\n  AND tm.from_user_is_bot = false\n  AND tm.text IS NOT NULL\nGROUP BY ca.ambassador\nHAVING COUNT(tm.message_id) > 0\nORDER BY telegram_posts DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": [],
+          "unit": "short"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "pieType": "pie",
+        "tooltip": {"mode": "single", "sort": "none"},
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "values": ["percent", "value"]
+        },
+        "displayLabels": ["name", "percent"]
+      },
+      "pluginVersion": "9.0.0"
+    },
+    {
+      "id": 20,
+      "title": "X/Twitter Activity Distribution",
+      "type": "piechart", 
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 5},
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH ambassador_x_posts AS (\n  SELECT \n    ca.ambassador,\n    COUNT(*) as x_posts\n  FROM community_ambassadors ca\n  INNER JOIN discord_messages dm ON TRUE\n  CROSS JOIN LATERAL jsonb_array_elements(COALESCE(dm.embeds, '[]'::jsonb)) AS embed\n  WHERE ca.x_handle IS NOT NULL\n    AND dm.webhook_id IS NOT NULL\n    AND embed->>'url' LIKE '%x.com%'\n    AND LOWER(\n      SUBSTRING(\n        (embed->'author'->>'name')::text \n        FROM '\\\\(@([A-Za-z0-9_]+)\\\\)'\n      )\n    ) = LOWER(ca.x_handle)\n    AND dm.created_at >= $__timeFrom()\n    AND dm.created_at <= $__timeTo()\n  GROUP BY ca.ambassador\n)\nSELECT \n  ambassador,\n  x_posts\nFROM ambassador_x_posts\nWHERE x_posts > 0\nORDER BY x_posts DESC;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            }
+          },
+          "mappings": [],
+          "unit": "short"
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "pieType": "pie",
+        "tooltip": {"mode": "single", "sort": "none"},
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "values": ["percent", "value"]
+        },
+        "displayLabels": ["name", "percent"]
+      },
+      "pluginVersion": "9.0.0"
+    },
 
     {
       "id": 6,
@@ -494,7 +626,7 @@
       "title": "Ambassador Activity Timeline",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 5},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 22},
       "targets": [
         {
           "format": "time_series",
@@ -553,7 +685,7 @@
       "title": "Ambassador Response Time Analysis",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 46},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 36},
       "targets": [
         {
           "format": "table",
@@ -626,7 +758,7 @@
       "title": "Ambassador Channel Distribution",
       "type": "barchart",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 46},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 36},
       "targets": [
         {
           "format": "table",
@@ -665,7 +797,7 @@
       "title": "Ambassador Weekly Performance Trends",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 5},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 22},
       "targets": [
         {
           "format": "time_series",
@@ -709,7 +841,7 @@
       "title": "Platform Comparison",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 40},
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 30},
       "targets": [
         {
           "format": "table",
@@ -795,7 +927,7 @@
       "title": "Ambassador Messages (Discord & Telegram)",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 22},
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 44},
       "targets": [
         {
           "format": "table",
@@ -929,7 +1061,7 @@
       "title": "Ambassador X Posts",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 54},
       "targets": [
         {
           "format": "table",
@@ -1013,7 +1145,7 @@
       "title": "X/Twitter Activity Analytics",
       "type": "timeseries",
       "datasource": {"type": "postgres", "uid": "supabase"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 54},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 62},
       "targets": [
         {
           "format": "time_series",
