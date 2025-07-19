@@ -196,7 +196,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  COUNT(DISTINCT dm.id) AS x_posts\nFROM discord_messages dm\nWHERE dm.channel_id = '1108219971273756725'\n  AND dm.created_at >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n  AND dm.created_at <= COALESCE($__timeTo(), NOW())\n  AND dm.author_is_bot = false\n  AND dm.content IS NOT NULL\n  AND (\n    dm.content ILIKE '%twitter.com%' OR\n    dm.content ILIKE '%x.com%' OR\n    dm.content ILIKE '%@%'\n  );",
+          "rawSql": "-- Count total X posts from all registered ambassadors\nWITH ambassador_posts AS (\n  SELECT COUNT(*) AS total_posts\n  FROM discord_messages dm\n  CROSS JOIN LATERAL jsonb_array_elements(COALESCE(dm.embeds, '[]'::jsonb)) AS embed\n  WHERE dm.webhook_id IS NOT NULL\n    AND embed->>'url' LIKE '%x.com%'\n    AND LOWER(\n      SUBSTRING(\n        (embed->'author'->>'name')::text \n        FROM '\\(@([A-Za-z0-9_]+)\\)'\n      )\n    ) IN (\n      SELECT LOWER(x_handle) \n      FROM community_ambassadors \n      WHERE x_handle IS NOT NULL\n    )\n    AND dm.created_at >= COALESCE($__timeFrom(), NOW() - INTERVAL '30 days')\n    AND dm.created_at <= COALESCE($__timeTo(), NOW())\n)\nSELECT total_posts AS x_posts FROM ambassador_posts;",
           "refId": "A"
         }
       ],
@@ -256,7 +256,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "WITH ambassador_activity AS (\n  SELECT \n    ca.ambassador,\n    ca.role,\n    ca.discord_id,\n    ca.telegram_id,\n    ca.x_handle,\n    CASE \n      WHEN COALESCE(discord_stats.discord_posts, 0) >= COALESCE(telegram_stats.telegram_posts, 0) THEN\n        COALESCE(discord_stats.discord_avatar_url, 'https://cdn.discordapp.com/embed/avatars/0.png')\n      ELSE\n        COALESCE(telegram_stats.telegram_avatar_url, 'https://ui-avatars.com/api/?name=' || ca.ambassador || '&size=80&background=0088CC&color=ffffff&bold=true')\n    END as discord_avatar,\n    COALESCE(discord_stats.discord_posts, 0) as discord_posts,\n    COALESCE(telegram_stats.telegram_posts, 0) as telegram_posts,\n    COALESCE(x_stats.x_posts, 0) as x_posts,\n    COALESCE(discord_stats.discord_posts, 0) + COALESCE(telegram_stats.telegram_posts, 0) + COALESCE(x_stats.x_posts, 0) as total_posts\n  FROM community_ambassadors ca\n  LEFT JOIN (\n    SELECT \n      dm.author_id,\n      COUNT(dm.id) as discord_posts,\n      MAX(dm.author_avatar_url) as discord_avatar_url\n    FROM discord_messages dm\n    WHERE dm.created_at >= $__timeFrom() \n      AND dm.created_at <= $__timeTo()\n      AND dm.author_is_bot = false\n      AND dm.content IS NOT NULL\n    GROUP BY dm.author_id\n  ) discord_stats ON ca.discord_id::text = discord_stats.author_id\n  LEFT JOIN (\n    SELECT \n      tm.from_user_id,\n      COUNT(tm.id) as telegram_posts,\n      MAX(tu.avatar_url) as telegram_avatar_url\n    FROM telegram_messages tm\n    LEFT JOIN telegram_users tu ON tm.from_user_id = tu.user_id\n    WHERE tm.date >= $__timeFrom() \n      AND tm.date <= $__timeTo()\n      AND tm.from_user_is_bot = false\n      AND tm.text IS NOT NULL\n    GROUP BY tm.from_user_id\n  ) telegram_stats ON ca.telegram_id = telegram_stats.from_user_id\n  LEFT JOIN (\n    SELECT \n      ca2.ambassador as ambassador_name,\n      COUNT(DISTINCT dm.id) as x_posts\n    FROM discord_messages dm\n    CROSS JOIN community_ambassadors ca2\n    WHERE dm.channel_id = '1248750328896295084'\n      AND dm.created_at >= $__timeFrom()\n      AND dm.created_at <= $__timeTo()\n      AND dm.author_is_bot = false\n      AND ca2.x_handle IS NOT NULL\n      AND dm.content ILIKE '%' || ca2.x_handle || '%'\n    GROUP BY ca2.ambassador\n  ) x_stats ON ca.ambassador = x_stats.ambassador_name\n)\nSELECT \n  discord_avatar,\n  ambassador,\n  role,\n  discord_posts,\n  telegram_posts,\n  x_posts,\n  total_posts,\n  discord_id,\n  telegram_id,\n  x_handle\nFROM ambassador_activity\nWHERE total_posts > 0\nORDER BY total_posts DESC\nLIMIT 20;",
+          "rawSql": "WITH ambassador_activity AS (\n  SELECT \n    ca.ambassador,\n    ca.role,\n    ca.discord_id,\n    ca.telegram_id,\n    ca.x_handle,\n    CASE \n      WHEN COALESCE(discord_stats.discord_posts, 0) >= COALESCE(telegram_stats.telegram_posts, 0) THEN\n        COALESCE(discord_stats.discord_avatar_url, 'https://cdn.discordapp.com/embed/avatars/0.png')\n      ELSE\n        COALESCE(telegram_stats.telegram_avatar_url, 'https://ui-avatars.com/api/?name=' || ca.ambassador || '&size=80&background=0088CC&color=ffffff&bold=true')\n    END as discord_avatar,\n    COALESCE(discord_stats.discord_posts, 0) as discord_posts,\n    COALESCE(telegram_stats.telegram_posts, 0) as telegram_posts,\n    COALESCE(x_stats.x_posts, 0) as x_posts,\n    COALESCE(discord_stats.discord_posts, 0) + COALESCE(telegram_stats.telegram_posts, 0) + COALESCE(x_stats.x_posts, 0) as total_posts\n  FROM community_ambassadors ca\n  LEFT JOIN (\n    SELECT \n      dm.author_id,\n      COUNT(dm.id) as discord_posts,\n      MAX(dm.author_avatar_url) as discord_avatar_url\n    FROM discord_messages dm\n    WHERE dm.created_at >= $__timeFrom() \n      AND dm.created_at <= $__timeTo()\n      AND dm.author_is_bot = false\n      AND dm.content IS NOT NULL\n    GROUP BY dm.author_id\n  ) discord_stats ON ca.discord_id::text = discord_stats.author_id\n  LEFT JOIN (\n    SELECT \n      tm.from_user_id,\n      COUNT(tm.id) as telegram_posts,\n      MAX(tu.avatar_url) as telegram_avatar_url\n    FROM telegram_messages tm\n    LEFT JOIN telegram_users tu ON tm.from_user_id = tu.user_id\n    WHERE tm.date >= $__timeFrom() \n      AND tm.date <= $__timeTo()\n      AND tm.from_user_is_bot = false\n      AND tm.text IS NOT NULL\n    GROUP BY tm.from_user_id\n  ) telegram_stats ON ca.telegram_id = telegram_stats.from_user_id\n  LEFT JOIN (\n    SELECT \n      LOWER(x_handle) AS handle,\n      ambassador as ambassador_name,\n      COUNT(*) as x_posts\n    FROM community_ambassadors ca2\n    INNER JOIN discord_messages dm ON TRUE\n    CROSS JOIN LATERAL jsonb_array_elements(COALESCE(dm.embeds, '[]'::jsonb)) AS embed\n    WHERE dm.webhook_id IS NOT NULL\n      AND embed->>'url' LIKE '%x.com%'\n      AND LOWER(\n        SUBSTRING(\n          (embed->'author'->>'name')::text \n          FROM '\\(@([A-Za-z0-9_]+)\\)'\n        )\n      ) = LOWER(ca2.x_handle)\n      AND dm.created_at >= $__timeFrom()\n      AND dm.created_at <= $__timeTo()\n      AND ca2.x_handle IS NOT NULL\n    GROUP BY ca2.x_handle, ca2.ambassador\n  ) x_stats ON ca.ambassador = x_stats.ambassador_name\n)\nSELECT \n  discord_avatar,\n  ambassador,\n  role,\n  discord_posts,\n  telegram_posts,\n  x_posts,\n  total_posts,\n  discord_id,\n  telegram_id,\n  x_handle\nFROM ambassador_activity\nWHERE total_posts > 0\nORDER BY total_posts DESC\nLIMIT 20;",
           "refId": "A"
         }
       ],
@@ -933,7 +933,7 @@
       "targets": [
         {
           "format": "table",
-          "rawSql": "SELECT \n  'X/Twitter Mentions' as \"Ambassador\",\n  'Various' as \"X Handle\",\n  dm.content as \"Bot Message Content\",\n  dm.created_at as \"Posted Date\",\n  dm.author_username as \"Bot Name\"\nFROM discord_messages dm\nWHERE dm.channel_id = '1108219971273756725'\n  AND dm.created_at >= $__timeFrom() AND dm.created_at <= $__timeTo()\n  AND dm.author_is_bot = false\n  AND dm.content IS NOT NULL\n  AND (\n    dm.content ILIKE '%twitter.com%' OR\n    dm.content ILIKE '%x.com%' OR\n    dm.content ILIKE '%@%'\n  )\nORDER BY dm.created_at DESC\nLIMIT 50;",
+          "rawSql": "-- Ambassador X Posts from webhook messages\nWITH ambassador_tweets AS (\n  SELECT DISTINCT\n    ca.ambassador,\n    ca.x_handle,\n    dm.created_at,\n    dm.author_username AS webhook_name,\n    dm.content,\n    -- Extract tweet URL\n    embed->>'url' AS tweet_url,\n    -- Extract tweet content\n    embed->>'description' AS tweet_content,\n    -- Extract tweet timestamp\n    (embed->>'timestamp')::timestamptz AS tweet_timestamp,\n    -- Extract author info\n    embed->'author'->>'name' AS author_display_name,\n    -- Extract action type\n    CASE \n      WHEN dm.content LIKE '%Posted]%' THEN 'Posted'\n      WHEN dm.content LIKE '%Quoted]%' THEN 'Quoted'\n      WHEN dm.content LIKE '%Reposted]%' THEN 'Reposted'\n      ELSE 'Shared'\n    END AS action_type\n  FROM community_ambassadors ca\n  INNER JOIN discord_messages dm ON TRUE\n  CROSS JOIN LATERAL jsonb_array_elements(COALESCE(dm.embeds, '[]'::jsonb)) AS embed\n  WHERE ca.x_handle IS NOT NULL\n    AND dm.webhook_id IS NOT NULL\n    AND embed->>'url' LIKE '%x.com%'\n    AND LOWER(\n      SUBSTRING(\n        (embed->'author'->>'name')::text \n        FROM '\\(@([A-Za-z0-9_]+)\\)'\n      )\n    ) = LOWER(ca.x_handle)\n    AND dm.created_at >= $__timeFrom() \n    AND dm.created_at <= $__timeTo()\n)\nSELECT \n  ambassador AS \"Ambassador\",\n  x_handle AS \"X Handle\",\n  action_type AS \"Action\",\n  LEFT(tweet_content, 200) || CASE WHEN LENGTH(tweet_content) > 200 THEN '...' ELSE '' END AS \"Tweet Content\",\n  tweet_url AS \"Tweet Link\",\n  tweet_timestamp::timestamp AS \"Posted Date\",\n  webhook_name AS \"Via\"\nFROM ambassador_tweets\nORDER BY tweet_timestamp DESC NULLS LAST, created_at DESC\nLIMIT 100;",
           "refId": "A"
         }
       ],
@@ -1004,6 +1004,51 @@
           "show": false,
           "reducer": ["sum"],
           "fields": ""
+        }
+      },
+      "pluginVersion": "9.0.0"
+    },
+    {
+      "id": 17,
+      "title": "X/Twitter Activity Analytics",
+      "type": "timeseries",
+      "datasource": {"type": "postgres", "uid": "supabase"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 54},
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "-- X/Twitter activity over time for ambassadors\nWITH ambassador_tweets AS (\n  SELECT \n    DATE_TRUNC('day', dm.created_at) AS time,\n    ca.ambassador,\n    COUNT(*) AS tweets\n  FROM community_ambassadors ca\n  INNER JOIN discord_messages dm ON TRUE\n  CROSS JOIN LATERAL jsonb_array_elements(COALESCE(dm.embeds, '[]'::jsonb)) AS embed\n  WHERE ca.x_handle IS NOT NULL\n    AND dm.webhook_id IS NOT NULL\n    AND embed->>'url' LIKE '%x.com%'\n    AND LOWER(\n      SUBSTRING(\n        (embed->'author'->>'name')::text \n        FROM '\\\\(@([A-Za-z0-9_]+)\\\\)'\n      )\n    ) = LOWER(ca.x_handle)\n    AND dm.created_at >= $__timeFrom() \n    AND dm.created_at <= $__timeTo()\n  GROUP BY DATE_TRUNC('day', dm.created_at), ca.ambassador\n)\nSELECT \n  time,\n  ambassador AS metric,\n  tweets AS value\nFROM ambassador_tweets\nORDER BY time, ambassador;",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "barAlignment": 0,
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "auto",
+            "pointSize": 6,
+            "stacking": {"mode": "none", "group": "A"}
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "legend": {
+          "calcs": ["lastNotNull", "max", "mean", "sum"],
+          "displayMode": "table",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
         }
       },
       "pluginVersion": "9.0.0"
