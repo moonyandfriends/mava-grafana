@@ -18,12 +18,13 @@ COPY grafana/dashboards/ /var/lib/grafana/dashboards/
 # Copy custom scripts
 COPY scripts/create_grafana_viewer.sh /scripts/create_grafana_viewer.sh
 COPY scripts/create_grafana_ambassador.sh /scripts/create_grafana_ambassador.sh
+COPY scripts/fix_ambassador_permissions.sh /scripts/fix_ambassador_permissions.sh
 COPY scripts/deploy_self_hosted.sh /scripts/deploy_self_hosted.sh
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 # Switch to root to set permissions
 USER root
-RUN chmod +x /docker-entrypoint.sh /scripts/create_grafana_viewer.sh /scripts/create_grafana_ambassador.sh /scripts/deploy_self_hosted.sh
+RUN chmod +x /docker-entrypoint.sh /scripts/create_grafana_viewer.sh /scripts/create_grafana_ambassador.sh /scripts/fix_ambassador_permissions.sh /scripts/deploy_self_hosted.sh
 
 # Switch back to the default Grafana user
 USER 472

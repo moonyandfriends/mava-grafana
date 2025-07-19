@@ -111,9 +111,11 @@ else
   echo "[ERROR] Response body: $(echo "$ADD_USER_RESPONSE" | head -n -1)"
 fi
 
-# Step 4: Find the ambassador dashboard
-echo "[INFO] Finding ambassador dashboard..."
+# Step 4: Get all dashboards and set permissions
+echo "[INFO] Finding all dashboards to set permissions..."
 DASHBOARDS_RESPONSE=$(curl -s -u "$GRAFANA_ADMIN_USER:$GRAFANA_ADMIN_PASSWORD" "$GRAFANA_URL/api/search?type=dash-db")
+
+# Find the ambassador dashboard
 AMBASSADOR_DASHBOARD_UID=$(echo "$DASHBOARDS_RESPONSE" | grep -o '"uid":"[^"]*"[^}]*"title":"[^"]*[Aa]mbassador[^"]*"' | head -1 | grep -o '"uid":"[^"]*"' | cut -d'"' -f4)
 
 if [[ -z "$AMBASSADOR_DASHBOARD_UID" ]]; then
@@ -122,22 +124,40 @@ if [[ -z "$AMBASSADOR_DASHBOARD_UID" ]]; then
 else
   echo "[INFO] Found ambassador dashboard with UID: $AMBASSADOR_DASHBOARD_UID"
   
-  # Step 5: Set dashboard permissions to restrict access to ambassador team only
-  echo "[INFO] Setting dashboard permissions..."
-  PERMISSIONS_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$GRAFANA_URL/api/dashboards/uid/$AMBASSADOR_DASHBOARD_UID/permissions" \
-    -H "Content-Type: application/json" \
-    -u "$GRAFANA_ADMIN_USER:$GRAFANA_ADMIN_PASSWORD" \
-    -d "{\"items\": [{\"teamId\": $TEAM_ID, \"permission\": 1}]}")
+  # Get all dashboard UIDs
+  ALL_DASHBOARD_UIDS=$(echo "$DASHBOARDS_RESPONSE" | grep -o '"uid":"[^"]*"' | cut -d'"' -f4)
   
-  PERMISSIONS_HTTP_STATUS=$(echo "$PERMISSIONS_RESPONSE" | tail -n1)
+  # Step 5: Set permissions on ALL dashboards
+  echo "[INFO] Setting dashboard permissions to restrict ambassador access..."
   
-  if [[ "$PERMISSIONS_HTTP_STATUS" == "200" || "$PERMISSIONS_HTTP_STATUS" == "201" ]]; then
-    echo "[SUCCESS] Dashboard permissions set successfully."
-    echo "[INFO] Ambassador team now has view access to the ambassador dashboard."
-  else
-    echo "[ERROR] Failed to set dashboard permissions. HTTP status: $PERMISSIONS_HTTP_STATUS"
-    echo "[ERROR] Response body: $(echo "$PERMISSIONS_RESPONSE" | head -n -1)"
-  fi
+  for DASHBOARD_UID in $ALL_DASHBOARD_UIDS; do
+    if [[ "$DASHBOARD_UID" == "$AMBASSADOR_DASHBOARD_UID" ]]; then
+      # For ambassador dashboard: Allow ONLY ambassador team (View permission)
+      echo "[INFO] Setting ambassador dashboard permissions (allowing ambassador team)..."
+      PERMISSIONS_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$GRAFANA_URL/api/dashboards/uid/$DASHBOARD_UID/permissions" \
+        -H "Content-Type: application/json" \
+        -u "$GRAFANA_ADMIN_USER:$GRAFANA_ADMIN_PASSWORD" \
+        -d "{\"items\": [{\"teamId\": $TEAM_ID, \"permission\": 1}]}")
+    else
+      # For all other dashboards: Deny ambassador team access (Admin users still have access)
+      echo "[INFO] Restricting access to dashboard $DASHBOARD_UID from ambassador team..."
+      PERMISSIONS_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$GRAFANA_URL/api/dashboards/uid/$DASHBOARD_UID/permissions" \
+        -H "Content-Type: application/json" \
+        -u "$GRAFANA_ADMIN_USER:$GRAFANA_ADMIN_PASSWORD" \
+        -d "{\"items\": [{\"role\": \"Admin\", \"permission\": 4}, {\"role\": \"Editor\", \"permission\": 2}]}")
+    fi
+    
+    PERMISSIONS_HTTP_STATUS=$(echo "$PERMISSIONS_RESPONSE" | tail -n1)
+    
+    if [[ "$PERMISSIONS_HTTP_STATUS" == "200" || "$PERMISSIONS_HTTP_STATUS" == "201" ]]; then
+      echo "[SUCCESS] Permissions set for dashboard $DASHBOARD_UID"
+    else
+      echo "[WARNING] Failed to set permissions for dashboard $DASHBOARD_UID. HTTP status: $PERMISSIONS_HTTP_STATUS"
+    fi
+  done
+  
+  echo "[SUCCESS] Dashboard permission restrictions applied."
+  echo "[INFO] Ambassador team can now ONLY access the ambassador dashboard."
 fi
 
 echo "[SUCCESS] Ambassador user setup completed!"

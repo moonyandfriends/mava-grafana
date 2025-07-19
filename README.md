@@ -126,6 +126,21 @@ This script will:
 
 The ambassador user will only see the community-ambassadors dashboard and nothing else.
 
+### Fixing Existing Ambassador Permissions
+
+If you have existing ambassador users who can see all dashboards, run the fix script:
+
+```
+scripts/fix_ambassador_permissions.sh
+```
+
+This script will:
+1. Find the existing Ambassadors team
+2. Set permissions on all dashboards to restrict ambassador access
+3. Ensure only the ambassador dashboard is visible to ambassador users
+
+Ambassador users will need to log out and log back in to see the changes take effect.
+
 ## Troubleshooting
 
 ### Connection Issues
